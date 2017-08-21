@@ -1,0 +1,243 @@
+<%@ page pageEncoding="UTF-8"%>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>创建评选活动</title>
+		<%@include file="../common/commonHead.jsp"%>
+		<link />
+		<script language="javascript" type="text/javascript" src="<%=basePathHeader%>/javascript/My97DatePicker/WdatePicker.js"></script>
+		<script type="text/javascript" src="<%=basePathHeader%>/javascript/master/createComparison.js"></script>
+		<script type="text/javascript">
+			var id = '<%=request.getParameter("id")%>';
+			var provinceId = ${provinceId};
+		</script>
+	</head>
+	<style>
+		table,table tr th, table tr td { border:1px solid #000000;  text-align: center;}
+	</style>
+	<body>
+		<!-- top -->
+		<div class="head">
+			<jsp:include page="../common/top.jsp">
+				<jsp:param value="project" name="flag" />
+			</jsp:include>
+		</div>
+		<!-- left -->
+		<div class="leftNav">
+			<%@include file="../common/projectLeft.jsp"%>
+		</div>
+
+		<div class="content">
+			<div class="place">
+				<span>位置：</span>
+				<ul class="placeul">
+					<li>
+						<a href="#">XXXX</a>
+					</li>
+					<li>
+						<a href="#">XXXX</a>
+					</li>
+					<li>
+						<a href="#">XXXX</a>
+					</li>
+				</ul>
+			</div>
+
+			<div class="formbody">
+				<ul class="seachform">
+					<li>
+						<label>
+							<font style="color: red">*</font>评选活动名称：
+						</label>
+						<input name="" type="text" class="scinput" style="width: 550px;" id="comparisonNameValue" />
+						<a id="comparisonNameErr" style="color: red"></a>
+					</li>
+				</ul>
+				<ul class="seachform">
+					<li>
+						<label>
+							<font style="color: red">*</font>评比活动年度：
+						</label>
+						<div class="vocation">
+	            			<select  class="select2 yearpicker"  id = "comparisonYearValue"  name="comparisonYearValue" ></select>
+	          			</div>
+	          			<a id="comparisonTypeErr" style="color: red"></a>
+					</li>
+				</ul>
+				<ul class="seachform">
+					<li>
+						<label>
+							<font style="color: red">*</font>报名开始日期：
+						</label>
+						<input type="text" name="signupStartDateValue" id="signupStartDateValue"
+							class="Wdate scinput"
+							style="height: 32px; line-height: 32px; border-color: #a7b5bc #ced9df #ced9df #a7b5bc;"
+							onClick="WdatePicker()">
+							<a id="startDateError" style="color: red"></a>
+					</li>
+					<li>
+						<label>
+							<font style="color: red">*</font>报名结束日期：
+						</label>
+						<input type="text" name="signupEndDateValue" id="signupEndDateValue"
+							class="Wdate scinput"
+							style="height: 32px; line-height: 32px; border-color: #a7b5bc #ced9df #ced9df #a7b5bc;"
+							onclick="WdatePicker()" />
+						<a id="endDateError" style="color: red"></a>
+					</li>
+				</ul>
+				<ul class="seachform">
+					<li>
+						<label>
+							<font style="color: red">*</font>审核开始日期：
+						</label>
+						<input type="text" name="auditStartDateValue" id="auditStartDateValue"
+							class="Wdate scinput"
+							style="height: 32px; line-height: 32px; border-color: #a7b5bc #ced9df #ced9df #a7b5bc;"
+							onClick="WdatePicker()">
+							<a id="startDateError" style="color: red"></a>
+					</li>
+					<li>
+						<label>
+							<font style="color: red">*</font>审核结束日期：
+						</label>
+						<input type="text" name="auditEndDateValue" id="auditEndDateValue"
+							class="Wdate scinput"
+							style="height: 32px; line-height: 32px; border-color: #a7b5bc #ced9df #ced9df #a7b5bc;"
+							onclick="WdatePicker()" />
+						<a id="endDateError" style="color: red"></a>
+					</li>
+				</ul>
+				<ul class="seachform">
+					<li>
+						<label>
+							<font style="color: red">*</font>评选活动类型：
+						</label>
+						<div class="vocation">
+	            			<select  class="select2"  id = "comparisonTypeValue"  name="comparisonTypeValue" ></select>
+	          			</div>
+	          			<a id="comparisonTypeErr" style="color: red"></a>
+					</li>
+					<li>
+						<label>
+							<font style="color: red">*</font>结果公布时间：
+						</label>
+						<input type="text" name="publishDateValue" id="publishDateValue"
+							class="Wdate scinput"
+							style="height: 32px; line-height: 32px; border-color: #a7b5bc #ced9df #ced9df #a7b5bc;"
+							onClick="WdatePicker()">
+							<a id="startDateError" style="color: red"></a>
+					</li>
+				</ul>
+				<ul class="seachform">
+					<li>
+						<label>
+							<font style="color: red">*</font>单位参评额度：
+						</label>
+						<div class="vocation">
+	            			<input name="comparisonNumValue" type="text" class="scinput" id="comparisonNumValue" />
+	          			</div>
+	          			<a id="comparisonNumErr" style="color: red"></a>
+					</li>
+					<li>
+						<label>
+							<font style="color: red">*</font>参评单位范围：
+						</label>
+						<div class="vocation">
+					          <input name="schoolNames" class="scinput" readonly="readonly" />
+					          <input name="input2" type="button" value="选 择" class="btnXuan" onclick="showS();"/>
+	          			</div>
+	          			<a id="comparisonNumErr" style="color: red"></a>
+					</li>
+				</ul>
+				<ul class="seachform" style="padding-bottom: 10px; height: 100%">
+					<li>
+						<label>
+							备注：
+						</label>
+						<textarea  cols="" rows=""
+							style="width: 550px; border: #eee 1px solid; height: 100px; border-color: #a7b5bc #ced9df #ced9df #a7b5bc; -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; margin-left: 50px;"
+							id="memoValue"></textarea>
+					</li>
+				</ul>
+				<div style="margin-left: 120px">
+				<form action="" id="proForm" enctype="multipart/form-data" method="post">
+					<input type="hidden" name = "comparisonName" />	        
+					<input type="hidden" name = "comparisonTypeId"/>	      
+					<input type="hidden" name = "comparisonYear"/>	        
+					<input type="hidden" name = "comparisonTypeName"/>	        
+					<input type="hidden" name = "comparisonPlanNum"/>	        
+					<input type="hidden" name = "signupStartDate"/>	       
+					<input type="hidden" name = "signupEndDate"/>	       
+					<input type="hidden" name = "auditStartDate"/>	       
+					<input type="hidden" name = "auditEndDate"/>	       
+					<input type="hidden" name = "publishDate"/>	       
+					<input type="hidden" name = "memo"/>	  
+					<input type="hidden" name = "id"/>	    
+					<input type="hidden" name = "schools"/>	       
+					<table border="0" cellspacing="0" cellpadding="0" style="line-height:40px;width: 500px">
+		        		<tbody id="files">
+							<tr>
+								<td width="84" colspan="2" ><b>上传附件：</b>【支持上传图片，文本文件，OFFICE 文档，压缩包等】&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:addMore()">添加</a></td>
+							</tr>
+		        		</tbody>
+		      		</table>
+	      		</form>
+	      		
+	      		<ul class="seachform" style="padding-bottom: 10px; height: 100%; margin-top: 10px">
+					<li>
+						<a href="#" class="dian3" onclick="saveInfo()" id="save">保 存</a>
+					</li>
+					<li>
+						<a href="#" class="dian3" onclick="updateInfo()" id="update" style="display: none;">修 改</a>
+					</li>
+					<li>
+						<a href="#" class="dian3" onclick="javascript:window.history.back();">取 消</a>
+					</li>
+				</ul>
+	      		</div>
+			</div>
+		</div>
+		
+		<!-- 参评单位 -->    
+		<div class="tip" id="tip" style="display:none; width: 600px; top:100px; height: 600px;">
+	    	<div class="tiptop"><span>参评单位</span><a href="javascript:hideMe();"></a></div>
+	    	<div style="position:relative;margin-left: 20px;width: 90%;margin-top: 2%;float: left;">
+		    	省级：
+			    <div style="width:100%;margin-top: 10p;background-color:#E5E5E5;x">
+		        	<div id="province" style="text-align: left;">
+		      		</div>
+		        </div>
+	 		</div>
+	      	<div style="position:relative;margin-top: 10px;margin-left: 20px;width: 90%;float: left;">
+	      		市级：
+		        <div style="width:100%;margin-top: 10px;background-color:#E5E5E5;">
+		        	<div id="city" style="text-align: left;">
+		      		</div>
+		        </div>
+	      	</div>
+	      	<div style="position: relative;margin-top: 10px;margin-left: 20px;width: 90%;float: left;">
+	      		区级：
+		        <div style="width:100%;margin-top: 10px;background-color:#E5E5E5;">
+		        	<div id="district" style="text-align: left;">
+		      		</div>
+		        </div>
+	      	</div>
+	      	<div style="position: relative;margin-top: 10px;margin-left: 20px;width: 90%;float: left;" >
+		      	学校：
+		      	<table style="width:100%;margin-top: 10px;background-color:#E5E5E5;">
+		        	<tbody id="school" style="text-align: left;">
+		      		</tbody>
+		        </table>
+			</div>
+			<div style="position: relative;margin-top: 10px;margin-left: 40%;width: 90%;float: left;" >
+		      	<table style="width:100%;margin-top: 20px">
+		        	<input class="sure" type="button" onclick="setSchool()" value="确定"/>
+		        </table>
+			</div>
+  		</div>
+	</body>
+</html>
+

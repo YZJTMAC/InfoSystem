@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_project" >
+
+	<!-- 项目汇总统计列表 chenlei 按项目统计-->
+	<select id="selectProjectList"  parameterClass="java.util.Map" resultClass="project.system.pojo.ProjectStatisticsActivty">
+		select p.project_name as projectName,p.year,p.class_period as projectClassPeriod,
+		p.plan_num as planNum,
+		count(c.project_id) as actualNum ,
+		sum(if(c.teacher_train_status_id in (1,2,3),1,0)) as yesScoreNum,
+        sum(if(c.teacher_train_status_id =0,1,0)) as noScoreNum, 
+        sum(if(c.teacher_train_status_id is null ,1,0)) as waitScoreNum,
+        round(sum(if(c.teacher_train_status_id in (1,2,3),1,0))/count(p.id),2) as percentOfPass
+        from edu_project p  
+        LEFT JOIN edu_model m on m.id = p.edu_model_type
+        LEFT JOIN edu_project_comment c on p.id = c.project_id
+        Left join edu_user u on u.id = c.teacher_id 
+        where  1=1  
+        <isNotEmpty prepend = "and" property="year">
+              p.year = #year#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="eduModelType">
+               m.id = #eduModelType#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="projectScope">
+               p.project_scope_id = #projectScope#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="areaId">
+            (u.user_province_id = #areaId# or u.user_city_id=#areaId# or u.user_district_id = #areaId# OR u.school_id = #areaId#) 
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="projectName">
+               p.project_name like '%$projectName$%'
+        </isNotEmpty>
+        GROUP BY p.id
+        limit #startIndex#, #endIndex#
+	</select>
+
+
+	<!-- 项目汇总统计总数 chenlei 按项目统计-->
+	<select id="selectProjectCount" parameterClass="java.util.Map" resultClass="int">
+		select count(distinct p.id)
+        from edu_project p  
+        LEFT JOIN edu_model m on m.id = p.edu_model_type
+        LEFT JOIN edu_project_comment c on p.id = c.project_id
+        Left join edu_user u on u.id = c.teacher_id 
+
+        where  1=1  
+        <isNotEmpty prepend = "and" property="year">
+              p.year = #year#
+        </isNotEmpty>
+         <isNotEmpty prepend="and" property="eduModelType">
+               m.id = #eduModelType#
+        </isNotEmpty>
+         <isNotEmpty prepend="and" property="projectScope">
+               p.project_scope_id = #projectScope#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="areaId">
+            (u.user_province_id = #areaId# or u.user_city_id=#areaId# or u.user_district_id = #areaId# OR u.school_id = #areaId#) 
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="projectName">
+               p.project_name like '%$projectName$%'
+        </isNotEmpty>
+	</select> 
+	
+	<!-- 继教模板培训信息统计 list -->
+	<select id="selectModelStatisticsList" parameterClass="java.util.Map" resultClass="project.system.pojo.ProjectStatisticsActivty">
+	select m.model_name as modelName,
+		count(c.project_id) as actualNum ,
+		sum(if(c.teacher_train_status_id in (1,2,3),1,0)) as yesScoreNum,
+        sum(if(c.teacher_train_status_id =0,1,0)) as noScoreNum, 
+        sum(if(c.teacher_train_status_id is null ,1,0)) as waitScoreNum,
+        round(sum(if(c.teacher_train_status_id in (1,2,3),1,0))/count(p.id),2) as percentOfPass
+        from edu_project p  
+        LEFT JOIN edu_model m on m.id = p.edu_model_type and m.status = 1
+        LEFT JOIN edu_project_comment c on p.id = c.project_id
+        Left join edu_user u on u.id = c.teacher_id 
+        where  1=1 
+        <isNotEmpty prepend="and" property="year">
+        p.year = #year#        
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="modelProjectScope">
+        p.project_scope_id = #modelProjectScope#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="areaId">
+         (u.user_province_id = #areaId# or u.user_city_id=#areaId# or u.user_district_id = #areaId# OR u.school_id = #areaId#)
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="modelId">
+        m.id = #modelId#
+        </isNotEmpty>
+        group by m.id
+        limit #startIndex#, #endIndex#
+	</select>
+	
+	<!-- 继教模板培训信息统计  count-->
+	<select id="selectModelStatisticsCount" parameterClass="java.util.Map" resultClass="int">
+	select count(distinct m.id)
+        from edu_project p  
+        LEFT JOIN edu_model m on m.id = p.edu_model_type and m.status = 1
+        LEFT JOIN edu_project_comment c on p.id = c.project_id
+        Left join edu_user u on u.id = c.teacher_id 
+        where  1=1 
+        <isNotEmpty prepend="and" property="year">
+        p.year = #year#        
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="modelProjectScope">
+        p.project_scope_id = #modelProjectScope#
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="areaId">
+         (u.user_province_id = #areaId# or u.user_city_id=#areaId# or u.user_district_id = #areaId# OR u.school_id = #areaId#)
+        </isNotEmpty>
+        <isNotEmpty prepend="and" property="modelId">
+        m.id = #modelId#
+        </isNotEmpty>
+	</select>
+	
+	<!-- 按项目性质统计-->
+	<select id = "selectAreaStatisticsList" parameterClass="java.util.Map" resultClass="project.system.pojo.ProjectStatisticsActivty">
+		select p.year as year,a.id as areaId,a.name as areaName,a.up_lv_code as upLvCode,
+		count(1) as actualNum,
+		sum(if(c.teacher_train_status_id in (1,2,3),1,0)) as yesScoreNum,
+		sum(if(c.teacher_train_status_id =0,1,0)) as noScoreNum,
+		sum(if(c.teacher_train_status_id is null,1,0)) as waitScoreNum,
+		(sum(if(c.teacher_train_status_id in (1,2,3),1,0))/count(1)) as percentOfPass
+		from edu_project_comment c 
+		LEFT JOIN edu_user u on c.teacher_id = u.id
+		LEFT JOIN edu_project p on p.id = c.project_id 
+		left JOIN edu_sys_area a on a.status =1 and (a.id = u.user_city_id OR a.id = u.user_province_id OR a.id = u.user_district_id)
+		where 1=1 
+		<isNotEmpty prepend="and" property="year">
+		p.year = #year#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="projectScopeId">
+		 p.project_scope_id = #projectScopeId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="areaId">
+		(a.id = #areaId# or a.up_lv_code = #areaId#)
+		</isNotEmpty>
+		GROUP BY a.id
+	</select>
+	
+</sqlMap>

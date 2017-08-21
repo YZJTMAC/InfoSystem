@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_message" >
+  <resultMap id="abatorgenerated_EduMessageResult" class="project.message.pojo.EduMessage" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="DATE" />
+    <result column="send_user_id" property="sendUserId" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="send_time" property="sendTime" jdbcType="DATE" />
+    <result column="send_user_name" property="sendUserName" jdbcType="VARCHAR" />
+     <result column="file_url" property="fileUrl" jdbcType="VARCHAR" />
+     <result column="file_name" property="fileName" jdbcType="VARCHAR" />
+     <result column="message_type" property="messageType" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <insert id="sendMessage" parameterClass="java.util.Map">
+	  INSERT INTO edu_message (
+	  	id,
+		content,
+		create_by,
+		create_date,
+		send_user_id,
+		title,
+		send_time,
+		send_user_name,
+		file_name,
+		file_url,
+		message_type
+		)
+		VALUES
+			(#id#,#content#,#createBy#,
+			NOW(),#sendUserId#,#title#,NOW(),
+			#sendUserName#,#fileName#,#fileUrl#,#messageType#)
+		<selectKey resultClass="Integer" keyProperty="id">
+			SELECT
+			last_insert_id() as id;    
+        </selectKey>
+  </insert>	
+  
+  <!-- 添加接收者 -->
+  <insert id="insertMessageUsers" parameterClass="java.util.Map">
+	  INSERT INTO edu_message_users (
+		message_id,
+		status,
+		receive_user_id,
+		receive_user_name
+		)
+		VALUES
+			(#messageId#,
+			#status#,
+			#receiveUserId#,
+			#receiveUserName#)
+  </insert>	
+  
+  <!-- 批量添加消息 -->
+  <insert id="batchSendMessage" parameterClass="java.util.Map">
+	  INSERT INTO edu_message_users (message_id,`status`,receive_user_id, receive_user_name)
+		VALUES 
+		<iterate conjunction ="," property="messageList">  
+            (#messageList[].id#,
+            #messageList[].status#,
+            #messageList[].receiveUserId#, 
+            #messageList[].receiveUserName#)
+    	</iterate>
+  </insert>
+  
+  <!-- 总未读数量 -->
+  <select id="selectMessageCountsByStatus" parameterClass="java.util.Map" resultClass="int">
+    select count(1)
+   	from edu_message_users
+	WHERE 1=1 
+	<isNotEmpty prepend="AND" property="receiveId">
+		receive_user_id = #receiveId# 
+	</isNotEmpty>
+    AND status = #status#
+  </select>
+
+  <!-- 省/市/区/校未读数量 -->
+  <select id="selectNoReadCountByReceiveUserId" parameterClass="java.util.Map" resultClass="project.message.pojo.EduMessage">
+   SELECT m.message_type AS messageType, COUNT(u.id) AS num 
+    FROM edu_message m
+	INNER JOIN edu_message_users u ON m.id=u.message_id
+    WHERE 1=1
+    <isNotEmpty prepend="AND" property="receiveId">
+		u.receive_user_id = #receiveId# 
+	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="status">
+		u.status = #status# 
+	</isNotEmpty>
+    GROUP BY m.message_type
+  </select>
+
+  <!-- 收到省/市/区/校的消息列表count -->
+  <select id="selectMessageCountByReceiveUserId" parameterClass="java.util.Map" resultClass="int">
+    SELECT count(1)
+	FROM edu_message m
+	INNER JOIN edu_message_users u ON m.id=u.message_id
+	WHERE 1=1 
+	<isNotEmpty prepend="AND" property="receiveId">
+		u.receive_user_id = #receiveId# 
+	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="messageType">
+		m.message_type = #messageType# 
+	</isNotEmpty>
+  </select>
+  
+  <!-- 收到省/市/区/校的消息列表 -->
+  <select id="selectMessageByReceiveUserId" parameterClass="java.util.Map" resultClass="project.message.pojo.EduMessage">
+    SELECT
+		m.id AS id,
+		m.content AS content,
+		m.send_user_id AS sendUserId,
+		m.title AS title,
+		m.send_time AS sendTime,
+		m.send_user_name AS sendUserName,
+		m.file_url AS fileUrl,
+		m.message_type AS messageType,
+		u.id AS messageUserId,
+		u.STATUS AS STATUS,
+		u.receive_user_id receiveUserId,
+		u.receive_user_name AS receiveUserName
+	FROM
+		edu_message m 
+	INNER JOIN edu_message_users u ON m.id=u.message_id
+	WHERE 1=1 
+	<isNotEmpty prepend="AND" property="receiveId">
+		u.receive_user_id = #receiveId# 
+	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="messageType">
+		m.message_type = #messageType# 
+	</isNotEmpty>
+	order by u.status asc,m.create_date desc
+	limit #startIndex#, #endIndex# 
+  </select>
+  
+  <!-- 我创建的消息列表count -->
+  <select id="selectCreateMessageCount" parameterClass="java.util.Map" resultClass="int">
+    SELECT count(1)
+	FROM edu_message
+	WHERE send_user_id=#sendUserId#
+  </select>
+  
+  <!-- 我创建的消息列表 -->
+  <select id="selectCreateMessageList" parameterClass="java.util.Map" resultMap="abatorgenerated_EduMessageResult">
+    SELECT * FROM edu_message 
+	WHERE send_user_id=#sendUserId#
+	ORDER BY create_date desc
+	LIMIT #startIndex#, #endIndex# 
+  </select>
+  
+  <!-- hanlongfe添加的审核不通过 -->
+   <!-- <select id="selectUserLoginAccountShenghe" parameterClass="java.util.Map" resultClass="project.message.pojo.EduMessage">
+    select
+       DISTINCT tz.project_id, 
+ tz.audit_memo AS auditMemo,  
+ p.project_name AS projectName,  
+ tz.update_by AS UpdateBy,
+ tz.create_date AS createDate,  
+ tz.status AS status 
+ FROM  
+	edu_message t1 
+	LEFT JOIN edu_user t2 ON t2.id = t1.receive_user_id
+	LEFT JOIN edu_project_comment tz ON tz.teacher_id = t1.receive_user_id
+	LEFT JOIN edu_project p ON  p.id = tz.project_id
+WHERE 1=1 
+	<isNotEmpty prepend="AND" property="userLoginAccount">
+		t1.receive_user_name = #userLoginAccount# 
+	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="receiveId">
+		t1.receive_user_id = #receiveId# 
+	</isNotEmpty>
+AND tz.status =#status# 
+order by tz.project_id desc
+  </select> -->
+  
+  <!-- 审核不通过消息总条数 -->
+ <!--  <select id="selectMessageCountsByshenheStatus" parameterClass="java.util.Map" resultClass="int">
+    select
+    count(DISTINCT  tz.id )
+   	from edu_message t1
+   	LEFT JOIN edu_project_comment tz ON tz.teacher_id = t1.receive_user_id
+	WHERE 1=1 
+	<isNotEmpty prepend="AND" property="userLoginAccount">
+		t1.receive_user_name = #userLoginAccount# 
+	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="receiveId">
+		tz.teacher_id = #receiveId# 
+	</isNotEmpty>
+    AND tz.status = #status#
+  </select> -->
+  
+  
+   <delete id="deleteMessage" parameterClass="java.util.HashMap" >
+		delete from edu_message where id=#messageId#
+   </delete>
+ 
+   <delete id="deleteMessageUsers" parameterClass="java.util.HashMap" >
+		delete from edu_message_users where 1=1
+		<isNotEmpty prepend="AND" property="messageId">
+			message_id=#messageId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="id">
+			id=#id#
+		</isNotEmpty>
+   </delete>
+	 
+ 	<!-- 修改消息状态 -->
+	<update id="readMessage" parameterClass="java.util.HashMap">
+		UPDATE edu_message_users
+		SET status = #status#,
+		update_by = #updateBy#,
+		update_date = now()
+		WHERE id=#id#
+	</update>
+ 
+ 	<!-- 根据Id获取消息 -->
+ 	<select id="findMessageById" parameterClass="Integer" resultMap="abatorgenerated_EduMessageResult">
+    	select * from edu_message where id=#id#
+	</select>
+</sqlMap>

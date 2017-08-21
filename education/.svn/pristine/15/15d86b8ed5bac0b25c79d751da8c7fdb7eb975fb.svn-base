@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_response_question_question">
+  <resultMap id="EduResponseQuestionResultMap" class="project.edupm.projectmanage.pojo.EduResponseQuestion" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="answer" property="answer" jdbcType="VARCHAR" />
+    <result column="response_id" property="responseId" jdbcType="INTEGER" />
+    <result column="question_id" property="questionId" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <select id="eduResponseQuestion_selectByPrimaryKey" resultMap="EduResponseQuestionResultMap"
+		parameterClass="int">
+		select
+		id,
+		create_date,
+		username,
+		answer,
+		response_id,
+		question_id
+		from edu_response_question
+		where id =
+		#id:INTEGER#
+	</select>
+	<insert id="eduResponseQuestion_insert" parameterClass="project.edupm.projectmanage.pojo.EduResponseQuestion">
+		insert into edu_response_question
+		(create_date,
+		username,
+		answer,
+		response_id,
+		question_id)
+		values (
+		#createDate:DATE#,
+		#username:VARCHAR#,
+		#answer:VARCHAR#,
+		#responseId:INTEGER#,
+		#questionId:INTEGER#)
+		<selectKey resultClass="int" keyProperty="id">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+
+	</insert>
+	<update id="eduResponseQuestion_updateByPrimaryKeySelective"
+		parameterClass="project.edupm.projectmanage.pojo.EduResponseQuestion">
+		update edu_response_question
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="createDate">
+				create_date
+				=#createDate:DATE#
+			</isNotNull>
+			<isNotNull prepend="," property="username">
+				username
+				=#username:VARCHAR#
+			</isNotNull>
+			<isNotNull prepend="," property="answer">
+				answer
+				=#answer:VARCHAR#
+			</isNotNull>
+			<isNotNull prepend="," property="responseId">
+				response_id
+				=#responseId:INTEGER#
+			</isNotNull>
+			<isNotNull prepend="," property="questionId">
+				question_id
+				=#questionId:INTEGER#
+			</isNotNull>
+		</dynamic>
+		where id = #id:INTEGER#
+	</update>
+
+
+
+	<select id="mgr_selectEduResponseQuestionListByCondition" parameterClass="java.util.Map"
+		resultClass="project.edupm.projectmanage.pojo.EduResponseQuestion">
+		SELECT
+	    id,
+		create_date as createDate,
+		username,
+		answer,
+		response_id as responseId,
+		question_id as questionId
+		from edu_response_question
+		WHERE 1=1
+		<isNotNull prepend="and" property="questionId">
+			question_id = #questionId#
+		</isNotNull>
+		<isNotNull prepend="and" property="responseId">
+			response_id = #responseId#
+		</isNotNull>
+		<isNotNull prepend="and" property="username">
+			username = #username#
+		</isNotNull>
+		order by create_date DESC limit #startIndex#,#endIndex#
+	</select>
+	
+	<!-- 调查问卷结果分析 每个question选项回答数量 -->
+	<select id="count_mgr_selectEduResponseQuestionListByCondition"
+		parameterClass="java.util.Map" resultClass="int">
+		SELECT
+		count(1)
+		FROM
+		edu_response_question
+		WHERE 1=1
+		<isNotNull prepend="and" property="questionId">
+			question_id = #questionId#
+		</isNotNull>
+		<isNotNull prepend="and" property="responseId">
+			response_id = #responseId#
+		</isNotNull>
+		<isNotNull prepend="and" property="username">
+			username = #username#
+		</isNotNull>
+		<isNotNull prepend="and" property="answer">
+			answer like	'%$answer$%' 
+		</isNotNull>
+	</select>
+
+
+  
+</sqlMap>

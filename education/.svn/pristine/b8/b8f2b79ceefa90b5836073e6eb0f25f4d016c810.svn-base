@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMapConfig PUBLIC "-//iBATIS.com//DTD SQL Map Config 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-config-2.dtd">
+
+<sqlMapConfig>
+	<sqlMap resource="config/ibatis/dbmaps/edu_project_teacher_activity_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_sys_dictionary_SqlMap.xml"/>
+	
+	<sqlMap resource="config/ibatis/dbmaps/edu_project_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_project_train_target_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_project_class_SqlMap.xml"/>
+
+	<!--教师基本信息 -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_teacher_old_school_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_audit_SqlMap.xml"/>
+	
+	<!-- 消息 -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_message_SqlMap.xml"/>
+	
+	<!-- add by dengguo  -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_teacher_activity_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_teacher_basic_info_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_teacher_job_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_teacher_education_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_target_by_year_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_project_comment_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_comment_activety_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_school_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_diploma_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_jobtransfer_history_SqlMap.xml"/>
+	
+	<!-- 机构信息 -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_organization_SqlMap.xml"/>
+	<!-- 总结 -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_project_summary_SqlMap.xml"/>
+	
+	<sqlMap resource="config/ibatis/dbmaps/edu_model_SqlMap.xml"/>
+	
+	<!-- 机构承培项目 -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_organization_project_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_organization_project_activity_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_user_SqlMap.xml"/>
+	
+	<!-- 系统管理-地区管理 -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_sys_area_SqlMap.xml"/>
+	<!-- 系统管理-角色权限 -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_sys_role_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_sys_function_SqlMap.xml"/>
+	<!-- 系统管理-功能设置 -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_sys_setup_SqlMap.xml"/>
+	<!-- 系统管理-系统设置 -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_sys_platform_setup_SqlMap.xml"/>
+	
+	<!-- 项目汇总统计 -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_project_statistics_SqlMap.xml"/>
+	
+	<!-- 继教考核查询 -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_teacher_assess_SqlMap.xml"/>
+	<!-- 导入教师历史记录 -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_teacher_import_history_SqlMap.xml"/>
+	
+	<!-- 用户根据邮箱找回密码记录表 -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_user_forgotpassword_SqlMap.xml"/>
+	<!-- 调查问卷-->
+	<sqlMap resource="config/ibatis/dbmaps/edu_paper_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_response_question_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_response_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_question_options_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_question_SqlMap.xml"/>
+	<!-- 项目审核 -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_project_audit_SqlMap.xml"/>
+	<!-- 按地区分配名额 -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_project_allocate_by_area_SqlMap.xml"/>
+	<!-- 继教校本培训项目 -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_project_notrain_SqlMap.xml"/>
+	
+	
+	<sqlMap resource="config/ibatis/dbmaps/edu_project_notrain_comment_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_statistic_model_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_statistic_year_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_sys_signet_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_project_process_SqlMap.xml"/>
+	
+	
+	<sqlMap resource="config/ibatis/dbmaps/edu_project_training_materials.xml"/>
+	
+	<!-- 文件上传 liuyiyou-->
+	<sqlMap resource="config/ibatis/dbmaps/edu_file_SqlMap.xml"/>
+	
+	<!-- 通知 liuyiyou -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_notice_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_teacher_nlts_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_teacher_train_history_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_sys_log_SqlMap.xml"/>
+	<!-- 教师学分信息汇总 -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_teacher_score_SqlMap.xml"/>
+	<!-- 2017-05-08 zhudi 证书 -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_certificate_SqlMap.xml"/>
+	<sqlMap resource="config/ibatis/dbmaps/edu_creditlend_SqlMap.xml"/>
+	<!-- 2017-07-13 zhudi 专家和教师评选 -->
+	<sqlMap resource="config/ibatis/dbmaps/edu_master_comparison_SqlMap.xml"/>
+</sqlMapConfig>

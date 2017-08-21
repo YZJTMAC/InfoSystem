@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" 
+	xmlns="http://java.sun.com/xml/ns/javaee" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+	http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+	
+	<context-param>
+     	<param-name>webAppRootKey</param-name>
+     	<param-value>AVerPortalTest</param-value>
+ 	</context-param>
+ 
+ 
+  <servlet>
+		<servlet-name>178xf</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+        	<param-name>contextConfigLocation</param-name>
+        	<param-value>/WEB-INF/178xf-servlet.xml</param-value>
+    	</init-param>
+    	<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>178xf</servlet-name>
+		<url-pattern>*.htm</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>178xf</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+	
+	<servlet-mapping>
+		<servlet-name>178xf</servlet-name>
+		<url-pattern>*.json</url-pattern>
+	</servlet-mapping>
+
+	<filter>
+		<filter-name>encodingFilter</filter-name>
+		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>*.htm</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>*.do</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>encodingFilter</filter-name>
+		<url-pattern>*.json</url-pattern>
+	</filter-mapping>
+	
+     <!-- 发现定时任务有时候会同时执行两次，第一次：web容器启动的时候，读取applicationContext.xml文件时，会加载一次。
+	第二次：Spring本身会加载applicationContext.xml一次。把定时器的配置单独写成一个配置文件，在web容器启动的时候只加载一次。
+	web.xml中context-param加入这个单独的文件	  -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/classes/config/spring/applicationContext*.xml,
+		/WEB-INF/classes/config/spring/scheduled.xml</param-value>
+	</context-param>	
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	<!-- 
+	<servlet>
+		<servlet-name>dwr</servlet-name>
+		<servlet-class>org.directwebremoting.spring.DwrSpringServlet</servlet-class>
+		<init-param>
+			<param-name>debug</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<init-param>  
+            <param-name>crossDomainSessionSecurity</param-name>  
+            <param-value>false</param-value>  
+        </init-param>  
+        <init-param>  
+            <param-name>allowScriptTagRemoting</param-name>  
+            <param-value>true</param-value>  
+        </init-param>  
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>dwr</servlet-name>
+		<url-pattern>/script/*</url-pattern>
+	</servlet-mapping>
+	-->
+	<!-- 
+	<servlet>
+		<servlet-name>jcaptcha</servlet-name>
+		<servlet-class>com.octo.captcha.module.servlet.image.SimpleImageCaptchaServlet</servlet-class>
+    </servlet>
+	<servlet-mapping>
+        <servlet-name>jcaptcha</servlet-name>
+        <url-pattern>/jcaptcha.jpg</url-pattern>
+	</servlet-mapping>
+	-->
+
+	<session-config>
+		<session-timeout>30</session-timeout>
+	</session-config>
+	
+	<!-- 
+	<error-page> 
+        <error-code>500</error-code> 
+        <location>/error/servererror.htm</location> 
+  	</error-page>
+  	
+  	<error-page> 
+        <error-code>404</error-code> 
+        <location>/error/pagenotfound.htm</location> 
+  	</error-page>
+    -->
+    <context-param>   
+        <param-name>log4jConfigLocation</param-name>   
+        <param-value>/WEB-INF/classes/log4j.xml</param-value>   
+   </context-param>
+   <context-param>  
+      <param-name>log4jRefreshInterval</param-name>  
+      <param-value>6000</param-value>  
+   </context-param>   
+   <listener>  
+      <listener-class>  
+        org.springframework.web.util.Log4jConfigListener  
+   		</listener-class>
+   </listener>  
+  
+  <listener>
+		<listener-class>framelib.common.SimpleRequestListener</listener-class>
+	</listener>
+  
+  	<error-page> 
+        <error-code>500</error-code> 
+        <location>/WEB-INF/jsps/error/500.jsp</location> 
+  	</error-page>
+  	
+	<error-page>
+	<error-code>404</error-code>
+	<location>/WEB-INF/jsps/error/404.jsp</location>
+	</error-page>
+    
+	<welcome-file-list>
+		<!--<welcome-file>/WEB-INF/jsps/person/login.jsp</welcome-file>
+	-->
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	
+	
+	<mime-mapping> 
+ 		<extension>xls</extension> 
+ 		<mime-type>application/msexcel</mime-type> 
+ 	</mime-mapping> 
+	
+	<!-- 更新 Session
+	<filter>
+		<filter-name>AuthenticationFilter</filter-name>
+		<filter-class>com.baoogu.filter.AuthenticationFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>AuthenticationFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping> -->
+
+	<!-- 生成验证码 -->
+	<servlet>
+		<servlet-name>randServlet</servlet-name>
+		<servlet-class>project.util.RandServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>randServlet</servlet-name>
+		<url-pattern>/randServlet</url-pattern>
+	</servlet-mapping>
+	
+</web-app>

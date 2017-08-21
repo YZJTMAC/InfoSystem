@@ -1,0 +1,254 @@
+var statusMap={};
+$(function(){
+	initDictionary("comparison_status",statusMap);
+	queryList();
+	initSelectClass();
+})
+
+function initDictionary(dictionaryType, map){
+	var url = pathHeader + "/org/queryDictionaryByType.do";
+	$.ajax({
+		url:url,
+		data:{
+			dictionaryType:dictionaryType,
+			status:1
+		},
+		type:"post",
+		async:false,
+		success:function(data){
+			if(data.rows.length > 0){
+				$.each(data.rows, function(key, value) {
+					map[value.dictionaryId] = value.dictionaryName;
+				});
+			}
+		},
+		error:function(){
+			
+		}
+	});
+}
+
+/**
+ * 跳转添加新的评比活动
+ */
+function toAdd(){
+	var url =  pathHeader + "/master/toCreateComparison.htm";
+	window.location.href=url;
+}
+/**
+ * 跳转修改评比活动
+ */
+function updateObj(id){
+	var url =  pathHeader + "/master/toCreateComparison.htm?id="+id+"";
+	window.location.href=url;
+}
+/**
+ * 专家账号管理
+ */
+function createMaster(id){
+	var url =  pathHeader + "/master/toMasterManage.htm?id="+id+"";
+	window.location.href=url;
+}
+
+/**
+ * 专家库
+ */
+function toMasterDatabase(){
+	var url =  pathHeader + "/master/toMasterDatabase.htm";
+	window.location.href=url;
+
+}
+/**
+ * 跳转删除评比活动
+ */
+function deleteObj(id){
+	jQuery.confirmWindow(
+	"提示",
+	"确认删除？",
+	function() {
+		var url = pathHeader + "/master/deleteComparison.do";
+		$.ajax({
+			url:url,
+			type:"post",
+			async:true,
+			data:{
+				id:id
+			},
+			success:function(data){
+				if(data.success){
+					queryList();
+				}
+				jQuery.generalAlert(data.message);	
+			},
+			error:function(){
+				jQuery.generalAlert("删除错误");	
+			}
+		});
+	});
+}
+/**
+ * 设置活动状态
+ * @param id
+ */
+function setComparisonStatus(id,status){
+	var url = pathHeader + "/master/setComparisonStatus.do";
+	$.ajax({
+		url:url,
+		type:"post",
+		async:true,
+		data:{
+			id:id,
+			status:status,
+			roleId:40
+		},
+		success:function(data){
+			if(data.success){
+				queryList();
+			}
+			jQuery.generalAlert(data.message);	
+		},
+		error:function(){
+		}
+	});
+}
+
+/**
+ * 查询列表
+ */
+function queryList(){
+	var url = pathHeader + "/master/queryComparison.do";
+	$('#queryList').html("");
+	$.ajax({
+		url:url,
+		type:"post",
+		async:true,
+		data:{
+		},
+		beforeSend: function(){
+			$('#queryList').html("<tr><td align='center' colspan='14'><img src='"+pathHeader+"/images/loding.gif'  alt='加载中'/></td></tr>");
+		},
+		success:function(data){
+			var rows = data.rows;
+			var totalNum = data.count;
+			if(rows.length > 0){
+				var gridHtml = "";
+				$.each(rows, function(index,element) {
+					gridHtml += getObjHtml(element);
+				});
+				$('#queryList').html(gridHtml);
+				initSelectClass();
+			}else{
+				$('#queryList').html("<tr><td colspan='14'>无查询记录</td></tr>");
+			}
+		},
+		error:function(){
+			$('#queryList').html("<tr><td colspan='14'>无查询记录</td></tr>");
+		}
+	});
+}
+
+
+
+function getObjHtml(obj){
+	var gridHtml = "<tr>";
+		gridHtml += "<td>"+obj.comparisonName+"</td>";
+		gridHtml += "<td>"+obj.comparisonTypeName+"</td>";
+		gridHtml += "<td>"+obj.comparisonYear+"</td>";
+		gridHtml += "<td>"+obj.comparisonPlanNum+"</td>";
+		gridHtml += "<td>"+obj.signupStartDate+"</td>";
+		gridHtml += "<td>"+obj.signupEndDate+"</td>";
+		gridHtml += "<td>"+obj.auditStartDate+"</td>";
+		gridHtml += "<td>"+obj.auditEndDate+"</td>";
+		gridHtml += "<td>"+obj.publishDate+"</td>";
+		gridHtml += "<td>"+ statusMap[obj.status] +"</td>";
+		gridHtml += "<td><a href='###' class='huibtn_a' onclick='uploadFile(\"" + obj.id + "\");'>附 件</a></td>";
+		gridHtml += "<td>"+getOperate(obj.id,obj.status)+"</td>";
+		gridHtml+= "</tr>";
+	return gridHtml;
+}
+
+function getOperate(id,status){
+	var op = "";
+	op += "<a href='###' class='huibtn_a' onclick='createMaster(\"" + id + "\");'>专 家</a>&nbsp;";
+	if(status == 0){//创建完未开始
+		op += "<a href='###' class='huibtn_a' onclick='updateObj(\"" + id + "\");'>编 辑</a>&nbsp;";
+		op += "<a href='###' class='huibtn_a' onclick='deleteObj(\"" + id + "\");'>删 除</a>&nbsp;";
+		op += "<a href='###' class='huibtn_a' onclick='setComparisonStatus(\"" + id + "\",1);'>启 动</a>&nbsp;";
+	}else if(status == 1){//活动开始
+		op += "<a href='###' class='huibtn_a' onclick='setComparisonStatus(\"" + id + "\",2);'>结 束</a>&nbsp;";
+	}else{
+		
+	}
+	
+	return op;
+}
+
+/**
+ * 查询附件
+ */
+function uploadFile(isId) {
+	$("#addFile").show();
+	var url = pathHeader + "/fileupload/viewFiles.do?time=" + (new Date()).getTime();
+	$(".addMore").html('');
+	$('#projectId').val(isId);
+	$.ajax({
+			cache: false,
+			dataType : 'json',
+			url : url,
+			async:"true",
+			type : 'post',
+			data : {
+				projectId : isId,
+				type:'comparison'
+			},
+			success : function(data) {
+				var table = "<tr><td width='8%'>序号</td><td width='40%'>文件名</td><td width='12%'>上传人</td><td width='25%'>上传时间</td><td colspan='2' width='15%'>操作</td><tr>";
+				$.each(data.files,function(i, item) {
+					table += "<tr>" +
+							"<td>"+ (i + 1)+ "</td>" +
+							"<td><a href='javascript:void(0)'; onclick='previewFile(\""+item.url+"\");'>"+ item.name+ "</a></td>" +
+							"<td>"+item.userName+"</td>"+ 
+							"<td>"+nullFormatter(item.createDate.replace(".0",""))+"</td>" +
+							"<td>"+ "<a href='#' onclick=downloadFile('"+ item.url+ "') >下载 </a></td>"+ 
+							"</tr>";
+						});
+				$("#hasUpload").html(table);
+				$('#myModal').modal('show');
+				
+			},
+			error : function() {
+				jQuery.generalAlert("查询数据出错！请联系管理员");
+			}
+		});
+}
+
+/**
+ * 下载文件
+ * @param filePathName
+ */
+function downloadFile(filePathName) {
+	var url = pathHeader + '/fileupload/downloadFiles.do';
+	var form = $("<form>");// 定义一个form表单
+	form.attr("style", "display:none");
+	form.attr("method", "post");
+	form.attr("action", url);
+	var input = $("<input>");
+	input.attr("type", "hidden");
+	input.attr("name", "filePathName");
+	input.attr("value", filePathName);
+	$("body").append(form);// 将表单放置在web中
+	form.append(input);
+	form.submit();// 表单提交
+}
+
+function initSelectClass(){
+	$(".select1").uedSelect({
+		width : 345			  
+	});
+	$(".select2").uedSelect({
+		width : 167  
+	});
+	$(".select3").uedSelect({
+		width : 100
+	});
+}

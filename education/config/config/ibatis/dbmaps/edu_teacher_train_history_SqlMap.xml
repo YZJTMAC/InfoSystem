@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_teacher_train_history" >
+  <resultMap id="edu_teacher_train_history_resultmap" class="project.system.pojo.FjimportHistory" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="import_success_count" property="importSuccessCount" jdbcType="INTEGER" />
+    <result column="imort_fail_count" property="imortFailCount" jdbcType="INTEGER" />
+    <result column="import_file_name" property="importFileName" jdbcType="VARCHAR" />
+    <result column="import_fail_url" property="importFailUrl" jdbcType="VARCHAR" />
+    <result column="import_serial" property="importSerial" jdbcType="INTEGER" />
+    <result column="option_real_name" property="optionRealName" jdbcType="VARCHAR" />
+    <result column="option_year" property="optionYear" jdbcType="INTEGER" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="real_name" property="optionRealName" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <insert id="insert_fjimport_history" parameterClass="project.system.pojo.FjimportHistory" >
+    insert into edu_teacher_train_history (id, create_date, create_by, import_success_count,
+      imort_fail_count, import_file_name, import_fail_url, import_serial, option_real_name,
+      option_year, history_type)
+    values (#id:INTEGER#, #createDate:TIMESTAMP#, #createBy:VARCHAR#, #importSuccessCount:INTEGER#,
+      #imortFailCount:INTEGER#, #importFileName:VARCHAR#, #importFailUrl:VARCHAR#,
+      #importSerial:INTEGER#, #optionRealName:VARCHAR#, #optionYear:INTEGER#, #historyType:VARCHAR#)
+      <selectKey resultClass="Integer" keyProperty="id">
+			SELECT last_insert_id() as id ;    
+        </selectKey>
+  </insert>
+  
+  <!-- 福建能力对接数据条数 -->
+   <select id="select_fjimport_history_count" parameterClass="java.util.HashMap" 
+   		resultClass="java.lang.Integer">
+   		select count(1)
+   		from edu_teacher_train_history h where h.create_by=#loginAccount#
+   		<isNotNull prepend="and" property="historyType">
+   			h.history_type = #historyType#
+   		</isNotNull>
+   		<isNotNull prepend="and" property="importDate">
+   			h.create_date between #importDate# and #nextDay#
+   		</isNotNull>		 		
+   </select>
+  
+  <select id="select_fjimport_history_list" parameterClass="java.util.HashMap" 
+   		resultMap="edu_teacher_train_history_resultmap">
+   		select h.*,
+   		u.real_name,
+   		IFNULL(CONCAT(u.user_province_name,IFNULL(u.user_city_name,''),
+   		IFNULL(u.user_district_name,''),
+   		IFNULL(u.user_address,'')),'') as address
+   		from edu_teacher_train_history h,
+   		edu_user u where 
+   		h.create_by=#loginAccount# and h.create_by=u.login_account and u.status = 1
+   		<isNotNull prepend="and" property="importDate">
+   			h.create_date between #importDate# and #nextDay#
+   		</isNotNull>
+   		<isNotNull prepend="and" property="historyType">
+   			h.history_type = #historyType#
+   		</isNotNull>
+   		order by h.create_date DESC limit #startIndex#,#endIndex#;		 		
+   </select>
+	
+	<!-- 学分汇总条数 -->
+   <select id="select_teacher_score_history_count" parameterClass="java.util.HashMap"  resultClass="java.lang.Integer">
+   		select count(1)
+   		from edu_teacher_train_history h where h.create_by=#loginAccount#
+   		<isNotNull prepend="and" property="importDate">
+   			h.create_date between #importDate# and #nextDay#
+   		</isNotNull>
+   		<isNotNull prepend="and" property="historyType">
+   			h.history_type = #historyType#
+   		</isNotNull>		 		
+   </select>
+   
+   <!-- 学分汇总分页 -->
+     <select id="select_teacher_score_history_pagelist" parameterClass="java.util.HashMap" resultMap="edu_teacher_train_history_resultmap">
+   		select h.*,
+   		u.real_name,
+   		IFNULL(CONCAT(u.user_province_name,IFNULL(u.user_city_name,''),
+   		IFNULL(u.user_district_name,''),
+   		IFNULL(u.user_address,'')),'') as address
+   		from edu_teacher_train_history h,
+   		edu_user u where 
+   		h.create_by=#loginAccount# and h.create_by=u.login_account and u.status = 1
+   		<isNotNull prepend="and" property="importDate">
+   			h.create_date between #importDate# and #nextDay#
+   		</isNotNull>
+   		<isNotNull prepend="and" property="historyType">
+   			h.history_type = #historyType#
+   		</isNotNull>
+   		order by h.create_date DESC limit #startIndex#,#endIndex#;		 		
+   </select>
+   
+  
+</sqlMap>

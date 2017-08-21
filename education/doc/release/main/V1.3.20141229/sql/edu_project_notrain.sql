@@ -1,0 +1,1 @@
+alter table edu_project_notrain add create_by_area int unsigned ;

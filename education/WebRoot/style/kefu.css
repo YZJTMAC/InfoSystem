@@ -1,0 +1,48 @@
+
+.kefu {
+    background-image: url("../images/kefuBg.jpg");
+    height: 190px;
+    width: 110px;
+    position:fixed;
+    right:10px;
+    bottom:170px;
+}
+.kefu h4 {
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    height: 30px;
+    line-height: 30px;
+    overflow: hidden;
+    padding-left: 11px;
+}
+.kefu h4 .l{
+	display: inline-block;
+}
+.kefu h4 .r {
+    background-image: url("../images/closeKefu.jpg");
+    background-repeat: no-repeat;
+    cursor: pointer;
+    display: inline-block;
+    height: 11px;
+    margin-right: 6px;
+    margin-top: 7px;
+    width: 11px;
+    float:right;
+}
+.kefu h5 {
+    display: block;
+    padding-bottom: 11px;
+    padding-left: 10px;
+    padding-top: 10px;
+}
+.kefu h5 img {
+    border: 1px solid #86aaba;
+}
+
+.kefu a {
+    display: block;
+    height: 22px;
+    margin-left: 6px;
+    width: 77px;
+}

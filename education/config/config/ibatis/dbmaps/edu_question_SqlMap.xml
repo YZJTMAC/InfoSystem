@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_question">
+	<resultMap id="EduQuestioResultMap" class="project.edupm.projectmanage.pojo.EduQuestion">
+		<result column="id" jdbcType="INTEGER" property="id" />
+		<result column="create_date" jdbcType="DATE" property="createDate" />
+		<result column="username" jdbcType="VARCHAR" property="username" />
+		<result column="question_type" jdbcType="INTEGER" property="questionType" />
+		<result column="rank" jdbcType="INTEGER" property="rank" />
+		<result column="title" jdbcType="VARCHAR" property="title" />
+		<result column="paper_id" jdbcType="INTEGER" property="paperId" />
+		<result column="required_answer" jdbcType="VARCHAR" property="requiredAnswer" />
+		<result column="show_style" jdbcType="INTEGER" property="showStyle" />
+		<result column="sta" jdbcType="INTEGER" property="sta" />
+	</resultMap>
+	<select id="eduQuestion_selectByPrimaryKey" resultMap="EduQuestioResultMap"
+		parameterClass="int">
+		select
+		id,
+		create_date,
+		username,
+		question_type,
+		rank,
+		title,
+		paper_id,
+		required_answer,
+		show_style,
+		sta
+		from edu_question
+		where id =
+		#id:INTEGER#
+	</select>
+	<insert id="eduQuestion_insert" parameterClass="project.edupm.projectmanage.pojo.EduQuestion">
+		insert into edu_question
+		(create_date,
+		username,
+		question_type,
+		rank,
+		title,
+		paper_id,
+		required_answer,
+		show_style,sta)
+		values (
+		#createDate:DATE#,
+		#username:VARCHAR#,
+		#questionType:INTEGER#,
+		#rank:INTEGER#,
+		#title:VARCHAR#,
+		#paperId:INTEGER#,
+		#requiredAnswer:VARCHAR#,
+		#showStyle:INTEGER#,
+		#sta:INTEGER#
+		)
+		<selectKey resultClass="int" keyProperty="id">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+
+	</insert>
+	<update id="eduQuestion_updateByPrimaryKeySelective"
+		parameterClass="project.edupm.projectmanage.pojo.EduQuestion">
+		update edu_question
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="createDate">
+				create_date
+				=#createDate:DATE#
+			</isNotNull>
+			<isNotNull prepend="," property="username">
+				username
+				=#username:VARCHAR#
+			</isNotNull>
+			<isNotNull prepend="," property="questionType">
+				question_type
+				=#questionType:INTEGER#
+			</isNotNull>
+			<isNotNull prepend="," property="rank">
+				rank = #rank:INTEGER#
+			</isNotNull>
+			<isNotNull prepend="," property="title">
+				title = #title:VARCHAR#
+			</isNotNull>
+			<isNotNull prepend="," property="paperId">
+				paper_id
+				=#paperId:INTEGER#
+			</isNotNull>
+			<isNotNull prepend="," property="requiredAnswer">
+				required_answer
+				=#requiredAnswer:VARCHAR#
+			</isNotNull>
+			<isNotNull prepend="," property="showStyle">
+				show_style
+				=#showStyle:INTEGER#
+			</isNotNull>
+			<isNotNull prepend="," property="sta">
+				sta
+				=#sta:INTEGER#
+			</isNotNull>
+		</dynamic>
+		where id = #id:INTEGER#
+	</update>
+
+
+
+	<select id="mgr_selectQuestionListByPapid" parameterClass="java.util.Map"
+		resultClass="project.edupm.projectmanage.pojo.EduQuestion">
+		SELECT
+		id,
+		create_date as createDate,
+		username,
+		question_type as
+		questionType,
+		rank,
+		title,
+		paper_id as paperId,
+		required_answer as
+		requiredAnswer,
+		show_style as showStyle,
+		sta
+		FROM
+		edu_question
+		WHERE 1=1 and sta=0
+		<isNotNull prepend="and" property="paperId">
+			paper_id = #paperId#
+		</isNotNull>
+		order by rank asc limit #startIndex#,#endIndex#
+	</select>
+
+
+
+	<select id="count_mgr_selectQuestionOptionsListByPid"
+		parameterClass="java.util.Map" resultClass="int">
+		SELECT
+		count(1)
+		FROM
+		edu_question
+		WHERE 1=1 and sta=0
+		<isNotNull prepend="and" property="paperId">
+			paper_id = #paperId#
+		</isNotNull>
+	</select>
+
+
+
+
+
+</sqlMap>

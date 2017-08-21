@@ -1,0 +1,245 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>选择教师</title>
+<%@include file="../common/commonHead.jsp"%>
+<%@include file="../common/commonAreaSelect.jsp" %>
+<script type="text/javascript" src="<%=basePathHeader%>/javascript/common/pagination.js"></script>
+<script type="text/javascript" src="<%=basePathHeader%>/javascript/master/signUpComparison.js"></script>
+<script type="text/javascript">
+var comparisonId = ${comparisonId};
+var signUpPage = ${signUpPage};
+</script>
+</head>
+<body>
+	<!-- top -->
+	<div class="head">
+		<jsp:include page="../common/top.jsp">
+			<jsp:param value="comparison" name="flag" />
+		</jsp:include>
+	</div>
+	<!-- left -->
+	<div class="leftNav">
+		<%@include file="../common/comparisonLeft.jsp"%>
+	</div>
+	<div class="content">
+		<div class="place">
+			<span>位置：</span>
+			<ul class="placeul">
+				<li>活动评比</li>
+				<li>活动评比</li>
+				<li>活动评比报名</li>
+			</ul>
+		</div>
+		<div class="formbody">
+			<div class="tabson">
+		 		<p class="xmTool">评比活动：<b>${comparisonName }</b></p> 
+			   	<div style="float:center;">
+					<ul class="seachform" id="seachform">
+						<li>
+							<label>
+								教师姓名：
+							</label>
+							<input name="input" type="text" value="" class="scinput" id="teacherNameQuery" />
+						</li>
+						<li>
+							<input name="" id="toPage" onclick="queryTeacher();" type="button" class="sure1" value="查 询" />
+						</li>
+					</ul>
+				</div> 
+				<div class="chauxnJS jsTool">
+					<span style="float: left;margin-left: 20px">
+						<a href="<%=basePathHeader %>/master/toReceiveComparison.htm" class="huibtn_a click" >返 回</a>
+						<a id="add" onclick="toSignup()" >添 加</a> 
+					</span>
+				</div>	
+				
+				<table class="tablelist" >
+		      		<thead>
+		       		    <tr>
+					        <th width="8%">头像</th>
+					        <th width="5%">姓名</th>
+					        <th width="10%">身份证号</th>
+					        <th width="8%">学段</th>
+					        <th width="8%">学科</th>
+					        <th width="15%">学校</th>
+					        <th width="8%">电话</th>
+							<th width="8%">备注</th>
+							<th width="8%">附件</th>
+							<th width="8%">状态</th>
+							<th width="15%" id="operate">操作</th>
+		        		</tr>
+		      		</thead>
+		      		<tbody id="proList1">
+					
+					</tbody>
+		    	</table>
+		    </div> 
+		 </div>
+	 	<!-- 分页 -->
+		<input id="sizePerPage" type="hidden" value="10" name="sizePerPage" />
+		<input id="pageIndex" value="1" type="hidden" name="pageIndex" />
+		<div id="pagebar" class="pagin"></div>
+		<!-- 分页 -->
+	</div> 
+	<!-- 报名（逐个） -->
+	<div class="tip" style=" z-index: 1;width: 480px;margin-left: 100px">
+		<div class="tiptop">
+			<span>报名</span><a href="javascript:hideMe();"></a>
+		</div>
+			<div class="tabson" style="margin-left: 100px">
+		       	<ul style="margin-left: 100px">
+		       		<li>
+						<img id="photoTemp" style="height: 99px; width:71px;"  src="<%=basePathHeader%>/static/photo/teacher_default.png" title="头像" />
+						<input id="photoFile" type="file" name="photoFile" onchange="uploadPhotoFile()" style="display: block;text-align: center;width: 100%" />	
+					</li>
+				</ul>
+				<ul class="seachform">
+					<li><label>姓名:</label>
+						<div class="vocation">
+							<input name="input" type="text" class="scinput" id="teacherNameValue" />
+							<a id="teacherNameError" style="color: red"></a>
+						</div>
+					</li>
+		        </ul>
+				<ul class="seachform" style="margin-left: -25px">
+					<li><label>身份证号:</label>
+						<div class="vocation" >
+							<input name="input" type="text" class="scinput" id="idNumberValue" />
+							<a id="idNumberError" style="color: red"></a>
+						</div>
+					</li>
+		        </ul>
+				<ul class="seachform">
+					<li><label>学校:</label>
+						<div class="vocation">
+							<input name="input" type="text" class="scinput"  id="schoolNameValue" disabled="disabled"/>
+							<a id="schoolNameError" style="color: red"></a>
+						</div>
+					</li>
+		        </ul>
+				<ul class="seachform">
+					<li><label>学段:</label>
+						<div class="vocation" id="sectionBox">
+						</div>
+							<a id="sectionError" style="color: red"></a>
+					</li>
+		        </ul>
+				<ul class="seachform">
+					<li><label>学科:</label>
+						<div class="vocation" id="subjectBox">
+						</div>
+							<a id="subjectError" style="color: red"></a>
+					</li>
+		        </ul>
+				<ul class="seachform">
+					<li><label>电话:</label>
+						<div class="vocation">
+							<input name="input" type="text" class="scinput"  id="phoneValue" />
+							<a id="phoneError" style="color: red"></a>
+						</div>
+					</li>
+		        </ul>
+				<ul style="margin-left: 21px">
+					<li><label>备注:</label>
+						<div >
+							<textarea  cols="" rows=""
+							style="width: 167px; border: #eee 1px solid; height: 100px; border-color: #a7b5bc #ced9df #ced9df #a7b5bc;border-radius: 5px;margin-left: 36px;margin-top: -15px"
+							id="memoValue"></textarea>
+						</div>
+					</li>
+		        </ul>
+				<ul >
+					<div >
+						<li style="width:90%;text-align: left;margin-top: 10px;margin-left: -50px;margin-right:10px">
+							<form action="" id="proForm" enctype="multipart/form-data" method="post">
+								<input type="hidden" name = "teacherName" />	        
+								<input type="hidden" name = "idNumber"/>	      
+								<input type="hidden" name = "schoolId"/>      
+								<input type="hidden" name = "schoolName"/>	
+								<input type="hidden" name = "sectionId"/>     
+								<input type="hidden" name = "subjectId"/>        
+								<input type="hidden" name = "sectionName"/>	        
+								<input type="hidden" name = "subjectName"/>	        
+								<input type="hidden" name = "phone"/>	 
+								<input type="hidden" name = "imageSrcTemp"/> 
+								<input type="hidden" name = "comparisonId"/>  
+								<input type="hidden" name = "memo"/>      
+								<input type="hidden" name = "id"/>           
+								<table border="0" cellspacing="0" cellpadding="0" style="line-height:40px;width: 500px">
+					        		<tbody id="files">
+										<tr>
+											<td width="84" colspan="2" ><b>上传附件：</b>【支持上传图片，文本文件，OFFICE 文档，压缩包等】&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:addMore()">添加</a></td>
+										</tr>
+					        		</tbody>
+			      				</table>
+		      				</form>
+						</li>
+					</div>
+		        </ul>
+		        <ul class="seachform" style="padding-bottom: 10px; height: 100%; margin-top: 10px;">
+					<li>
+						<a class="dian3" onclick="signup()" id="saveBtn">保 存</a>
+					</li>
+					<li>
+						<a class="dian3" onclick="updateObj()" id="updateBtn" style="display: none;">修 改</a>
+					</li>
+					<li>
+						<a class="dian3" onclick="hideMe()">取 消</a>
+					</li>
+				</ul>
+	      	</div>
+	</div>
+	<!-- 查看附件 -->	
+		<div id="myModal" class="modal hide fade " tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
+	  		<div class="modal-header">
+	    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+	    		<h3 id="projectName2"></h3><label>附件</label>
+	  		</div>
+	  		<div class="modal-body">
+	    		<form id="declareForm" enctype="multipart/form-data" method="post">
+					<input id="projectId" name="projectId" type="hidden" value="" />
+					<input id="projectName3" name="projectName" type="hidden" value="" />
+					<input id="type" name="type" type="hidden" value="declareTemplate" />
+					<table id="hasUpload" class="table table-hover table-condensed"></table>
+					<table id="noUpload" class="table"></table>
+				</form>
+	 		</div>
+	 		<div class="modal-footer">
+			    <button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
+	  		</div>
+		</div>
+		<!-- 查看附件结束 -->	
+		<!-- 审核意见对话框开始-->	
+		<div id="auditReasonModal" class="modal hide fade " tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
+			<div class="modal-header">
+		    	<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+		    	<h3 id="projectName9">审核意见</h3>
+		  	</div>
+		  	<div class="modal-body">
+				<div id="provinceMemo"></div>
+				<div id="cityMemo"></div>
+				<div id="districtMemo"></div>
+		  	</div>
+		  	<div class="modal-footer">
+		 		<button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
+		  	</div>
+		</div>
+		<!-- 查看备注 -->	
+	<div id="memoModal" class="modal hide fade " tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" >
+  		<div class="modal-header">
+    		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    		<h3 id="projectName2"></h3><label>备注</label>
+  		</div>
+  		<div class="modal-body" id="memoName">
+ 		</div>
+  		<div class="modal-body" id="memoBox">
+ 		</div>
+ 		<div class="modal-footer">
+		    <button class="btn" data-dismiss="modal" aria-hidden="true">关闭</button>
+  		</div>
+	</div>
+</body>
+</html>

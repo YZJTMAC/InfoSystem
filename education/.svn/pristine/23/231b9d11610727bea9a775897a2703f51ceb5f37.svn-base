@@ -1,0 +1,121 @@
+package project.master.dao;
+
+import java.util.Map;
+
+import framelib.utils.page.PageObject;
+
+public interface IEduMasterWriteDAO {
+
+	/**
+	 * 新增评比活动
+	 * @param condition
+	 * @return
+	 */
+	Integer addComparison(Map<String, Object> condition);
+
+	/**
+	 * 修改评比活动
+	 * @param condition
+	 * @return
+	 */
+	int updateComparison(Map<String, Object> condition);
+
+	/**
+	 * 删除评比活动
+	 * @param condition
+	 * @return
+	 */
+	boolean deleteComparison(Map<String, Object> condition);
+
+	/**
+	 * 报名评比活动
+	 * @param condition
+	 * @return
+	 */
+	int signUpComparisonTeacher(Map<String, Object> condition);
+
+	/**
+	 * 取消报名评比活动
+	 * @param condition
+	 * @return
+	 */
+	boolean canelSignUpComparisonTeacher(Map<String, Object> condition);
+
+	/**
+	 * 更改教师报名状态
+	 * @param condition
+	 * @return
+	 */
+	boolean updateComparisonCommentStatus(Map<String, Object> condition);
+
+	/**
+	 * 教师报名评比活动（批量）
+	 * @param condition
+	 * @return
+	 */
+	boolean signUpComparisonTeacherBatch(Map<String, Object> condition);
+
+	/**
+	 * 取消教师报名评比活动（批量）
+	 * @param condition
+	 * @return
+	 */
+	boolean canelSignUpComparisonTeacherBatch(Map<String, Object> condition);
+
+	/**
+	 * 按照一定数目为评比活动创建专家
+	 * @param condition
+	 * @return
+	 */
+	Integer createMaster(Map<String, Object> condition);
+
+	/**
+	 * 为专家分配评比活动
+	 * @param condition
+	 * @return
+	 */
+	boolean associatedMasterComparison(Map<String, Object> condition);
+
+	/**
+	 * 将专家账号设为禁用
+	 * @param condition
+	 * @return
+	 */
+	boolean updateComparisonMasterDisable(Map<String, Object> condition);
+
+	/**
+	 * 删除评比活动(专家分配评比活动)
+	 * @param request
+	 * @return
+	 */
+	boolean deleteComparisonToMaster(Map<String, Object> condition);
+
+	/**
+	 * 设置专家状态
+	 * @param condition
+	 * @return
+	 */
+	boolean setMasterStatus(Map<String, Object> condition);
+
+	/**
+	 * 刪除活動的文件
+	 * @param request
+	 * @return
+	 */
+	boolean delComprisonFile(Map<String, Object> condition);
+
+	/**
+	 * 刪除活動狀態
+	 * @param request
+	 * @return
+	 */
+	boolean setComparisonStatus(Map<String, Object> condition);
+
+	/**
+	 * 修改上报教师信息
+	 * @param condition
+	 * @return
+	 */
+	int updateSignUpComparisonTeacher(Map<String, Object> condition);
+
+}

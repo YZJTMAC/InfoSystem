@@ -1,0 +1,233 @@
+package project.master.pojo;
+
+public class EduComparisonComment {
+	private String id;					//主键
+	private String comparisonId;	//评比活动id
+	private String teacherName;		//教师姓名
+	private String idNumber;		//身份证号
+	private String teacherImg;
+	private String sectionId;	//教师学段
+	private String sectionName;//学段名称
+	private String subjectId;	//教师学科
+	private String subjectName;//学科名称
+	private String schoolId;//校id
+	private String schoolName;		//校
+	private String phone;		//电话
+	private String expertScore;		//得分
+	private String averageScore;	//平均分
+	private String createBy;			//创建者		
+	private String createDate;			//创建时间
+	private String updateBy;			//修改者
+	private String updateDate;			//修改时间
+	private String status;				//状态
+	private String memo;			//备注
+	private String provinceMemo;		//省级审核意见
+	private String cityMemo;			//市级审核意见
+	private String districtMemo;		//区级审核意见
+	private String provinceMemoDate;//省级审核时间
+	private String cityMemoDate;//市级审核时间
+	private String districtMemoDate;//区级审核时间
+	private String createByName; //创建者姓名
+
+	//////////edu_comparison_score//////////
+	private String teacherId;	//教师id
+	private String masterId;	//专家id
+	private String masterName;	//专家姓名
+	private String isPass;		//是否通过
+	private String loginAccount;
+	
+	
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getComparisonId() {
+		return comparisonId;
+	}
+	public void setComparisonId(String comparisonId) {
+		this.comparisonId = comparisonId;
+	}
+	public String getTeacherName() {
+		return teacherName;
+	}
+	public void setTeacherName(String teacherName) {
+		this.teacherName = teacherName;
+	}
+	public String getIdNumber() {
+		return idNumber;
+	}
+	public void setIdNumber(String idNumber) {
+		this.idNumber = idNumber;
+	}
+	public String getTeacherImg() {
+		return teacherImg;
+	}
+	public void setTeacherImg(String teacherImg) {
+		this.teacherImg = teacherImg;
+	}
+	public String getSectionId() {
+		return sectionId;
+	}
+	public void setSectionId(String sectionId) {
+		this.sectionId = sectionId;
+	}
+	public String getSubjectId() {
+		return subjectId;
+	}
+	public void setSubjectId(String subjectId) {
+		this.subjectId = subjectId;
+	}
+	public String getSchoolName() {
+		return schoolName;
+	}
+	public void setSchoolName(String schoolName) {
+		this.schoolName = schoolName;
+	}
+	public String getPhone() {
+		return phone;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+	public String getExpertScore() {
+		return expertScore;
+	}
+	public void setExpertScore(String expertScore) {
+		this.expertScore = expertScore;
+	}
+	public String getAverageScore() {
+		return averageScore;
+	}
+	public void setAverageScore(String averageScore) {
+		this.averageScore = averageScore;
+	}
+	public String getCreateBy() {
+		return createBy;
+	}
+	public void setCreateBy(String createBy) {
+		this.createBy = createBy;
+	}
+	public String getCreateDate() {
+		return createDate;
+	}
+	public void setCreateDate(String createDate) {
+		this.createDate = createDate;
+	}
+	public String getUpdateBy() {
+		return updateBy;
+	}
+	public void setUpdateBy(String updateBy) {
+		this.updateBy = updateBy;
+	}
+	public String getUpdateDate() {
+		return updateDate;
+	}
+	public void setUpdateDate(String updateDate) {
+		this.updateDate = updateDate;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public String getMemo() {
+		return memo;
+	}
+	public void setMemo(String memo) {
+		this.memo = memo;
+	}
+	public String getProvinceMemo() {
+		return provinceMemo;
+	}
+	public void setProvinceMemo(String provinceMemo) {
+		this.provinceMemo = provinceMemo;
+	}
+	public String getCityMemo() {
+		return cityMemo;
+	}
+	public void setCityMemo(String cityMemo) {
+		this.cityMemo = cityMemo;
+	}
+	public String getDistrictMemo() {
+		return districtMemo;
+	}
+	public void setDistrictMemo(String districtMemo) {
+		this.districtMemo = districtMemo;
+	}
+	public String getIsPass() {
+		return isPass;
+	}
+	public void setIsPass(String isPass) {
+		this.isPass = isPass;
+	}
+	public String getTeacherId() {
+		return teacherId;
+	}
+	public void setTeacherId(String teacherId) {
+		this.teacherId = teacherId;
+	}
+	public String getMasterId() {
+		return masterId;
+	}
+	public void setMasterId(String masterId) {
+		this.masterId = masterId;
+	}
+	public String getMasterName() {
+		return masterName;
+	}
+	public void setMasterName(String masterName) {
+		this.masterName = masterName;
+	}
+	public String getSectionName() {
+		return sectionName;
+	}
+	public void setSectionName(String sectionName) {
+		this.sectionName = sectionName;
+	}
+	public String getSubjectName() {
+		return subjectName;
+	}
+	public void setSubjectName(String subjectName) {
+		this.subjectName = subjectName;
+	}
+	public String getSchoolId() {
+		return schoolId;
+	}
+	public void setSchoolId(String schoolId) {
+		this.schoolId = schoolId;
+	}
+	public String getCreateByName() {
+		return createByName;
+	}
+	public void setCreateByName(String createByName) {
+		this.createByName = createByName;
+	}
+	public String getProvinceMemoDate() {
+		return provinceMemoDate;
+	}
+	public void setProvinceMemoDate(String provinceMemoDate) {
+		this.provinceMemoDate = provinceMemoDate;
+	}
+	public String getCityMemoDate() {
+		return cityMemoDate;
+	}
+	public void setCityMemoDate(String cityMemoDate) {
+		this.cityMemoDate = cityMemoDate;
+	}
+	public String getDistrictMemoDate() {
+		return districtMemoDate;
+	}
+	public void setDistrictMemoDate(String districtMemoDate) {
+		this.districtMemoDate = districtMemoDate;
+	}
+	public String getLoginAccount() {
+		return loginAccount;
+	}
+	public void setLoginAccount(String loginAccount) {
+		this.loginAccount = loginAccount;
+	}
+	
+}

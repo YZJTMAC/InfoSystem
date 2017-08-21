@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap>
+	<resultMap id="abatorgenerated_EduProjectNotrainCommentResult" class="project.edupm.projectmanage.pojo.EduProjectNotrainComment">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="project_id" property="projectId" jdbcType="INTEGER" />
+		<result column="teacher_id" property="teacherId" jdbcType="INTEGER" />
+		<result column="teacher_score" property="teacherScore" jdbcType="REAL" />
+		<result column="tacher_audi_score" property="tacherAudiScore" jdbcType="REAL" />
+		<result column="audit_status" property="auditStatus" jdbcType="INTEGER" />
+		<result column="audit_status_name" property="auditStatusName" jdbcType="VARCHAR" />
+		<result column="create_by" property="createBy" jdbcType="VARCHAR" />
+		<result column="create_date" property="createDate" jdbcType="DATE" />
+		<result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+		<result column="update_date" property="updateDate" jdbcType="DATE" />
+	</resultMap>
+	<!-- 实施/管理项目证书打印__查询已结束或已关闭的项目下的教师总数__(非培训类) -->
+  	<select id="selectTeacherByProIdCount_NoTrain" resultClass="int" parameterClass="java.util.Map">
+  		SELECT
+			COUNT(1)
+		FROM
+			edu_project_notrain_comment pnc
+			LEFT JOIN edu_project_notrain pn ON pnc.project_id = pn.id
+			LEFT JOIN edu_user u ON pnc.teacher_id = u.id
+			LEFT JOIN edu_school s ON u.school_id = s.school_id
+		WHERE
+			pnc.project_id = #proId#
+		<isNotEmpty prepend="AND" property="teacherName">
+			u.real_name LIKE '%$teacherName$%'
+		</isNotEmpty>
+  	</select>
+  
+  	<!-- 实施/管理项目证书打印__查询已结束或已关闭的项目下的教师__(非培训类) -->
+  	<select id="selectTeacherByProId_NOTrain" resultClass="project.furtheredu.edumanage.pojo.TeacherInfoActivity" parameterClass="java.util.Map">
+  		SELECT
+			u.real_name AS teacherName,
+			u.gender,
+			s.school_name AS schoolName,
+			pnc.audit_status_name AS auditStatus,
+			pnc.audit_score AS teacherClassScore
+		FROM
+			edu_project_notrain_comment pnc
+			LEFT JOIN edu_project_notrain pn ON pnc.project_id = pn.id
+			LEFT JOIN edu_user u ON pnc.teacher_id = u.id
+			LEFT JOIN edu_school s ON u.school_id = s.school_id
+		WHERE
+			pnc.project_id = #proId#
+		<isNotEmpty prepend="AND" property="teacherName">
+			u.real_name LIKE '%$teacherName$%'
+		</isNotEmpty>
+		ORDER BY
+			pnc.create_date DESC
+		LIMIT 
+			#startIndex#, #endIndex# 		
+  	</select>
+	
+	<!--  教师项目证书打印__查询已结束或已关闭的项目__(非培训类) -->
+	<select id="selectSSProByStatusNoTrain" resultClass="project.furtheredu.edumanage.pojo.TeacherProActivity" parameterClass="java.util.Map">
+		SELECT
+			pn.id AS proId,
+			pn.name AS proName,
+			pn.begin_date AS startDate,
+			pn.end_date AS endDate,
+			pn.train_type_name AS trainTypeName,
+			pn.property_name AS projectPropertyName,
+			pn.organizer,
+			pn.scope_name AS trainScopeName
+		FROM
+			edu_project_notrain pn
+		LEFT JOIN edu_project_notrain_comment pnc ON pn.id = pnc.project_id
+		LEFT JOIN edu_user u ON pn.create_by = u.login_account
+		WHERE
+			u.role_id >= #role#
+		AND
+			pnc.audit_status_name IS NOT NULL
+		<isNotEmpty prepend="AND" property="provinceId">
+			u.user_province_id = #provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="cityId">
+			u.user_city_id = #cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="districtId">
+			u.user_district_id = #districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="schoolId">
+			u.user_school_id = #schoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="projectName">
+			pn.name LIKE '%$projectName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="year">
+			pn.year = #year#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="trainTypeId">
+			pn.train_type_id = #trainTypeId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="proProperty">
+			pn.property_id = #proProperty#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="proScope">
+			pn.scope_id = #proScope#
+		</isNotEmpty>
+			ORDER BY pn.create_date DESC
+	</select>
+
+
+	<!--  教师项目证书打印__查询已结束或已关闭的项目__(非培训类) -->
+	<select id="selectTeacherProByStatusNoTrain" resultClass="project.furtheredu.edumanage.pojo.TeacherProActivity" parameterClass="java.util.Map">
+		SELECT
+			pn.id AS proId,
+			pn.name AS proName,
+			pn.begin_date AS startDate,
+			pn.end_date AS endDate,
+			pn.train_type_name AS trainTypeName,
+			pn.property_name AS projectPropertyName,
+			pnc.audit_status_name AS trainStatus
+		FROM
+			edu_project_notrain pn
+			LEFT JOIN edu_project_notrain_comment pnc ON pn.id = pnc.project_id
+		WHERE
+			pnc.teacher_id = #teacherId#
+		AND
+			pnc.audit_status_name IS NOT NULL
+		<isNotEmpty prepend="AND" property="projectName">
+			pn.name LIKE '%$projectName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="year">
+			pn.year = #year#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="trainTypeId">
+			pn.train_type_id = #trainTypeId#
+		</isNotEmpty>
+			ORDER BY pn.create_date DESC
+	</select>
+ 
+	
+	 <insert id="enterCredit" parameterClass="java.util.Map" >
+    insert into edu_project_notrain_comment (project_id,teacher_id,teacher_score) 
+    values (#projectId#,#teacherId#,#score#  )
+     
+  </insert>
+  
+   <update id="auditCredit" parameterClass="java.util.Map" >
+    update edu_project_notrain_comment
+    	set audit_status=#status#,audit_score=#score#,audit_status_name=#statusName#
+    where teacher_id=#id# and project_id=#projectId#
+  </update>
+  
+  
+</sqlMap>

@@ -1,0 +1,1974 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_user">
+
+	<resultMap id="abatorgenerated_EduUserResult" class="project.person.pojo.EduUser">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="login_account" property="loginAccount"
+			jdbcType="VARCHAR" />
+		<result column="real_name" property="realName" jdbcType="VARCHAR" />
+		<result column="role_id" property="roleId" jdbcType="INTEGER" />
+		<result column="id_number" property="idNumber" jdbcType="VARCHAR" />
+		<result column="mail" property="mail" jdbcType="VARCHAR" />
+		<result column="mobile" property="mobile" jdbcType="VARCHAR" />
+		<result column="paswd_question_type" property="paswdQuestionType"
+			jdbcType="INTEGER" />
+		<result column="paswd_answer" property="paswdAnswer" jdbcType="VARCHAR" />
+		<result column="password" property="password" jdbcType="VARCHAR" />
+		<result column="create_by" property="createBy" jdbcType="VARCHAR" />
+		<result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+		<result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+		<result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="version" property="version" jdbcType="INTEGER" />
+		<result column="teacher_no" property="teacherNo" jdbcType="VARCHAR" />
+		<result column="school_id" property="schoolId" jdbcType="INTEGER" />
+		<result column="gender" property="gender" jdbcType="INTEGER" />
+		<result column="user_image_url" property="userImageUrl"
+			jdbcType="VARCHAR" />
+		<result column="user_province_id" property="userProvinceId"
+			jdbcType="INTEGER" />
+		<result column="user_province_name" property="userProvinceName"
+			jdbcType="VARCHAR" />
+		<result column="user_city_id" property="userCityId" jdbcType="INTEGER" />
+		<result column="user_city_name" property="userCityName"
+			jdbcType="VARCHAR" />
+		<result column="user_district_id" property="userDistrictId"
+			jdbcType="INTEGER" />
+		<result column="user_district_name" property="userDistrictName"
+			jdbcType="VARCHAR" />
+		<result column="user_address" property="userAddress" jdbcType="VARCHAR" />
+
+		<result column="sex" property="sex" jdbcType="VARCHAR" />
+		<result column="roleName" property="roleName" jdbcType="VARCHAR" />
+		<result column="statusName" property="statusName" jdbcType="VARCHAR" />
+		<result column="schoolName" property="schoolName" jdbcType="VARCHAR" />
+		<result column="organization_id" property="organizationId"
+			jdbcType="INTEGER" />
+		<result column="is_password" property="isPassword"
+			jdbcType="INTEGER" />
+	</resultMap>
+
+	<insert id="user_insert" parameterClass="project.person.pojo.EduUser">
+		insert into edu_user (id, login_account, real_name, role_id,
+		id_number, mail, mobile,
+		paswd_question_type, paswd_answer, password,
+		create_by, update_by, create_date,
+		update_date,
+		status, version,
+		teacher_no, school_id, school_name, gender, user_image_url,
+		user_province_id,
+		user_province_name, user_city_id, user_city_name,
+		user_district_id,
+		user_district_name,
+		user_address,organization_id,is_password)
+		values (#id:INTEGER#,
+		#loginAccount:VARCHAR#, #realName:VARCHAR#,
+		#roleId:INTEGER#,
+		#idNumber:VARCHAR#, #mail:VARCHAR#, #mobile:VARCHAR#,
+		#paswdQuestionType:INTEGER#,
+		#paswdAnswer:VARCHAR#, #password:VARCHAR#,
+		#createBy:VARCHAR#,
+		#updateBy:VARCHAR#,
+		now(),
+		now(), #status:INTEGER#,
+		1,
+		#teacherNo:VARCHAR#,
+		#schoolId:INTEGER#, #schoolName:VARCHAR#,
+		#gender:INTEGER#, #userImageUrl:VARCHAR#,
+		#userProvinceId:INTEGER#,
+		#userProvinceName:VARCHAR#,
+		#userCityId:INTEGER#,
+		#userCityName:VARCHAR#, #userDistrictId:INTEGER#,
+		#userDistrictName:VARCHAR#,
+		#userAddress:VARCHAR#,
+		#organizationId:INTEGER#,
+		#isPassword:INTEGER#)
+		<selectKey resultClass="Integer" keyProperty="id">
+			SELECT
+			last_insert_id() as id ;    
+        </selectKey>
+	</insert>
+
+	<update id="user_update" parameterClass="project.person.pojo.EduUser">
+		update edu_user
+		set
+		<isNotEmpty property="loginAccount">
+		login_account = #loginAccount:VARCHAR#,
+		 </isNotEmpty>
+		<isNotEmpty property="realName">
+		real_name = #realName:VARCHAR#,
+ 		</isNotEmpty>
+		<isNotEmpty property="roleId">
+		role_id = #roleId:INTEGER#,
+ 		</isNotEmpty>
+		<isNotEmpty property="idNumber">
+		id_number = #idNumber:VARCHAR#,
+ 		</isNotEmpty>
+		<isNotEmpty property="mail">
+		mail = #mail:VARCHAR#,
+ 		</isNotEmpty>
+		<isNotEmpty property="mobile">
+		mobile = #mobile:VARCHAR#,
+ 		</isNotEmpty>
+		<isNotEmpty property="paswdQuestionType">
+		paswd_question_type =#paswdQuestionType:INTEGER#,
+ 		</isNotEmpty>
+		<isNotEmpty property="paswdAnswer">
+		paswd_answer = #paswdAnswer:VARCHAR#,
+ 		</isNotEmpty>
+		<isNotEmpty property="password">
+		password = #password:VARCHAR#,
+ 		</isNotEmpty>
+		<isNotEmpty property="updateBy">
+		update_by = #updateBy:VARCHAR#,
+ 		</isNotEmpty>
+		<isNotEmpty property="status">
+		status = #status:INTEGER#,
+ 		</isNotEmpty>
+		<isNotEmpty property="teacherNo">
+		teacher_no =
+		#teacherNo:VARCHAR#,
+		 </isNotEmpty>
+		<isNotEmpty property="schoolId">
+		school_id = #schoolId:INTEGER#,
+ 		</isNotEmpty>
+		<isNotEmpty property="schoolName">
+		school_name =
+		#schoolName:INTEGER#,
+ 		</isNotEmpty>
+		<isNotEmpty property="userProvinceId">
+		user_province_id = #userProvinceId:INTEGER#,
+ 		</isNotEmpty>
+		<isNotEmpty property="userProvinceName">
+		user_province_name = #userProvinceName:VARCHAR#,
+		</isNotEmpty>
+		<isNotEmpty property="userCityId">
+		user_city_id =
+		#userCityId:INTEGER#,
+ 		</isNotEmpty>
+		<isNotEmpty property="userCityName">
+		user_city_name = #userCityName:VARCHAR#,
+ 		</isNotEmpty>
+		<isNotEmpty property="userDistrictId">
+		user_district_id= #userDistrictId:INTEGER#,
+ 		</isNotEmpty>
+		<isNotEmpty property="userDistrictName">
+		user_district_name =
+		#userDistrictName:VARCHAR#,
+ 		</isNotEmpty>
+		<isNotEmpty property="userImageUrl">
+		user_image_url = #userImageUrl:VARCHAR#,
+ 		</isNotEmpty>
+		<isNotEmpty property="gender">
+		gender =
+		#gender:INTEGER#,
+	  </isNotEmpty>
+	  <isNotEmpty property="isPassword">
+		is_password =
+		#isPassword:INTEGER#,
+	  </isNotEmpty>
+	  	update_date = now()
+		where id = #id:INTEGER#
+  </update>
+
+	<update id="update_user_versionOrStatus" parameterClass="java.util.HashMap">
+		update edu_user
+		set
+		update_by = #updateBy#,
+		update_date = now(),
+		<isNotEmpty property="optionBy">
+			audit_name = #optionBy#,
+      </isNotEmpty>
+		<isNotEmpty property="updateBy">
+			update_by = #updateBy#,
+      </isNotEmpty>
+		<isNotEmpty property="auditDate">
+			audit_date = #auditDate#,
+      </isNotEmpty>
+		<isNotEmpty property="memo">
+			memo = #memo#,
+      </isNotEmpty>
+		<isNotEmpty property="version">
+			version = #version#,
+      </isNotEmpty>
+		<isNotEmpty property="status">
+			status = #status#
+      </isNotEmpty>
+
+		where id = #id#
+	</update>
+	
+	
+	<delete id="deleteTeacheres" parameterClass="java.util.HashMap">
+	
+	   delete from edu_user where 1=1
+	   <isNotNull prepend="and" property="id">
+			 id =#id#
+		</isNotNull>
+	   
+	   
+	    <!-- <iterate property="list" conjunction="," open="(" close=")">
+        #[]#
+      </iterate> -->
+	   
+	   
+	  
+	
+	</delete>
+
+	<select id="selectUserLoginAccount" parameterClass="java.util.HashMap"
+		resultClass="project.person.pojo.EduUser">
+		select id AS id,
+		login_account AS loginAccount,
+		real_name AS realName
+		FROM
+		edu_user
+		where 
+		login_account = #loginAccount#
+	</select>
+	<!-- add by yinxiaolong : 老师的资料信息-->
+	<select id="selectTeacherInfoByLoginAccount" parameterClass="java.util.HashMap"
+		resultClass="project.person.pojo.EduUser">
+		SELECT
+		t1.id,
+		t1.login_account AS loginAccount,
+		t1. PASSWORD AS password,
+		t1.real_name AS realName,
+		t1.id_number AS idNumber,
+		t1.gender AS gender,
+		t1.teacher_no AS teacherNo,
+		t1.status AS status,
+		t1.user_image_url AS
+		userImageUrl,
+		t1.user_province_id userProvinceId,
+		t1.user_province_name
+		userProvinceName,
+		t1.user_city_id userCityId,
+		t1.user_city_name
+		userCityName,
+		t1.user_district_id userDistrictId,
+		t1.user_district_name
+		userDistrictName,
+		t1.school_id as schoolId,
+		t1.school_name schoolName,
+		audit_name as auditName,
+		audit_date as auditDate,
+		memo as memo,
+		t1.is_password  as isPassword
+		FROM
+		edu_user t1
+		LEFT JOIN
+		edu_school t2 ON t1.school_id = t2.school_id
+		WHERE
+		t1.status!=0
+		<isNotNull prepend="AND" property="loginAccount">
+			t1.login_account =
+			#loginAccount#
+		</isNotNull>
+		<isNotNull prepend="AND" property="userId">
+			t1.id = #userId#
+		</isNotNull>
+		<isNotNull prepend="AND" property="idNumber">
+			t1.id_number = #idNumber#
+		</isNotNull>
+		<isNotNull prepend="AND" property="teacherNo">
+			t1.teacher_no = #teacherNo#
+		</isNotNull>
+	</select>
+
+	<!-- 不在使用 add by zhangxiaoqi -->
+	<select id="selectTeacherIdByIdNumber" parameterClass="String"
+		resultClass="int">
+		SELECT
+		id
+		FROM
+		edu_user
+		WHERE
+		id_number = #idNumber#
+    </select>
+
+	<!-- add by chenlei : 检查用户登录-->
+	<select id="existUserByLoginAccountAndPsd" parameterClass="java.util.HashMap"
+		resultClass="project.person.pojo.EduUserActivty">
+		select
+		edu_sys_role.role_name roleName,
+		edu_user.id as userId,
+		edu_sys_role.status roleStatus,
+		login_account loginAccount,
+		real_name realName,
+		role_id roleTypeId,
+		role_type roleId,
+		paswd_question_type paswdQuestionType,
+		paswd_answer paswdAnswer,
+		teacher_no teacherNo,
+		edu_user.school_id
+		schoolId,
+		s.school_name schoolName,
+		gender,
+		user_image_url userImageUrl,
+		user_province_id userProvinceId,
+		user_province_name userProvinceName,
+		user_city_id userCityId,
+		user_city_name userCityName,
+		user_district_id
+		userDistrictId,
+		user_district_name userDistrictName,
+		user_address
+		userAddress,
+		edu_user.id_number idNumber,
+		edu_user.mail,
+		edu_user.mobile,
+		edu_user.password,
+		edu_user.is_password  as isPassword,
+		edu_user.status,
+		edu_user.organization_id as organizationId
+		from edu_user
+		left join edu_sys_role on edu_user.role_id=edu_sys_role.id
+		left join edu_school s	on edu_user.school_id = s.school_id
+		where 1=1
+		<isNotNull prepend="AND" property="status">
+			edu_user.status !=
+			#status#
+		</isNotNull>
+		<isNotNull prepend="AND" property="loginAccount">
+			((login_account =
+			#loginAccount# and password = #password#)
+			or(teacher_no
+			=#loginAccount# and password = #password#)
+			or(id_number
+			=#loginAccount# and password = #password#))
+		</isNotNull>
+	</select>
+
+	<update id="user_other_update" parameterClass="project.person.pojo.EduUserActivty">
+		update edu_user
+		set
+		real_name = #realName:VARCHAR#,
+		id_number = #idNumber:VARCHAR#,
+		mail
+		= #mail:VARCHAR#,
+		mobile = #mobile:VARCHAR#,
+		paswd_question_type =
+		#paswdQuestionType:INTEGER#,
+		paswd_answer = #paswdAnswer:VARCHAR#,
+		update_by = #updateBy:VARCHAR#,
+		update_date = now()
+		where id =
+		#userId:INTEGER#
+  </update>
+
+	<update id="user_psd_update" parameterClass="project.person.pojo.EduUserActivty">
+		update edu_user
+		set
+		password = #password:VARCHAR#,
+		update_by = #updateBy:VARCHAR#,
+		is_password=#isPassword:INTEGER#,
+		<isNotEmpty property="mail">
+		mail = #mail:VARCHAR#,
+ 		</isNotEmpty>
+		<isNotEmpty property="paswdQuestionType">
+		paswd_question_type =#paswdQuestionType:INTEGER#,
+ 		</isNotEmpty>
+		<isNotEmpty property="paswdAnswer">
+		paswd_answer = #paswdAnswer:VARCHAR#,
+ 		</isNotEmpty>
+		update_date = now()
+		where id = #userId:INTEGER#
+  </update>
+
+	<!-- 管理员管理count -->
+	<select id="selectManagesCount" parameterClass="java.util.Map"
+		resultClass="int">
+		select COUNT(1) from (select
+		a.id,
+		IFNULL(a.id_number,'') idNumber,
+		IFNULL(a.school_name,'')
+		schoolName,
+		a.real_name realName,
+		a.login_account loginAccount,
+		a.password,
+		a.role_id roleId,
+		b.role_name
+		roleName,
+		IFNULL(a.user_province_name,'')
+		userProvinceName,
+		(case when
+		LENGTH(a.user_city_name)>0 then
+		CONCAT('—',a.user_city_name)
+		ELSE ''
+		end) userCityName,
+		(case when
+		LENGTH(a.user_district_name)>0
+		then
+		CONCAT('—',a.user_district_name)
+		else '' end)userDistrictName,
+		(case
+		when a.status=44 then '禁用' else '正常'
+		end) userStatus,
+		a.create_date createDate
+		from edu_user
+		a
+		LEFT JOIN
+		edu_sys_role b on a.role_id=b.id
+		join edu_sys_role_type rt on b.role_type=rt.id
+		where a.status!=0 and
+		a.role_id!=5
+		and a.role_id != 20
+		<!-- 查询条件 -->
+		<isNotEmpty prepend="AND" property="loginAccount">
+			a.login_account like '%$loginAccount$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="roleTypeId">
+			rt.role_type = #roleTypeId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="roleId">
+			a.role_id= #roleId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="provinceId">
+			a.user_province_id= #provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cityId">
+			a.user_city_id= #cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="districtId">
+			a.user_district_id= #districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			a.school_id= #schoolId#
+		</isNotEmpty>
+		<!-- 实施用的控制条件 -->
+		<!-- <isNotEmpty prepend="and" property="userProvinceId1">
+			a.user_province_id = #userProvinceId1#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userCityId1">
+			a.user_city_id = #userCityId1#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userDistrictId1">
+			a.user_district_id = #userDistrictId1#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId1">
+			a.school_id = #schoolId1#
+		</isNotEmpty> 
+		
+		<isLessThan compareValue="5" compareProperty="role" prepend="and"> 
+			a.role_id >= #role#
+		</isLessThan>
+		<isGreaterEqual compareValue="7" compareProperty="role" prepend="and">
+			a.role_id >= #role#
+		</isGreaterEqual>-->
+
+		<!-- 查询系统管理员 -->
+		<!-- <isEqual compareValue="0" compareProperty="role">
+			union
+			select
+			a.id,
+			IFNULL(a.id_number,'') idNumber,
+			IFNULL(a.school_name,'')
+			schoolName,
+			a.real_name realName,
+			a.login_account loginAccount,
+			a.password,
+			a.role_id roleId,
+			b.role_name
+			roleName,
+			''
+			userProvinceName,
+			''
+			userCityName,
+			''
+			userDistrictName,
+			(case
+			when a.status=44 then '禁用' else '正常'
+			end) userStatus,
+			a.create_date createDate
+			from edu_user
+			a
+			LEFT JOIN
+			edu_sys_role b on a.role_id=b.id
+			where a.status!=0 and
+			a.role_id=0
+		</isEqual> -->
+		
+		)as tt  where 1=1 
+		
+		<isNotEmpty prepend="and" property="schoolName">
+			tt.schoolName like '%$schoolName$%'
+		</isNotEmpty>
+		
+	</select>
+
+	<!-- 管理员管理列表 -->
+	<select id="selectManagesList" parameterClass="java.util.Map"
+		resultClass="project.person.pojo.EduUser">
+		select * from (select
+		a.id,
+		role_type_name roleTypeName,
+		IFNULL(a.id_number,'') idNumber,
+		a.real_name realName,
+		a.login_account loginAccount,
+		a.password,
+		a.role_id roleId,
+		b.role_name
+		roleName,
+		IFNULL(a.user_province_name,'')
+		userProvinceName,
+		(case when   LENGTH(s.school_name)>0 then   CONCAT('—',s.school_name)   ELSE ''   end) schoolName,
+		(case when
+		LENGTH(a.user_city_name)>0 then
+		CONCAT('—',a.user_city_name)
+		ELSE ''
+		end) userCityName,
+		(case when
+		LENGTH(a.user_district_name)>0
+		then
+		CONCAT('—',a.user_district_name)
+		else '' end)userDistrictName,
+		(case
+		when a.status=44 then '禁用' else '正常'
+		end) userStatus,
+		a.create_date createDate
+		from edu_user
+		a
+		LEFT JOIN
+		edu_school s on a.school_id = s.school_id
+		LEFT JOIN
+		edu_sys_role b on a.role_id=b.id
+		join edu_sys_role_type rt on b.role_type=rt.id
+		where a.status!=0 and
+		a.role_id!=5
+		and a.role_id != 20
+		<!-- 查询条件 -->
+		<isNotEmpty prepend="AND" property="loginAccount">
+			a.login_account like '%$loginAccount$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="roleTypeId">
+			rt.role_type = #roleTypeId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="roleId">
+			a.role_id= #roleId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="provinceId">
+			a.user_province_id= #provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cityId">
+			a.user_city_id= #cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="districtId">
+			a.user_district_id= #districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			a.school_id= #schoolId#
+		</isNotEmpty>
+		
+		<!-- 实施用的控制条件 -->
+		<!-- <isNotEmpty prepend="and" property="userProvinceId1">
+			a.user_province_id = #userProvinceId1#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userCityId1">
+			a.user_city_id = #userCityId1#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userDistrictId1">
+			a.user_district_id = #userDistrictId1#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId1">
+			a.school_id = #schoolId1#
+		</isNotEmpty> 
+		
+		<isLessThan compareValue="5" compareProperty="role" prepend="and"> 
+			a.role_id >= #role#
+		</isLessThan>
+		<isGreaterEqual compareValue="7" compareProperty="role" prepend="and">
+			a.role_id >= #role#
+		</isGreaterEqual>-->
+
+		<!-- 查询系统管理员 -->
+		<!-- <isEqual compareValue="0" compareProperty="role">
+			union
+			select
+			a.id,
+			IFNULL(a.id_number,'') idNumber,
+			IFNULL(s.school_name,'') schoolName,
+			a.real_name realName,
+			a.login_account loginAccount,
+			a.password,
+			a.role_id roleId,
+			b.role_name
+			roleName,
+			''
+			userProvinceName,
+			''
+			userCityName,
+			''
+			userDistrictName,
+			(case
+			when a.status=44 then '禁用' else '正常'
+			end) userStatus,
+			a.create_date createDate
+			from edu_user
+			a
+			LEFT JOIN a.school_id = s.chool_id 
+			LEFT JOIN
+			edu_sys_role b on a.role_id=b.id
+			where a.status!=0 and
+			a.role_id=0
+		</isEqual> -->
+		
+		)as tt
+		
+		where 1=1 
+		
+		<isNotEmpty prepend="and" property="schoolName">
+			tt.schoolName like '%$schoolName$%'
+		</isNotEmpty>
+		ORDER BY
+		tt.id desc
+		  LIMIT #startIndex#, #endIndex# 
+	</select>
+	
+	<!-- <select id="selectManagesListes" parameterClass="java.util.Map"
+		resultClass="project.person.pojo.EduUser">
+		select * from (select
+		a.id,
+		IFNULL(a.id_number,'') idNumber,
+		IFNULL(a.school_name,'')
+		schoolName,
+		a.real_name realName,
+		a.login_account loginAccount,
+		a.password,
+		a.role_id roleId,
+		b.role_name
+		roleName,
+		IFNULL(a.user_province_name,'')
+		userProvinceName,
+		(case when
+		LENGTH(a.user_city_name)>0 then
+		CONCAT('—',a.user_city_name)
+		ELSE ''
+		end) userCityName,
+		(case when
+		LENGTH(a.user_district_name)>0
+		then
+		CONCAT('—',a.user_district_name)
+		else '' end)userDistrictName,
+		(case
+		when a.status=44 then '禁用' else '正常'
+		end) userStatus,
+		a.create_date createDate
+		from edu_user
+		a
+		LEFT JOIN
+		edu_sys_role b on a.role_id=b.id
+		where a.status!=0 and
+		a.role_id!=5
+		and a.role_id != 20
+		查询条件
+		<isNotEmpty prepend="AND" property="loginAccount">
+			a.login_account like '%$loginAccount$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="roleId">
+			a.role_id= #roleId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userProvinceId">
+			a.user_province_id= #userProvinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userCityId">
+			a.user_city_id= #userCityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userDistrictId">
+			a.user_district_id= #userDistrictId#
+		</isNotEmpty>
+		
+		实施用的控制条件
+		<isNotEmpty prepend="and" property="userProvinceId1">
+			a.user_province_id = #userProvinceId1#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userCityId1">
+			a.user_city_id = #userCityId1#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userDistrictId1">
+			a.user_district_id = #userDistrictId1#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId1">
+			a.school_id = #schoolId1#
+		</isNotEmpty>
+		
+		<isLessThan compareValue="5" compareProperty="role" prepend="and"> 
+			a.role_id >= #role#
+		</isLessThan>
+		<isGreaterEqual compareValue="7" compareProperty="role" prepend="and">
+			a.role_id >= #role#
+		</isGreaterEqual>
+
+		查询系统管理员
+		<isEqual compareValue="0" compareProperty="role">
+			union
+			select
+			a.id,
+			IFNULL(a.id_number,'') idNumber,
+			IFNULL(a.school_name,'')
+			schoolName,
+			a.real_name realName,
+			a.login_account loginAccount,
+			a.password,
+			a.role_id roleId,
+			b.role_name
+			roleName,
+			''
+			userProvinceName,
+			''
+			userCityName,
+			''
+			userDistrictName,
+			(case
+			when a.status=44 then '禁用' else '正常'
+			end) userStatus,
+			a.create_date createDate
+			from edu_user
+			a
+			LEFT JOIN
+			edu_sys_role b on a.role_id=b.id
+			where a.status!=0 and
+			a.role_id=0
+		</isEqual>
+		
+		)as tt
+		
+		ORDER BY
+		tt.id desc
+		 LIMIT #startIndex#, #endIndex#
+	</select> -->
+
+	<select id="selectManagesListNoLimit" parameterClass="java.util.Map"
+		resultClass="project.person.pojo.EduUser">
+		select
+		a.id,
+		a.real_name realName,
+		a.login_account loginAccount,
+		a.password,
+		b.role_name
+		roleName,
+		a.user_province_name userProvinceName,
+		 (case when
+		LENGTH(a.school_name)>0 then CONCAT('—',a.school_name)
+		ELSE ''
+		end)  schoolName,
+		(case when
+		LENGTH(a.user_city_name)>0 then CONCAT('—',a.user_city_name)
+		ELSE ''
+		end) userCityName,
+		(case when LENGTH(a.user_district_name)>0
+		then
+		CONCAT('—',a.user_district_name) else '' end)userDistrictName,
+		(case
+		when a.status=44 then '禁用' else '正常' end) userStatus
+		from edu_user
+		a
+		LEFT JOIN edu_sys_role b on a.role_id=b.id
+		where a.status!=0 and
+		a.role_id!=5
+		and a.role_id != 20 
+		<isNotEmpty prepend="AND" property="projectId">
+			a.id in( 
+				SELECT
+					teacher_id
+				FROM
+					edu_project_comment
+				WHERE
+				  project_id =#projectId#
+				UNION
+				SELECT
+					o.id
+				FROM
+					edu_organization_project p,
+					edu_user o
+				WHERE
+					p.organization_id = o.organization_id
+					AND project_id = #projectId#
+			) 
+		</isNotEmpty>
+		<!-- 查询条件 -->
+		<isNotEmpty prepend="AND" property="loginAccount">
+			a.login_account like '%$loginAccount$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="roleId">
+			a.role_id= #roleId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userProvinceId">
+			a.user_province_id= #userProvinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userCityId">
+			a.user_city_id= #userCityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userDistrictId">
+			a.user_district_id= #userDistrictId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			a.school_id= #schoolId#
+		</isNotEmpty>
+		
+		<!-- 实施用的控制条件 -->
+		<isNotEmpty prepend="and" property="userProvinceId1">
+			a.user_province_id = #userProvinceId1#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userCityId1">
+			a.user_city_id = #userCityId1#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userDistrictId1">
+			a.user_district_id = #userDistrictId1#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId1">
+			a.school_id = #schoolId1#
+		</isNotEmpty>
+		
+		<isLessThan compareValue="5" compareProperty="role" prepend="and"> 
+			a.role_id >= #role#
+		</isLessThan>
+		<isGreaterEqual compareValue="7" compareProperty="role" prepend="and">
+			a.role_id >= #role#
+		</isGreaterEqual>
+		ORDER BY
+		a.id,a.user_province_id,a.user_city_id,a.user_district_id desc
+	</select>
+
+	<!--  select id="selectManagesCount" parameterClass="java.util.Map"
+		resultClass="int">
+		select count(1)counts  from (
+		select
+		a.id
+		from edu_user a
+		LEFT JOIN edu_sys_role b on
+		a.role_id=b.id
+		where a.status!=0 and a.role_id!=5
+		<isNotEmpty prepend="AND" property="loginAccount">
+			a.login_account like
+			'%$loginAccount$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="roleId">
+			a.role_id=
+			#roleId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userProvinceId">
+			a.user_province_id=
+			#userProvinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userCityId">
+			a.user_city_id=
+			#userCityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userDistrictId">
+			a.user_district_id=
+			#userDistrictId#
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="userProvinceId1">
+			a.user_province_id =
+			#userProvinceId1#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userCityId1">
+			a.user_city_id =
+			#userCityId1#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userDistrictId1">
+			a.user_district_id =
+			#userDistrictId1#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId1">
+			a.school_id =
+			#schoolId1#
+		</isNotEmpty>
+		
+		union
+		
+		select
+		a.id
+		from edu_user a
+		LEFT JOIN edu_sys_role b on
+		a.role_id=b.id
+		where a.status!=0 and a.role_id=0)as tt
+		
+	</select-->
+
+	<select id="selectManagesInfoCount" parameterClass="java.util.Map"
+		resultClass="int">
+		select
+		count(1)counts
+		from edu_user
+		where 1=1
+		and
+			status != 0
+		<isNotEmpty prepend="AND" property="loginAccount">
+			login_account=#loginAccount#
+		</isNotEmpty>
+	</select>
+
+	<insert id="insert_sys_manages" parameterClass="project.person.pojo.EduUser">
+		insert into
+		edu_user
+		(login_account, real_name,role_id,
+		id_number,mail,mobile,password,
+		status, version, user_province_id,
+		user_province_name, user_city_id,
+		user_city_name,user_district_id,user_district_name,
+		user_address,gender, create_by,
+		create_date, update_by,
+		update_date,school_id,school_name)
+		values
+		(#loginAccount#,
+		#realName#,#roleId#,
+		#idNumber#, #mail#,
+		#mobile#,
+		#password#,
+		#status#,
+		1,
+		#userProvinceId#,
+		#userProvinceName#,
+		#userCityId#,#userCityName#,
+		#userDistrictId#,#userDistrictName#,#userAddress#,#gender#,
+		#createBy:VARCHAR#,
+		now(), #updateBy:VARCHAR#, now(),#schoolId#,#schoolName#)
+	</insert>
+
+	<update id="update_sys_manages" parameterClass="project.person.pojo.EduUser">
+		update edu_user
+		set
+			update_date=now()
+		<isNotEmpty prepend="," property="loginAccount">
+			login_account=#loginAccount#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="realName">
+			real_name=#realName#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="roleId">
+			role_id=#roleId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="idNumber">
+			id_number=#idNumber#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="mail">
+			mail=#mail#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="mobile">
+			mobile=#mobile#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="password">
+			password=#password#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="isPassword">
+			is_password=#isPassword#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="status">
+			status=#status#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="userProvinceId">
+			user_province_id=#userProvinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="userProvinceName">
+			user_province_name=#userProvinceName#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="userCityId">
+			user_city_id=#userCityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="userCityName">
+			user_city_name=#userCityName#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="userDistrictId">
+			user_district_id=#userDistrictId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="userDistrictName">
+			user_district_name=#userDistrictName#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="userAddress">
+			user_address=#userAddress#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="gender">
+			gender=#gender#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="schoolId">
+			school_id=#schoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="schoolName">
+			school_name=#schoolName#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="updateBy">
+			update_by=#updateBy:VARCHAR#
+		</isNotEmpty>
+		where id=#id#
+	</update>
+
+	<update id="delete_sys_manages" parameterClass="project.person.pojo.EduUser">
+		update edu_user
+		set
+		status=#status#,
+		update_by=#updateBy:VARCHAR#,
+		update_date=now()
+		where id=#id#
+	</update>
+
+	<select id="selectSysManagesInfo" parameterClass="int"
+		resultMap="abatorgenerated_EduUserResult">
+		select
+		a.*,
+		b.role_name roleName,
+		b.id roleId,
+		role_id roleTypeId,
+		(case when a.gender=1 then
+		'男' else '女' end) sex,
+		(case when a.status=44 then '禁用' else '正常' end)
+		statusName,
+		c.school_name schoolName
+		from edu_user a
+		LEFT JOIN edu_sys_role b on a.role_id=b.id
+		
+		left join edu_school c on
+		a.school_id=c.school_id
+		where a.id=#id#
+	</select>
+
+	<select id="select_all_user_name" resultClass="java.lang.String">
+		select
+		login_account from edu_user  where status != 0
+	</select>
+	
+	<!-- 查询所有的教师编号 在模板导入教师信息是 进行数据校验 是否有重复的教师编号 -->
+	<select id="select_all_user_no" resultClass="java.lang.String">
+		select
+		teacher_No from edu_user where status != 0
+	</select>
+
+	<select id="count_user_by_conditions" parameterClass="java.util.HashMap"
+		resultClass="int">
+		SELECT
+		u.id
+		from edu_user u
+		left join edu_teacher_job j
+		on u.id =
+		j.teacher_id and u.version = j.version
+		LEFT join
+		edu_school s
+		on
+		u.school_id = s.school_id
+		LEFT join
+		edu_teacher_basic_info i
+		on
+		i.teacher_id = u.id and i.version = u.version
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="name">
+				u.real_name = #name#
+			</isNotNull>
+
+			<isNotNull prepend="and" property="retirees">
+				u.status != 9
+				</isNotNull>
+
+			<isNotNull prepend="and" property="id">
+				u.id_number = #id#
+			</isNotNull>
+
+			<isNotNull prepend="and" property="province">
+				u.user_province_name =
+				#province#
+				</isNotNull>
+			<isNotNull prepend="and" property="city">
+				u.user_city_name = #city#
+			</isNotNull>
+			<isNotNull prepend="and" property="district">
+				u.user_district_name =
+				#district#
+				</isNotNull>
+			<isNotNull prepend="and" property="school">
+				s.school_name = #school#
+			</isNotNull>
+			<isNotNull prepend="and" property="schoolCode">
+				s.school_code = #schoolCode#
+			</isNotNull>
+			<isNotNull prepend="and" property="subject">
+				j.job_former_teaching_subject like '%$subject$%'
+				</isNotNull>
+			<isNotNull prepend="and" property="phone">
+				i.teacher_phone_num =
+				#phone#
+				</isNotNull>
+			<isNotNull prepend="and" property="email">
+				i.teacher_email = #email#
+			</isNotNull>
+		</dynamic>
+	</select>
+	<!-- 
+	add yinxiaolong
+	 -->
+	<insert id="insertOrgUserInfo" parameterClass="java.util.HashMap">
+		insert into
+		edu_user
+		(login_account, real_name,
+		role_id,
+		mobile,password,
+		status,
+		version,create_by,
+		create_date)
+		values
+		(#loginAccount#,
+		#realName#,6,
+		#mobile#,
+		#password#,
+		1,
+		1, #createBy#,
+		now())
+	</insert>
+
+	<!-- add by jiabo : 检查用户登录名是否重复-->
+	<select id="existUserByLoginAccount" parameterClass="String"
+		resultClass="int">
+		select
+		count(*)
+		from edu_user
+		where login_account =
+		#loginAccount#
+	</select>
+	<!-- add by jiabo : 检查用户邮箱是否重复-->
+	<select id="existUserByMail" parameterClass="String"
+		resultClass="int">
+		select
+		count(*)
+		from edu_user
+		where mail=#mail#
+	</select>
+	<!-- add by jiabo : 检查教师编号是否重复-->
+	<select id="existUserByTeacherNo" parameterClass="String"
+		resultClass="int">
+		select
+		count(*)
+		from edu_user
+		where teacher_no =#teacherNo#
+	</select>
+	<!-- add by jiabo : 检查身份证号是否重复-->
+	<select id="existUserByIdNumber" parameterClass="String"
+		resultClass="int">
+		select
+		count(*)
+		from edu_user
+		where id_number =#idNumber#
+	</select>
+	<select id="getIdByLoginAccountAndMail" parameterClass="java.util.HashMap"
+		resultClass="int">
+		select
+		id
+		from edu_user
+		where (login_account
+		='$loginAccount$' or id_number ='$loginAccount$') and mail='$mail$'
+	</select>
+	<select id="getUserById" parameterClass="int"
+		resultClass="project.person.pojo.EduUser">
+		select
+		id,login_account as loginAccount,
+		id_number as
+		idNumber,
+		teacher_no as teacherNo,mail,real_name as realName,role_id as
+		roleId,
+		paswd_question_type as paswdQuestionType,
+		paswd_answer as
+		paswdAnswer,
+		password,
+		create_by as createBy,
+		update_by as updateBy,
+		create_date as createDate,
+		update_date as updateDate,
+		status,version,
+		teacher_no as teacherNo,
+		user_province_id as userProvinceId,
+		user_city_id as userCityId,
+		user_district_id as userDistrictId,
+		school_id as schoolId
+
+		from edu_user
+		where id=#id#
+	</select>
+	<select id="getUserByLoginAccountOrIdNumber" parameterClass="string"
+		resultClass="project.person.pojo.EduUser">
+		select
+		id,login_account as loginAccount,
+		id_number as
+		idNumber,
+		teacher_no as teacherNo,mail,real_name as realName,role_id as
+		roleId,
+		paswd_question_type as paswdQuestionType,
+		paswd_answer as
+		paswdAnswer,
+		password,
+		school_id as schoolId,
+		school_name as schoolName,
+		create_by as createBy,
+		update_by as updateBy,
+		create_date as createDate,
+		update_date as updateDate,
+		status,version,
+		teacher_no as teacherNo,
+		is_password as isPassword
+
+		from edu_user
+		where login_account=#loginAccount#
+		or
+		id_number=#loginAccount#
+	</select>
+
+	<!-- 
+	add yinxiaolong
+	 -->
+	<select id="selectAllUserList" parameterClass="java.util.Map"
+		resultClass="project.person.pojo.EduUser">
+		select login_account as loginAccount,
+		id_number as
+		idNumber,
+		teacher_no as teacherNo
+		from edu_user
+	</select>
+
+	<!-- 机构管理员count -->
+	<select id="selectOrgAdminsCount" parameterClass="java.util.HashMap"
+		resultClass="int">
+		select count(id)
+		from edu_user
+		WHERE organization_id =
+		#organizationId# and status !=0
+	</select>
+
+	<!-- 机构管理员列表 -->
+	<select id="selectOrgAdminsInfoByOrgId" parameterClass="java.util.HashMap"
+		resultClass="project.person.pojo.EduUser">
+		SELECT
+		u.id as id,
+		real_name as realName,
+		login_account as
+		loginAccount,
+		r.role_name roleName,
+		password as password
+		from edu_user u left join edu_sys_role r on r.id = u.role_id
+		WHERE organization_id =
+		#organizationId# and u.status !=0
+		ORDER BY
+		u.create_date desc
+		LIMIT
+		#startIndex#, #endIndex# 
+		
+	</select>
+
+
+	<select id="get_user_version" parameterClass="int" resultClass="int">
+		SELECT MAX(version) from edu_user WHERE id =#id#
+	</select>
+
+	<!-- 
+	修改User验重
+	add yinxiaolong
+	 -->
+	<select id="get_exist_admin" parameterClass="java.util.HashMap"
+		resultClass="int">
+		select
+		count(*)
+		from edu_user
+		where login_account =
+		#loginAccount# and id != #id#
+	</select>
+	<!-- 
+	add yinxiaolong
+	 -->
+	<select id="exist_admin_IdNumber" parameterClass="java.util.HashMap"
+		resultClass="int">
+		select
+		count(*)
+		from edu_user
+		where id_number =#idNumber#
+		and
+		id !=#id#
+	</select>
+	<!-- 
+	add yinxiaolong
+	 -->
+	<select id="exist_admin_email" parameterClass="java.util.HashMap"
+		resultClass="int">
+		select
+		count(*)
+		from edu_user
+		where mail=#mail#
+		and id !=#id#
+	</select>
+	<!-- 
+	add yinxiaolong
+	 -->
+	<select id="exist_admin_teacherNo" parameterClass="java.util.HashMap"
+		resultClass="int">
+		select
+		count(*)
+		from edu_user
+		where teacher_no =#teacherNo#
+		and id !=#id#
+	</select>
+	<!-- 
+	add yinxiaolong
+	 -->
+	<update id="org_update_admin_info" parameterClass="project.person.pojo.EduUser">
+		update
+		edu_user
+		set
+		login_account = #loginAccount#,
+		<isNotEmpty property="roleId">
+			role_id = #roleId:INTEGER#,
+		 </isNotEmpty>
+		password = #password#,
+		mail =
+		#mail#,
+		mobile = #mobile#,
+		id_number = #idNumber#,
+		real_name =
+		#realName#,
+		teacher_no = #teacherNo#,
+		update_by = #updateBy#,
+		version =
+		#version#,
+		update_date = now()
+		where id = #id#
+  </update>
+
+	<!-- 
+	add yinxiaolong
+	 -->
+	<select id="org_admin_info" parameterClass="int"
+		resultClass="project.person.pojo.EduUser">
+		SELECT
+		id as id,
+		role_id roleId,
+		real_name as realName,
+		login_account as
+		loginAccount,
+		password as password,
+		id_number as idNumber,
+		mail as mail,
+		mobile as mobile,
+		teacher_no as teacherNo,
+		organization_id as organizationId
+		from edu_user
+		where id=#id#
+	</select>
+	<!-- 
+	add yinxiaolong
+	 -->
+	<update id="org_update_admin_status" parameterClass="int">
+		update
+		edu_user set status = 0
+		where id = #id#
+	</update>
+
+	<!-- 成绩审核教师列表/成绩修改教师列表/已公布成绩的教师列表/教师成绩查询列表 总数 -->
+	<select id="count_mgr_select_user" parameterClass="java.util.HashMap"
+		resultClass="int">
+		select count(*)
+		from edu_project_comment c 
+		left JOIN edu_user u on u.id=c.teacher_id
+		left JOIN edu_school s on u.school_id=s.school_id
+		where u.status!=0
+		and c.status = 13		
+		<isNotEmpty prepend="AND" property="realName">
+			u.real_name like
+			'%$realName$%'
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="userProvinceId">
+			u.user_province_id=
+			#userProvinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userCityId">
+			u.user_city_id=
+			#userCityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userDistrictId">
+			u.user_district_id=
+			#userDistrictId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			u.school_id= #schoolId#
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="projectId">
+			c.project_id=
+			#projectId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolType">
+			s.school_type_id =
+			#schoolType#
+		</isNotEmpty>
+
+	</select>
+	
+	<!-- 成绩审核教师列表/成绩修改教师列表/已公布成绩的教师列表/教师成绩查询列表/培训结果审核的教师列表 -->
+	<select id="mgr_select_user_list" parameterClass="java.util.HashMap"
+		resultClass="project.person.pojo.EduUser">
+
+		select c.id as id,
+		u.real_name as realName,
+		u.gender,
+		u.user_province_name as userProvinceName,
+		u.user_city_name as
+		userCityName,
+		u.user_district_name as userDistrictName,
+		u.school_name as
+		schoolName,
+		c.teacher_score as teacherScore,
+		c.teacher_class_period as teacherClassPeriod,
+		c.project_id as projectId,
+		c.examine,
+		c.teacher_train_status_name as trainStatusName,
+		c.teacher_class_score as auditScore
+		from edu_project_comment c 
+		left JOIN edu_user u on u.id=c.teacher_id
+		left JOIN edu_school s on u.school_id=s.school_id
+		where u.status!=0
+		and c.status = 13
+		<isNotEmpty prepend="AND" property="realName">
+			u.real_name like
+			'%$realName$%'
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="userProvinceId">
+			u.user_province_id=
+			#userProvinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userCityId">
+			u.user_city_id=
+			#userCityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userDistrictId">
+			u.user_district_id=
+			#userDistrictId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			u.school_id= #schoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="projectId">
+			c.project_id=
+			#projectId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolType">
+			s.school_type_id =
+			#schoolType#
+		</isNotEmpty>
+			LIMIT #startIndex#, #endIndex#
+	</select>
+
+	<select id="selectLoginAccountCount" parameterClass="java.util.Map"
+		resultClass="int">
+		select
+		count(1)counts
+		from edu_user
+		where
+		login_account=#loginAccount# or id_number=#loginAccount# or
+		teacher_no=#loginAccount#
+	</select>
+
+	<select id="getRegionUserCount" parameterClass="java.util.HashMap"
+		resultClass="int">
+		select count(*)
+		from edu_user u
+		where u.status!=0 and role_id=5
+		<isNotEmpty prepend="AND" property="realName">
+			u.real_name like
+			'%$realName$%'
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="userProvinceId">
+			u.user_province_id=
+			#userProvinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userCityId">
+			u.user_city_id=
+			#userCityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userDistrictId">
+			u.user_district_id=
+			#userDistrictId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			u.school_id= #schoolId#
+		</isNotEmpty>
+
+
+
+	</select>
+	<select id="getRegionUserList" parameterClass="java.util.HashMap"
+		resultClass="project.person.pojo.EduUser">
+
+		select u.id as id,
+		u.real_name as realName,
+		u.gender,
+		u.user_province_name as userProvinceName,
+		u.user_city_name as
+		userCityName,
+		u.user_district_name as userDistrictName,
+		u.school_name as
+		schoolName,
+		u.id_number as idNumber
+
+
+		from edu_user u
+
+		where u.status!=0 and
+		role_id=5
+		<isNotEmpty prepend="AND" property="realName">
+			u.real_name like
+			'%$realName$%'
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="userProvinceId">
+			u.user_province_id=
+			#userProvinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userCityId">
+			u.user_city_id=
+			#userCityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userDistrictId">
+			u.user_district_id=
+			#userDistrictId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			u.school_id= #schoolId#
+		</isNotEmpty>
+
+	</select>
+
+	<!-- 非培训类项目用户查询  count-->
+	<select id="getRegionUserCountNotrain" parameterClass="java.util.HashMap"
+		resultClass="int">
+		select count(*)
+		from edu_user u left JOIN edu_school s on u.school_id=s.school_id
+		where u.status!=0 and role_id=5
+		and u.id
+		not in (select teacher_id from edu_project_notrain_comment pc where
+		pc.project_id=#projectId#)
+		<isNotEmpty prepend="AND" property="realName">
+			u.real_name like
+			'%$realName$%'
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="userProvinceId">
+			u.user_province_id=
+			#userProvinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userCityId">
+			u.user_city_id=
+			#userCityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userDistrictId">
+			u.user_district_id=
+			#userDistrictId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			u.school_id= #schoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolType">
+			s.school_type_id =
+			#schoolType#
+		</isNotEmpty>
+
+
+
+	</select>
+	<!-- 非培训类项目用户查询 -->
+	<select id="getRegionUserListNotrain" parameterClass="java.util.HashMap"
+		resultClass="project.person.pojo.EduUser">
+
+		select u.id as id,
+		u.real_name as realName,
+		u.gender,
+		u.user_province_name as userProvinceName,
+		u.user_city_name as
+		userCityName,
+		u.user_district_name as userDistrictName,
+		u.school_name as
+		schoolName,
+		u.id_number as idNumber
+
+
+		from edu_user u left JOIN edu_school s on u.school_id=s.school_id
+		where u.status!=0 and
+		role_id=5
+		and u.id not in (select
+		teacher_id from
+		edu_project_notrain_comment pc where
+		pc.project_id=#projectId#)
+		<isNotEmpty prepend="AND" property="realName">
+			u.real_name like
+			'%$realName$%'
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="userProvinceId">
+			u.user_province_id=
+			#userProvinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userCityId">
+			u.user_city_id=
+			#userCityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userDistrictId">
+			u.user_district_id=
+			#userDistrictId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			u.school_id= #schoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolType">
+			s.school_type_id =
+			#schoolType#
+		</isNotEmpty>
+           LIMIT #startIndex#, #endIndex#
+	</select>
+
+	<!-- 非培训类项目已登记学分用户查询  count-->
+	<select id="count_getRegionUserNotrainEntered" parameterClass="java.util.HashMap"
+		resultClass="int">
+		select count(*)
+		from edu_user u inner join edu_project_notrain_comment 
+		pc on u.id= pc.teacher_id left JOIN edu_school s on u.school_id=s.school_id
+		where u.status!=0 and role_id=5
+
+		<isNotEmpty prepend="AND" property="realName">
+			u.real_name like
+			'%$realName$%'
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="userProvinceId">
+			u.user_province_id=
+			#userProvinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userCityId">
+			u.user_city_id=
+			#userCityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userDistrictId">
+			u.user_district_id=
+			#userDistrictId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			u.school_id= #schoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="projectId">
+			pc.project_id=
+			#projectId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="notAudit">
+			pc.audit_status= 11
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="alreadyAudit">
+			pc.audit_status > 11
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolType">
+			s.school_type_id =
+			#schoolType#
+		</isNotEmpty>
+
+	</select>
+
+
+	<!-- 非培训类项目已登记学分用户查询 -->
+	<select id="getRegionUserListNotrainEntered" parameterClass="java.util.HashMap"
+		resultClass="project.person.pojo.EduUser">
+
+		select u.id as id,
+		u.real_name as realName,
+		u.gender,
+		u.user_province_name as userProvinceName,
+		u.user_city_name as
+		userCityName,
+		u.user_district_name as userDistrictName,
+		u.school_name as
+		schoolName,
+		u.id_number as idNumber,
+		pc.teacher_score as teacherScore,
+		pc.audit_score as auditScore,
+		pc.audit_status as auditStatus
+
+
+		from
+		edu_user u join edu_project_notrain_comment pc on u.id= pc.teacher_id  left JOIN edu_school s on u.school_id=s.school_id
+		where u.status!=0 and role_id=5
+
+		<isNotEmpty prepend="AND" property="realName">
+			u.real_name like
+			'%$realName$%'
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="userProvinceId">
+			u.user_province_id=
+			#userProvinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userCityId">
+			u.user_city_id=
+			#userCityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userDistrictId">
+			u.user_district_id=
+			#userDistrictId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			u.school_id= #schoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="projectId">
+			pc.project_id=
+			#projectId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="notAudit">
+			pc.audit_status= 11
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="alreadyAudit">
+			pc.audit_status > 11
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolType">
+			s.school_type_id =
+			#schoolType#
+		</isNotEmpty>
+        LIMIT #startIndex#, #endIndex#
+	</select>
+
+
+	<!-- 培训类项目已登记学分用户查询  count-->
+	<select id="count_getRegionUserListTrain" parameterClass="java.util.HashMap"
+		resultClass="int">
+		select count(*)
+		<!-- from edu_user u 
+		inner join edu_project_comment pc on u.id= pc.teacher_id
+		where u.status!=0 and role_id in (4,5)
+        and pc.status = 13 -->
+        from edu_project_comment pc 
+        inner join edu_user u on u.id= pc.teacher_id
+        where pc.status = 13
+        <isNotEmpty prepend="and" property="projectId">
+			pc.project_id=#projectId#
+		</isNotEmpty>
+      	<isNotEmpty prepend="AND" property="queryIdNumber" >
+        	u.id_number = #queryIdNumber#
+     	</isNotEmpty>
+      	<isNotEmpty prepend="AND" property="queryRealName" >
+        	u.real_name like
+			'%$queryRealName$%'
+     	</isNotEmpty>
+		<isNotEmpty prepend="and" property="provinceId">
+			u.user_province_id=
+			#provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cityId">
+			u.user_city_id=
+			#cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="districtId">
+			u.user_district_id=
+			#districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			u.school_id= #schoolId#
+		</isNotEmpty>
+		
+		<isNotEmpty prepend="and" property="notAudit">
+			pc.teacher_score_audit_status_id= 11 
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="alreadyAudit">
+			<isNotEmpty property="queryStatus">
+				pc.teacher_score_audit_status_id = #queryStatus#
+			</isNotEmpty>
+			<isEmpty property="queryStatus">
+				pc.teacher_score_audit_status_id > 11
+			</isEmpty>
+		</isNotEmpty>
+	</select>
+
+
+	<!-- 培训类项目已登记学分用户查询 -->
+	<select id="getRegionUserListTrain" parameterClass="java.util.HashMap"
+		resultClass="project.person.pojo.EduUser">
+
+		select u.id as id,
+		u.real_name as realName,
+		u.gender,
+		u.user_province_name as userProvinceName,
+		u.user_city_name as
+		userCityName,
+		u.user_district_name as userDistrictName,
+		u.school_name as
+		schoolName,
+		u.id_number as idNumber,
+		pc.teacher_score as teacherScore,
+		IFNULL(pc.teacher_class_score,'') as auditScore,
+		pc.teacher_score_audit_status_id
+		as auditStatus,
+		pc.teacher_score_audit_status_name as auditStatusName,
+		IFNULL(pc.teacher_class_period,'') as teacherClassPeriod
+
+
+		<!-- from edu_user u join
+		edu_project_comment pc on u.id= pc.teacher_id
+		where
+		u.status!=0 and
+		role_id in (4,5)
+        and pc.status = 13 -->
+        from edu_project_comment pc  
+        inner join edu_user u on u.id= pc.teacher_id
+		where pc.status = 13
+        <isNotEmpty prepend="and" property="projectId">
+			pc.project_id=#projectId#
+		</isNotEmpty>
+      	<isNotEmpty prepend="AND" property="queryIdNumber" >
+        	u.id_number = #queryIdNumber#
+     	</isNotEmpty>
+      	<isNotEmpty prepend="AND" property="queryRealName" >
+        	u.real_name like
+			'%$queryRealName$%'
+     	</isNotEmpty>
+		<isNotEmpty prepend="and" property="provinceId">
+			u.user_province_id=
+			#provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cityId">
+			u.user_city_id=
+			#cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="districtId">
+			u.user_district_id=
+			#districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			u.school_id= #schoolId#
+		</isNotEmpty>
+		
+		<isNotEmpty prepend="and" property="notAudit">
+			pc.teacher_score_audit_status_id= 11  
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="alreadyAudit">
+			<isNotEmpty property="queryStatus">
+				pc.teacher_score_audit_status_id = #queryStatus#
+			</isNotEmpty>
+			<isEmpty property="queryStatus">
+				pc.teacher_score_audit_status_id > 11
+			</isEmpty>
+		</isNotEmpty>
+		<isNotEmpty property="periodSortType">
+			ORDER BY pc.teacher_class_period $periodSortType$
+		</isNotEmpty>
+		<isNotEmpty property="scoreSortType">
+			ORDER BY pc.teacher_class_score $scoreSortType$
+		</isNotEmpty>
+		LIMIT #startIndex#, #endIndex#
+
+	</select>
+
+
+	<select id="getAllUserByParam"  
+		resultClass="project.person.pojo.EduUser">
+		
+		select u.id as id,
+		u.role_id as roleId,
+		u.real_name as realName,
+		u.user_province_name as userProvinceName,
+		u.user_city_name as
+		userCityName,
+		u.user_district_name as userDistrictName,
+		u.school_name as
+		schoolName,
+		u.id_number as idNumber
+		from
+		edu_user u
+		where u.role_id in
+		 <iterate open="(" close=")" conjunction="," > 
+                    #[]# 
+                </iterate> 
+		</select>
+		
+		<!-- 根据idNumber查询用户身份信息 ,用于福建网络研修平台对接实现单点登录-->
+		<select id="queryUserByIdNumber" parameterClass="String" resultClass="project.person.pojo.EduUser">
+		select
+		id,login_account as loginAccount,
+		id_number as
+		idNumber,
+		teacher_no as teacherNo,mail,real_name as realName,role_id as
+		roleId,
+		paswd_question_type as paswdQuestionType,
+		paswd_answer as
+		paswdAnswer,
+		password,
+		create_by as createBy,
+		update_by as updateBy,
+		create_date as createDate,
+		update_date as updateDate,
+		status,version,
+		teacher_no as teacherNo,
+		user_province_id as userProvinceId,
+		user_city_id as userCityId,
+		user_district_id as userDistrictId,
+		school_id as schoolId,
+		user_image_url as userImageUrl
+		from edu_user u
+		where id_number=#idNumber#
+		or u.id = #teacherId#
+		</select>
+		
+		<!-- 导入离退休教师，是否已离退休,本地区的管理员只能导入本地区的人员 -->
+		<select id="count_user_by_Retiree" parameterClass="java.util.HashMap"
+		resultClass="int">
+		SELECT u.id from edu_user u		
+		<dynamic prepend="where">
+			<isNotNull prepend="and" property="name">
+				u.real_name = #name#
+			</isNotNull>
+			<isNotNull prepend="and" property="retirees">
+				u.status not in(31,33)
+				</isNotNull>
+			<isNotNull prepend="and" property="id">
+				u.id_number = #id#
+			</isNotNull>
+			<isNotNull prepend="and" property="provinceId">
+				u.user_province_Id =
+				#provinceId#
+				</isNotNull>
+			<isNotNull prepend="and" property="cityId">
+				u.user_city_Id = #cityId#
+			</isNotNull>
+			<isNotNull prepend="and" property="districtId">
+				u.user_district_Id =
+				#districtId#
+				</isNotNull>
+			<isNotNull prepend="and" property="schoolId">
+				u.school_Id = #schoolId#
+			</isNotNull>
+			
+		</dynamic>
+	</select>
+	
+	<!-- 获取指定项目下参训教师及项目申报人 -->
+	<select id="selectUsersByProjectId" resultClass="project.person.pojo.EduUser" parameterClass="java.util.HashMap">
+    	<!-- 接收者为参训教师及项目申报人 -->
+    	<isEqual property="receiver" compareValue="1">
+			SELECT u.id, u.real_name as realName
+			FROM edu_project_comment pc
+			INNER JOIN edu_user u ON u.id=pc.teacher_id
+			WHERE pc.project_id=#projectId#
+			
+			UNION
+			
+			SELECT u.id, u.real_name as realName
+			FROM (SELECT applicant_id FROM edu_project_audit where id=(SELECT MAX(id)id from edu_project_audit where project_id=#projectId#))t
+			INNER JOIN edu_user u ON u.id = t.applicant_id
+		</isEqual>
+		
+		<!-- 接收者为参训教师 -->
+    	<isEqual property="receiver" compareValue="2">
+			SELECT u.id, u.real_name as realName
+			FROM edu_project_comment pc
+			INNER JOIN edu_user u ON u.id=pc.teacher_id
+			WHERE pc.project_id=#projectId#
+		</isEqual>
+		
+		<!-- 接收者为项目申报人 -->
+		<isEqual property="receiver" compareValue="3">
+			SELECT u.id, u.real_name as realName 
+			FROM (SELECT applicant_id FROM edu_project_audit where id=(SELECT MAX(id)id from edu_project_audit where project_id=#projectId#))t
+			INNER JOIN edu_user u ON u.id = t.applicant_id
+		</isEqual>
+	</select>
+</sqlMap>

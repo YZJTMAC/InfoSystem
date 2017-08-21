@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+   <beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd"
+       default-autowire="byName">
+   <bean id="supplyGoodsServiceReadDAO" class="project.supplierGoods.dao.impl.SupplyGoodsServiceReadDAOImpl" parent="parentQueryDao"/>
+    <bean id="supplyGoodsServiceWriteDAO" class="project.supplierGoods.dao.impl.SupplyGoodsServiceWriteDAOImpl" parent="parentDao"/>
+   <bean id="supplyGoodsService" class="project.supplierGoods.service.impl.SupplyGoodsServiceImpl"/>
+</beans>

@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap>
+  <resultMap id="OrganizationResult" class="project.organization.pojo.Organization" >
+    <result column="organization_id" property="organizationId" jdbcType="INTEGER" />
+    <result column="organization_name" property="organizationName" jdbcType="VARCHAR" />
+    <result column="org_code" property="orgCode" jdbcType="VARCHAR" />
+    <result column="organization_adderss" property="organizationAdderss" jdbcType="VARCHAR" />
+    <result column="contacts" property="contacts" jdbcType="VARCHAR" />
+    <result column="contacts_type" property="contactsType" jdbcType="VARCHAR" />
+    <result column="organization_province_id" property="organizationProvinceId" jdbcType="INTEGER" />
+    <result column="organization_province_name" property="organizationProvinceName" jdbcType="VARCHAR" />
+    <result column="organization_city_id" property="organizationCityId" jdbcType="INTEGER" />
+    <result column="organization_city_name" property="organizationCityName" jdbcType="VARCHAR" />
+    <result column="organization_district_id" property="organizationDistrictId" jdbcType="INTEGER" />
+    <result column="organization_district_name" property="organizationDistrictName" jdbcType="VARCHAR" />
+    <result column="memo" property="memo" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="DATE" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_date" property="updateDate" jdbcType="DATE" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+  </resultMap>
+  
+  	<!-- 机构管理列表count -->
+	<select id="selectSysOrganizationCount" parameterClass="java.util.Map" resultClass="int">
+		select
+		count(1)counts
+		from edu_organization WHERE status=1 and type=#type#
+		<isNotNull prepend="and" property="provinceId">
+	  		organization_province_id = #provinceId#
+	  	</isNotNull>
+	  	<isNotNull prepend="and" property="cityId">
+	  		organization_city_id = #cityId#
+	  	</isNotNull>
+	  	<isNotNull prepend="and" property="districtId">
+	  		organization_district_id = #districtId#
+	  	</isNotNull>
+			<isNotNull prepend="and" property="organizationName">
+	  		organization_name like '%$organizationName$%'
+	  	</isNotNull>
+	</select>
+	
+	<!-- 机构管理列表
+		add by yinxiaolong
+	 -->
+  	<select id="selectSysOrganizationList" parameterClass="java.util.HashMap" resultMap="OrganizationResult">
+	  	SELECT
+		organization_id,
+		user_id,
+		org_code,
+		organization_name,
+		contacts,
+		contacts_type,
+		organization_adderss,
+		organization_province_id,
+		organization_province_name,
+		organization_city_id,
+		organization_city_name,
+		organization_district_id,
+		organization_district_name,
+		memo,
+		create_by,
+		create_date,
+		update_by,
+		update_date,
+		status,
+		type
+		FROM
+			edu_organization
+		WHERE status  = 1 and type=#type#
+		<isNotNull prepend="and" property="provinceId">
+	  		organization_province_id = #provinceId#
+	  	</isNotNull>
+	  	<isNotNull prepend="and" property="cityId">
+	  		organization_city_id = #cityId#
+	  	</isNotNull>
+	  	<isNotNull prepend="and" property="districtId">
+	  		organization_district_id = #districtId#
+	  	</isNotNull>
+	  	<isNotNull prepend="and" property="organizationName">
+	  		organization_name like '%$organizationName$%'
+	  	</isNotNull>
+	  	order by organization_id DESC  limit #startIndex#,#endIndex#
+	</select>
+<!-- 
+	add by yinxiaolong
+查询培训机构名称 -->
+<select id="selectOrganizationName" resultClass="project.organization.pojo.Organization" parameterClass="java.util.HashMap">
+SELECT
+	t1.organization_id AS organizationId,
+	t1.organization_name AS organizationName,
+	t2.project_id AS projectId,
+	t2.training_address AS trainingAddress,
+	t2.class_subject_id as subjectIds,
+	t2.area_code as areaCode,
+	t3.project_name AS projectName
+FROM
+	edu_organization t1
+LEFT JOIN edu_organization_project t2 ON t1.organization_id = t2.organization_id
+LEFT JOIN edu_project t3 ON t3.id = t2.project_id
+WHERE
+	t2.project_id = #projectId# 
+	AND ((t1.organization_province_id = (SELECT user_province_id FROM edu_user WHERE id=#teacherId#))OR
+(t1.organization_city_id = (SELECT user_city_id FROM edu_user WHERE id=#teacherId#)) OR 
+(t1.organization_district_id = (SELECT user_district_id FROM edu_user WHERE id=#teacherId#)))
+	<isNotNull prepend="and" property="organizationId">
+	t2.organization_id = #organizationId#
+	</isNotNull>
+</select>
+
+<!-- 
+	add yinxiaolong
+	查看机构详情
+ -->
+<select id="selectorganizationInfoById" resultMap="OrganizationResult" parameterClass="int">
+SELECT
+	*
+FROM
+	edu_organization
+WHERE
+	organization_id = #organizationId#
+</select>
+	<select id="selectOrgByUserId" parameterClass="java.lang.Integer" resultMap="OrganizationResult" >
+		SELECT
+			*
+		FROM
+			edu_organization
+		WHERE
+			user_id = #userId#			
+	</select>
+
+<!-- 通过地区查询所有机构 add by zhangBo -->
+<select id="select_org_by_area" resultClass="project.organization.pojo.Organization" parameterClass="java.util.HashMap">
+	select organization_id as organizationId,
+	organization_name as organizationName,
+	status  
+	from edu_organization where status=1
+</select>
+
+
+
+
+<!-- 通过地区查询机构数量 add by zhangBo -->
+<select id="count_org_by_area" resultClass="int" parameterClass="java.util.HashMap" >
+	select count(1) from ( 
+		select organization_name from edu_organization where organization_id = -1
+	<isNotNull prepend="union" property="cityIds">
+	select organization_name from edu_organization where 1=1
+		<iterate conjunction="or "   open="(" close=")" prepend="and" property="cityIds">
+		organization_city_id = #cityIds[]#
+	</iterate>
+	</isNotNull>
+	
+	<isNotNull prepend="union" property="provinceIds">
+			select organization_name from edu_organization where 1=1
+	<iterate conjunction="or "   open="(" close=")" prepend="and" property="provinceIds">
+		organization_province_id = #provinceIds[]#
+	</iterate>
+	</isNotNull>
+
+	<isNotNull prepend="union" property="districtIds" >
+	select organization_name from edu_organization where 1=1
+	<iterate conjunction="or "   open="(" close=")" prepend="and" property="districtIds">
+		organization_district_id = #districtIds[]#
+	</iterate>
+	</isNotNull>
+	) o
+</select>
+
+<insert id="insert_ssorg" parameterClass="project.organization.dto.OrganizationDto">
+INSERT INTO edu_organization (
+	organization_name,
+	org_code,
+	contacts,
+	contacts_type,
+	organization_adderss,
+	organization_province_id,
+	organization_province_name,
+	organization_city_id,
+	organization_city_name,
+	organization_district_id,
+	organization_district_name,
+	memo,
+	create_by,
+	create_date,
+	update_by,
+	update_date,
+	status,
+	type
+)
+VALUES
+	(
+		#organizationName#,
+		#orgCode#,
+		#contacts#,
+		#contactsType#,
+		#organizationAdderss#,
+		#organizationProvinceId#,
+		#organizationProvinceName#,
+		#organizationCityId#,
+		#organizationCityName#,
+		#organizationDistrictId#,
+		#organizationDistrictName#,
+		#memo#,
+		#createBy#,
+		now(),
+		#updateBy#,
+		now(),
+		1,
+		#type#
+	)
+</insert>
+
+<insert id="insertOrganizationInfo" parameterClass="java.util.HashMap" >
+INSERT INTO edu_organization (
+	organization_name,
+	org_code,
+	contacts,
+	contacts_type,
+	organization_adderss,
+	organization_province_id,
+	organization_province_name,
+	organization_city_id,
+	organization_city_name,
+	organization_district_id,
+	organization_district_name,
+	memo,
+	create_by,
+	create_date,
+	status,
+	type
+)
+VALUES
+	(
+		#organizationName#,
+		#orgCode#,
+		#contacts#,
+		#contactsType#,
+		#organizationAdderss#,
+		#organizationProvinceId#,
+		#organizationProvinceName#,
+		#organizationCityId#,
+		#organizationCityName#,
+		#organizationDistrictId#,
+		#organizationDistrictName#,
+		#memo#,
+		#createBy#,
+		now(),
+		1,
+		#type#
+	)
+</insert>
+
+<insert id="insert_organization_info" parameterClass="java.util.HashMap" >
+INSERT INTO edu_organization (
+	organization_name,
+	contacts,
+	contacts_type,
+	organization_adderss,
+	memo,
+	create_by,
+	create_date,
+	update_by,
+	update_date,
+	status,
+	organization_province_id,
+	organization_province_name,
+	organization_city_id,
+	organization_city_name,
+	organization_district_id,
+	organization_district_name,
+	type
+)
+VALUES
+	(
+		#organizationName#,
+		#contacts#,
+		#contactsType#,
+		#organizationAdderss#,
+		#memo#,
+		#createBy#,
+		now(),
+		#updateBy#,
+		now(),
+		1,
+		#provinceId#,
+		#provinceName#,
+		#cityId#,
+		#cityName#,
+		#districtId#,
+		#districtName#,
+		#type#
+	)
+</insert>
+<update id="updateOrganization" parameterClass="java.util.HashMap" >
+UPDATE edu_organization
+SET organization_name = #organizationName#,
+org_code = #orgCode#,
+contacts = #contacts#,
+contacts_type = #contactsType#
+WHERE
+	organization_id = #organizationId#
+</update>
+
+<update id="deleteOrganization" parameterClass="java.util.HashMap" >
+UPDATE edu_organization
+SET 
+status = 0
+WHERE
+	organization_id = #organizationId#
+</update>
+
+
+<select id="selectAllOragnizations" resultMap="OrganizationResult">
+SELECT
+	*
+FROM
+	edu_organization
+</select>
+</sqlMap>

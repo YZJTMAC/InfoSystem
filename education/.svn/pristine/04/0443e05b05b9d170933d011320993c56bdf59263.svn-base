@@ -1,0 +1,1066 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_master_comparison">
+
+	<insert id="add_comparison" parameterClass="java.util.HashMap">
+		insert into edu_comparison
+		(
+			comparison_name,
+			comparison_type_id,
+			comparison_year,
+			comparison_type_name,
+			comparison_plan_num,
+			signup_start_date,
+			signup_end_date,
+			audit_start_date,
+			audit_end_date,
+			publish_date,
+			memo,
+			create_by,
+			create_date,
+			schools,
+			status,
+			create_level
+		)
+		values
+		(
+			#comparisonName#,
+			#comparisonType#,
+			#comparisonYear#,
+			#comparisonTypeName#,
+			#comparisonNum#,
+			#signupStartDate#,
+			#signupEndDate#,
+			#auditStartDate#,
+			#auditEndDate#,
+			#publishDate#,
+			#memo#,
+			#createBy#,
+			now(),
+			#schools#,
+			0,
+			#createLevel#
+		)
+		<selectKey resultClass="int" keyProperty="id">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+	
+	
+
+	<select id="query_comparison" parameterClass="java.util.HashMap" resultClass="project.master.pojo.EduComparison">
+		SELECT
+			t1.id AS id,
+			t1.comparison_name AS comparisonName,
+			t1.comparison_type_id AS comparisonTypeId,
+			t1.comparison_type_name AS comparisonTypeName,
+			t1.comparison_year AS comparisonYear,
+			t1.comparison_plan_num AS comparisonPlanNum,
+			t1.signup_start_date AS signupStartDate,
+			t1.signup_end_date AS signupEndDate,
+			t1.audit_start_date AS auditStartDate,
+			t1.audit_end_date AS auditEndDate,
+			t1.publish_date AS publishDate,
+			t1.memo AS memo,
+			t2.id AS createBy,
+			t2.real_name AS createByName,
+			t1.create_date AS createDate,
+			t1.`status` AS STATUS,
+			t1.schools as schools,
+			t1.create_level as createLevel,
+			IFNULL(t3.signNum,0) as signupNum
+		FROM
+			edu_comparison t1
+		LEFT JOIN edu_user t2 ON t1.create_by = t2.id
+		LEFT JOIN 
+		(
+		SELECT
+			count(*) as signNum,
+			comparison_id
+		FROM
+			edu_comparison_comment
+		WHERE
+			1 = 1
+		AND status != 1
+		<isNotNull prepend="and" property="schoolId">
+			school_id = #schoolId#
+		</isNotNull>
+		GROUP BY
+			comparison_id
+		) t3 on t3.comparison_id = t1.id
+		WHERE
+			1 = 1
+		<isNotNull prepend="and" property="comparisonId">
+			t1.id = #comparisonId#
+		</isNotNull>
+		<isNotNull prepend="and" property="status">
+			t1.status in ($status$)
+		</isNotNull>
+		<isNotNull prepend="and" property="comparisonName">
+			t1.comparison_name like '%$comparisonName$%'
+		</isNotNull>
+		<isNotNull prepend="and" property="comparisonType">
+			t1.comparison_type_id  = #comparisonType#
+		</isNotNull>
+		<isNotNull prepend="and" property="startDate">
+			t1.signup_start_date > #startDate#
+		</isNotNull>
+		<isNotNull prepend="and" property="endDate">
+			#endDate# > t1.signup_start_date
+		</isNotNull>
+		<isNotNull prepend="and" property="schoolId">
+			t1.schools like '%$schoolId$%'
+		</isNotNull>
+		<isNotNull prepend="and" property="schoolName">
+			t1.schools like '%$schoolName$%'
+		</isNotNull>
+		<isNotNull  property="startIndex">
+			LIMIT #startIndex#,#pageSize#
+		</isNotNull> 
+	</select>
+	<select id="query_comparison_count" parameterClass="java.util.HashMap" resultClass="int">
+		SELECT
+			count(*)
+		FROM
+			edu_comparison t1
+		LEFT JOIN edu_user t2 ON t1.create_by = t2.id
+		WHERE
+			1 = 1
+		<isNotNull prepend="and" property="comparisonId">
+			t1.id = #comparisonId#
+		</isNotNull>
+		<isNotNull prepend="and" property="status">
+			t1.status in ($status$)
+		</isNotNull>
+		<isNotNull prepend="and" property="schoolId">
+			t1.schools like '%$schoolId$%'
+		</isNotNull>
+		<isNotNull prepend="and" property="schoolName">
+			t1.schools like '%$schoolName$%'
+		</isNotNull>
+	</select>
+	
+	<select id="query_comparison_bytype_count"  parameterClass="java.util.HashMap" resultClass="int">
+		SELECT
+			count(*)
+		FROM
+			edu_comparison 
+		WHERE
+			1 = 1
+		<isNotNull prepend="and" property="id">
+			id = #id#
+		</isNotNull>
+		<isNotNull prepend="and" property="status">
+			status in ($status$)
+		</isNotNull>
+		<isNotNull prepend="and" property="roleId">
+			create_level<![CDATA[ <= ]]>($roleId$)
+		</isNotNull>
+	</select>
+	
+	<update id="update_comparison" parameterClass="java.util.HashMap">
+		UPDATE edu_comparison
+			SET 
+				<isNotNull property="comparisonName">
+				comparison_name = #comparisonName#,
+				</isNotNull>
+				<isNotNull property="comparisonNum">
+				comparison_plan_num = #comparisonNum#,
+				</isNotNull>
+				<isNotNull property="comparisonYear">
+				comparison_year = #comparisonYear#,
+				</isNotNull>
+				<isNotNull property="comparisonType">
+				comparison_type_id = #comparisonType#,
+				</isNotNull>
+				<isNotNull property="comparisonTypeName">
+				comparison_type_name = #comparisonTypeName#,
+				</isNotNull>
+				<isNotNull property="signupStartDate">
+				signup_start_date = #signupStartDate#,
+				</isNotNull>
+				<isNotNull property="signupEndDate">
+				signup_end_date = #signupEndDate#,
+				</isNotNull>
+				<isNotNull property="auditStartDate">
+				audit_start_date = #auditStartDate#,
+				</isNotNull>
+				<isNotNull property="auditEndDate">
+				audit_end_date = #auditEndDate#,
+				</isNotNull>
+				<isNotNull property="publishDate">
+				publish_date = #publishDate#,
+				</isNotNull>
+				<isNotNull property="memo">
+				memo = #memo#,
+				</isNotNull>
+				<isNotNull property="status">
+				status = #status#,
+				</isNotNull>
+				<isNotNull property="schools">
+				schools = #schools#,
+				</isNotNull>
+				update_by = #updateBy#,
+				update_date = now()
+		WHERE
+			id = #id#
+	</update>
+	<delete id="delete_comparison" parameterClass="java.util.HashMap">
+		delete 
+		from 
+			edu_comparison 
+		where 
+			id = #id#
+	</delete>
+	<select id="query_comparison_teacher_count" parameterClass="java.util.HashMap" resultClass="int">
+		SELECT
+			count(*)
+		FROM
+			edu_comparison_comment
+		WHERE
+			1 = 1
+		<isNotNull prepend="and" property="teacherName">
+			teacher_name like '%$teacherName$%'
+		</isNotNull>
+		<isNotNull prepend="and" property="comparisonId">
+			comparison_id = #comparisonId#
+		</isNotNull>
+		<isNotNull prepend="and" property="teacherId">
+			id = #teacherId#
+		</isNotNull>
+				<isNotNull prepend="and" property="schoolId">
+			school_id = #schoolId#
+		</isNotNull>
+		<isNotNull prepend="and" property="status">
+			status in ($status$)
+		</isNotNull>
+	</select>
+	
+	<select id="query_comparison_teacher" parameterClass="java.util.HashMap" resultClass="project.master.pojo.EduComparisonComment">
+			SELECT
+					id as id,
+					teacher_name as teacherName,
+					id_number as idNumber,
+					phone as phone,
+					school_id as schoolId,
+					school_name as schoolName,
+					subject_id as subjectId,
+					section_id as sectionId,
+					subject_name as subjectName,
+					section_name as sectionName,
+					status as status,
+					teacher_img as teacherImg,
+					memo as memo
+				FROM
+					edu_comparison_comment
+				WHERE
+					1 = 1
+				<isNotNull prepend="and" property="teacherName">
+					teacher_name like '%$teacherName$%'
+				</isNotNull>
+				<isNotNull prepend="and" property="comparisonId">
+					comparison_id = #comparisonId#
+				</isNotNull>
+				<isNotNull prepend="and" property="teacherId">
+					id = #teacherId#
+				</isNotNull>
+				<isNotNull prepend="and" property="schoolId">
+					school_id = #schoolId#
+				</isNotNull>
+				 	LIMIT #startIndex#,#pageSize#
+	</select>
+	
+	<insert id="signup_comparison_teacher"  parameterClass="java.util.HashMap">
+		insert into edu_comparison_comment
+		(
+			teacher_name,
+			id_number,
+			phone,
+			school_id,
+			school_name,
+			section_id,
+			subject_id,
+			section_name,
+			subject_name,
+			status,
+			comparison_id,
+			create_by,
+			create_date,
+			teacher_img,
+			memo
+			
+		)
+		values
+		(
+			#teacherName#,
+			#idNumber#,
+			#phone#,
+			#schoolId#,
+			#schoolName#,
+			#sectionId#,
+			#subjectId#,
+			#sectionName#,
+			#subjectName#,
+			#status#,
+			#comparisonId#,
+			#createBy#,
+			now(),
+			#teacherImg#,
+			#memo#
+		)
+		<selectKey resultClass="int" keyProperty="id">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	<update id="canel_signup_comparison_teacher" parameterClass="java.util.HashMap">
+		delete from edu_comparison_comment
+			WHERE
+		id = #id#
+	</update>
+	<update id="update_comparison_comment_status" parameterClass="java.util.HashMap">
+		update edu_comparison_comment set
+			status = #status#
+			WHERE
+			1 = 1
+			<isNotNull prepend="and" property="id">
+				id = #id#
+			</isNotNull>
+			<isNotNull prepend="and" property="comparisonId">
+				comparison_id = #comparisonId#
+			</isNotNull>
+			<isNotNull prepend="and" property="conditionStatus">
+				status = #conditionStatus#
+			</isNotNull>
+	</update>
+	<select id="query_signup_comparison_teacher" parameterClass="java.util.HashMap" resultClass="project.master.pojo.EduComparisonComment">
+		SELECT
+			t1.id as id,
+			t2.real_name as teacherName,
+			t2.id_number as idNumber,
+			t3.job_former_teaching_subject as teacherSubject,
+			t2.user_province_name as provinceName,
+			t2.user_city_name as cityName,
+			t2.user_district_name as districtName,
+			t2.school_name as schoolName,
+			t1.teacher_id as teacherId,
+			t1.status as status,
+			t1.comparison_id as comparisonId,
+			t1.expert_score as expertScore,
+			t1.average_score as averageScore
+		FROM
+			edu_comparison_comment t1
+			LEFT JOIN edu_user t2 on t1.teacher_id = t2.id
+			LEFT JOIN edu_teacher_job t3 ON t1.teacher_id = t3.teacher_id
+		WHERE
+		1 = 1
+		<isNotNull prepend="and" property="status#">
+			t1.status in ($status$)
+		</isNotNull> 
+		<isNotNull prepend="and" property="comparisonId">
+			t1.comparison_id = #comparisonId#
+		</isNotNull> 
+		<isNotNull prepend="and" property="teacherIds">
+			t1.teacher_id in ($teacherIds$)
+		</isNotNull> 
+		<isNotNull prepend="and" property="teacherName">
+			t1.teacher_id in ($teacherIds$)
+		</isNotNull> 
+		<isNotNull prepend="and" property="provinceId">
+			t2.user_province_id = #provinceId#
+		</isNotNull> 
+		<isNotNull prepend="and" property="cityId">
+			t2.user_city_id = #cityId#
+		</isNotNull> 
+		<isNotNull prepend="and" property="districtId">
+			t2.user_district_id = #districtId#
+		</isNotNull> 
+		<isNotNull prepend="and" property="schoolId">
+			t2.school_id = #schoolId#
+		</isNotNull> 
+		<isNotNull  property="startIndex">
+			LIMIT #startIndex#,#pageSize#
+		</isNotNull> 
+		
+	</select>
+	
+	<select id="query_signup_comparison_teacher_count" parameterClass="java.util.HashMap" resultClass="int">
+		SELECT
+			count(*)
+		FROM
+			edu_comparison_comment t1
+			LEFT JOIN edu_user t2 on t1.teacher_id = t2.id
+		WHERE
+		1 = 1
+		<isNotNull prepend="and" property="status#">
+			t1.status in ($status$)
+		</isNotNull> 
+		<isNotNull prepend="and" property="comparisonId">
+			t1.comparison_id = #comparisonId#
+		</isNotNull> 
+		<isNotNull prepend="and" property="teacherIds">
+			t1.teacher_id in ($teacherIds$)
+		</isNotNull> 
+		<isNotNull prepend="and" property="teacherName">
+			t1.teacher_id in ($teacherIds$)
+		</isNotNull> 
+		<isNotNull prepend="and" property="provinceId">
+			t2.user_province_id = #provinceId#
+		</isNotNull> 
+		<isNotNull prepend="and" property="cityId">
+			t2.user_city_id = #cityId#
+		</isNotNull> 
+		<isNotNull prepend="and" property="districtId">
+			t2.user_district_id = #districtId#
+		</isNotNull> 
+		<isNotNull prepend="and" property="schoolId">
+			t2.school_id = #schoolId#
+		</isNotNull> 
+	</select>
+	<insert id="create_master" parameterClass="java.util.HashMap" >
+	insert into edu_user
+		(
+			login_account,
+			password,
+			real_name,
+			role_id,
+			status,
+			create_by,
+			create_date
+			<isNotNull prepend="," property="masterImg">
+			user_image_url
+			</isNotNull>
+		)
+		values
+		(
+			#loginAccount#,
+			#password#,
+			#realName#,
+			#roleId#,
+			#status#,
+			#createBy#,
+			now()
+			<isNotNull prepend="," property="masterImg">
+			#masterImg#
+			</isNotNull>
+		)
+		<selectKey resultClass="int" keyProperty="id">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	<insert id="associated_master_comparison" parameterClass="java.util.HashMap">
+		insert into edu_comparison_master
+			(
+				comparison_id,
+				master_id,
+				create_by,
+				create_date
+			)
+			values
+			(
+				#comparisonId#,
+				#masterId#,
+				#createBy#,
+				now()
+			)
+		<selectKey resultClass="int" keyProperty="id">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	<select id="query_comparison_master" parameterClass="java.util.HashMap" resultClass="project.master.pojo.EduComparisonMaster">
+		SELECT
+			t1.id as id,
+			t1.real_name AS masterName,
+			t1.login_account AS loginAccount,
+			t1.`password` AS PASSWORD,
+			IFNULL(group_concat(t3.comparison_name SEPARATOR ','), '无') AS comparisonName,
+			t1.status as status,
+			t1.user_image_url as masterImg
+		FROM
+			edu_user t1
+		LEFT JOIN edu_comparison_master t2 ON t1.id = t2.master_id
+		LEFT JOIN edu_comparison t3 ON t2.comparison_id = t3.id
+		where 
+		1 = 1
+		AND t1.status != 0
+		<isNotNull prepend="and" property="roleId">
+			t1.role_id = #roleId#
+		</isNotNull>
+		<isNotNull prepend="and" property="comparisonId">
+			t2.comparison_id = #comparisonId#
+		</isNotNull>
+		<isNotNull prepend="and" property="masterId">
+			t1.id = #masterId#
+		</isNotNull>
+		<isNotNull prepend="and" property="masterName">
+			t1.real_name like '%$masterName$%'
+		</isNotNull>
+		<isNotNull prepend="and" property="loginAccount">
+			t1.login_account like '%$loginAccount$%'
+		</isNotNull>
+		group by t1.id 
+		<isNotNull  property="startIndex">
+			LIMIT #startIndex#,#pageSize#
+		</isNotNull>
+	</select>
+	<select id="query_comparison_master_count" parameterClass="java.util.HashMap" resultClass="int">
+		SELECT
+			count(*)
+		FROM
+			edu_user t1
+		<isNotNull property="comparisonId">
+			LEFT JOIN edu_comparison_master t2 ON t2.master_id = t1.id
+		</isNotNull>
+		where 
+		1 = 1
+		AND t1.status != 0
+		AND t1.role_id = #roleId#
+		<isNotNull prepend="and" property="comparisonId">
+			t2.comparison_id = #comparisonId#
+		</isNotNull>
+	</select>
+	<update id="update_comparison_master_disable" parameterClass="java.util.HashMap">
+		UPDATE edu_user t1
+			LEFT JOIN edu_comparison_master t2 ON t1.id = t2.master_id
+			SET STATUS = 44
+			WHERE
+				t2.comparison_id = #id# 
+				AND t1.role_id = #roleId#
+	</update>
+	<select id="query_comparison_check" parameterClass="java.util.HashMap" resultClass="project.master.pojo.EduComparison">
+		SELECT
+			t1.id AS id,
+			t1.comparison_name AS comparisonName,
+			t1.comparison_type_id AS comparisonTypeId,
+			t1.comparison_type_name AS comparisonTypeName,
+			t1.comparison_plan_num AS comparisonPlanNum,
+			t1.signup_start_date AS signupStartDate,
+			t1.signup_end_date AS signupEndDate,
+			t1.memo AS memo,
+			t2.real_name AS createBy,
+			t1.create_date AS createDate,
+			t1.`status` AS STATUS,
+			t3.id as isCheck
+		FROM
+			edu_comparison t1
+		LEFT JOIN edu_user t2 ON t1.create_by = t2.id
+		LEFT JOIN (
+			SELECT
+				id,
+				comparison_id
+			FROM
+				edu_comparison_master
+			WHERE
+				master_id = #masterId#
+		) t3 ON t3.comparison_id = t1.id
+		WHERE
+			1 = 1
+		<isNotNull prepend="and" property="id">
+			t1.id = #id#
+		</isNotNull>
+		<isNotNull prepend="and" property="status">
+			t1.status in ($status$)
+		</isNotNull>
+	</select>
+	<delete id="delete_comparison_to_master" parameterClass="java.util.HashMap">
+		delete 
+		from 
+			edu_comparison_master
+		where 
+		<isNotNull property="masterId">
+			master_id = #masterId#
+		</isNotNull>
+		<isNotNull property="comparisonId">
+			comparison_id = #comparisonId#
+		</isNotNull>
+		
+		
+	</delete>
+	<update id="set_master_status" parameterClass="java.util.HashMap">
+		update edu_user set status = #status# where id = #id#
+	</update>
+	<delete id="del_comparison_file" parameterClass="java.util.HashMap">
+		delete 
+		from 
+			edu_file 
+		where 
+			id = #id#
+	</delete>
+	<update id="set_comparison_status" parameterClass="java.util.HashMap">
+		UPDATE edu_comparison
+			SET 
+				<isNotNull property="status">
+				status = #status#,
+				</isNotNull>
+				update_by = #updateBy#,
+				update_date = now()
+		WHERE
+			id = #id#
+	</update>
+	<select id="get_area" parameterClass="java.util.HashMap" resultClass="project.system.pojo.SysArea">
+		select 
+			code as code ,
+			name as name,
+			up_lv_code as upLvCode,
+			type as type,
+			area_code as areaCode
+		from 
+			edu_sys_area
+		where 
+			1 = 1
+		<isNotNull prepend="and" property="fatherCode">
+			up_lv_code in ($fatherCode$)
+		</isNotNull>
+		<isNotNull property="comparisonId">
+			comparison_id = #comparisonId#
+		</isNotNull>
+		
+	</select>
+	
+	<select id="get_school" parameterClass="java.util.HashMap" resultClass="project.system.pojo.EduSchool">
+		select 
+			school_id as schoolId,
+			school_name as schoolName,
+			school_type_id as schoolTypeId,
+			school_type_name as schoolTypeName,
+			school_province_id as schoolProvinceId,
+			school_province_name as schoolProvinceName,
+			school_city_id as schoolCityId,
+			school_city_name as schoolCityName,
+			school_district_id as schoolDistrictId,
+			school_district_name as schoolDistrictName
+		from 
+			edu_school
+		where 
+			1 = 1
+		<isNotNull prepend="and" property="provinceId">
+			school_province_id = #provinceId#
+		</isNotNull>
+		<isNotNull prepend="and" property="cityId">
+			school_city_id = #cityId#
+		</isNotNull>
+		<isNotNull prepend="and" property="districtId">
+			school_district_id = #districtId#
+		</isNotNull>
+	</select>
+	<update id="update_comparison_comment" parameterClass="java.util.HashMap">
+		update edu_comparison_comment set 
+		<isNotNull property="teacherName">
+		teacher_name = #teacherName#,
+		</isNotNull>
+		<isNotNull property="idNumber">
+		id_number = #idNumber#,
+		</isNotNull>
+		<isNotNull property="teacherImg">
+	    teacher_img = #teacherImg#,
+		</isNotNull>
+		<isNotNull property="phone">
+		phone = #phone#,
+		</isNotNull>
+		<isNotNull property="schoolName">
+		school_name = #schoolName#,
+		</isNotNull>
+		<isNotNull property="subject">
+		subject = #subject#,
+		</isNotNull>
+		<isNotNull property="section">
+		section = #section#,
+		</isNotNull>
+		<isNotNull property="memo">
+		memo = #memo#,
+		</isNotNull>
+		update_by = #updateBy#,
+		update_date = now()
+		where
+		id = #id#
+	</update>
+	<select id="get_memos" parameterClass="java.util.HashMap" resultClass="project.master.pojo.EduComparisonComment">
+		select 
+			IFNULL(p_memo,'无') as provinceMemo,
+			IFNULL(c_memo,'无') as cityMemo,
+			IFNULL(d_memo,'无') as districtMemo,
+			IFNULL(p_memo_date,'无') as provinceMemoDate,
+			IFNULL(c_memo_date,'无') as cityMemoDate,
+			IFNULL(d_memo_date,'无') as districtMemoDate
+		from 
+			edu_comparison_comment
+		where 
+			id = #id#
+	</select>
+	
+	<select id="query_comparison_comment_count_byid"  parameterClass="java.util.HashMap" resultClass="int">
+		SELECT
+			count(*)
+		FROM
+			edu_comparison_comment
+		WHERE
+			1 = 1
+		<isNotNull prepend="and" property="comparisonId">
+			comparison_id = #comparisonId#
+		</isNotNull>
+	</select>
+	<select id="query_comparison_comment_byid"  parameterClass="java.util.HashMap" resultClass="project.master.pojo.EduComparisonComment">
+		SELECT
+			*
+		FROM
+			edu_comparison_comment
+		WHERE
+			1 = 1
+		<isNotNull prepend="and" property="comparisonId">
+			comparison_id = #comparisonId#
+		</isNotNull>
+	</select>
+	
+	<select id="query_comparison_by_master" parameterClass="java.util.HashMap" resultClass="project.master.pojo.EduComparison">
+		SELECT
+			t1.id as id,
+			t1.comparison_name as comparisonName,
+			t1.comparison_type_name as comparisonTypeName,
+			t1.comparison_type_id as comparisonTypeId,
+			t1.signup_start_date as signupStartDate,
+			t1.signup_end_date as signupEndDate,
+			t1.audit_start_date as auditStartDate,
+			t1.audit_end_date as auditEndDate,
+			t1.comparison_year as comparisonYear,
+			t1.memo as memo,
+			t1.publish_date as publishDate,
+			t1.comparison_type_id as comparisonPlanNum,
+			t1.status as status,
+			t1.create_by as createBy
+		FROM
+			edu_comparison t1
+		LEFT JOIN edu_comparison_master t2 ON t1.id = t2.comparison_id
+		LEFT JOIN edu_user t3 ON t2.master_id = t3.id
+		where  1=1
+		<isNotNull prepend="and" property="id">
+			t2.master_id = #id#
+		</isNotNull>
+		<isNotNull prepend="and" property="status">
+			t1.status = #status#
+		</isNotNull>
+		<isNotNull  property="startIndex">
+			LIMIT #startIndex#,#pageSize#
+		</isNotNull> 
+	</select>
+	<select id="query_comparison_by_master_count" parameterClass="java.util.HashMap" resultClass="int">
+		SELECT
+			count(*)
+		FROM
+			edu_comparison t1
+		LEFT JOIN edu_comparison_master t2 ON t1.id = t2.comparison_id
+		LEFT JOIN edu_user t3 ON t2.master_id = t3.id
+		where  1=1
+		<isNotNull prepend="and" property="id">
+			t2.master_id = #id#
+		</isNotNull>
+		<isNotNull prepend="and" property="status">
+			t1.status = #status#
+		</isNotNull>
+	</select>
+	<insert id="judge_score" parameterClass="java.util.HashMap">
+		insert into edu_comparison_score
+		(
+			master_id ,
+			teacher_id,
+			comparison_id,
+			score,
+			is_pass,
+			memo,
+			create_by,
+			create_date
+		)
+			values
+		(
+			#masterId#,
+			#teacherId#,
+			#comparisonId#,
+			#score#,
+			#isPass#,
+			#memo#,
+			#createBy#,
+			now()
+		)
+	<selectKey resultClass="int" keyProperty="id">
+		SELECT
+		LAST_INSERT_ID()
+	</selectKey>
+	</insert>
+	<select id="query_comparison_teacher_score" parameterClass="java.util.HashMap" resultClass="project.master.pojo.EduComparisonComment">
+	SELECT
+		t1.id AS id,
+		t1.teacher_name AS teacherName,
+		t1.id_number AS idNumber,
+		t1.phone AS phone,
+		t1.school_id AS schoolId,
+		t1.school_name AS schoolName,
+		t1.section_id as sectionId,
+		t1.section_name as sectionName,
+		t1.subject_id as subjectId,
+		t1.subject_name as subjectName,
+		t1.STATUS AS STATUS,
+		t1.teacher_img AS teacherImg,
+		t1.memo AS memo,
+		t2.score as expertScore,
+		t2.is_pass as isPass,
+		t1.create_by as createBy
+	FROM
+		edu_comparison_comment t1
+	LEFT JOIN (
+		SELECT
+			score,
+			teacher_id,
+			is_pass
+		FROM
+			edu_comparison_score
+		WHERE
+		master_id = #masterId#
+		AND comparison_id = #comparisonId#
+	) t2 ON t2.teacher_id = t1.id
+	WHERE
+		1 = 1
+		AND t1.status = 4
+		<isNotNull prepend="and" property="comparisonId">
+			comparison_id = #comparisonId#
+		</isNotNull>
+		<isNotNull prepend="and" property="teacherName">
+			t1.teacher_name like '%$teacherName$%'
+		</isNotNull>
+		<isNotNull  property="startIndex">
+			LIMIT #startIndex#,#pageSize#
+		</isNotNull> 
+	</select>
+	<select id="query_teacher_comment" parameterClass="java.util.HashMap" resultClass="project.master.pojo.EduComparisonComment">
+	SELECT
+		t1.id AS id,
+		t1.teacher_name AS teacherName,
+		t1.id_number AS idNumber,
+		t1.phone AS phone,
+		t1.school_id AS schoolId,
+		t1.school_name AS schoolName,
+		t1.subject_id AS subjectId,
+		t1.subject_name AS subjectName,
+		t1.section_id AS sectionId,
+		t1.section_name AS sectionName,
+		t1.STATUS AS STATUS,
+		t1.teacher_img AS teacherImg,
+		t1.memo AS memo,
+		t1.create_by as createBy,
+		IFNULL(ROUND(AVG(t2.score),1),0) AS expertScore,
+		t2.is_pass as isPass,
+		t3.real_name as createByName,
+		t1.create_date as createDate
+	FROM
+		edu_comparison_comment t1
+	LEFT JOIN (
+		SELECT
+			score,
+			teacher_id,
+			is_pass
+		FROM
+			edu_comparison_score
+		WHERE
+		1 = 1
+		<isNotNull prepend="and" property="masterId">
+			master_id = #masterId#
+		</isNotNull>
+		<isNotNull prepend="and" property="comparisonId">
+			comparison_id = #comparisonId#
+		</isNotNull>
+	) t2 ON t2.teacher_id = t1.id
+	LEFT JOIN edu_user t3 ON t1.create_by = t3.id
+	WHERE
+	    1 = 1
+		<isNotNull prepend="and" property="comparisonId">
+			comparison_id = #comparisonId#
+		</isNotNull>
+		<isNotNull prepend="and" property="status">
+			t1.status in ($status$)
+		</isNotNull>
+	GROUP BY
+		t1.id
+	order by status desc ,expertScore DESC
+	<isNotNull  property="startIndex">
+		LIMIT #startIndex#,#pageSize#
+	</isNotNull> 
+	</select>
+	<select id="query_master_score" parameterClass="java.util.HashMap" resultClass="project.master.pojo.EduComparisonComment">
+	SELECT
+		t1.teacher_name as teacherName,
+		t2.score as expertScore,
+		t3.real_name as masterName,
+		t2.create_date as createDate,
+		t2.memo as memo,
+		t3.login_account as loginAccount
+	FROM
+		edu_comparison_score t2
+	LEFT JOIN `edu_comparison_comment` t1 ON t1.id = t2.teacher_id
+	LEFT JOIN edu_user t3 ON t2.master_id = t3.id
+	WHERE
+		1 = 1
+	<isNotNull prepend="and" property="teacherId">
+		t1.id = #teacherId#
+	</isNotNull>
+	<isNotNull prepend="and" property="comparisonId">
+		t2.comparison_id = #comparisonId#
+	</isNotNull>
+	</select>
+	
+	<select id="query_master" parameterClass="java.util.HashMap" resultClass="project.person.pojo.EduUser">
+		select * from edu_user 
+		where 1 = 1
+		<isNotNull prepend="and" property="loginAccount">
+			login_account = #loginAccount#
+		</isNotNull>
+	</select>
+	<update id="update_master_one" parameterClass="java.util.HashMap">
+		update edu_user set 
+		update_by = #updateBy#,
+		update_date = now()
+		<isNotNull prepend="," property="realName">
+		real_name = #realName#
+		</isNotNull>
+		<isNotNull prepend="," property="loginAccount">
+		login_account = #loginAccount#
+		</isNotNull>
+		<isNotNull prepend="," property="password">
+		password = #password#
+		</isNotNull>
+		<isNotNull prepend="," property="masterImg">
+		user_image_url = #masterImg#
+		</isNotNull>
+		where 
+		id = #masterId#
+	</update>
+	<select id="query_judge_detail" parameterClass="java.util.HashMap" resultClass="project.master.pojo.EduComparisonComment">
+		SELECT
+			t1.id AS id,
+			t2.teacher_img AS teacherImg,
+			t2.teacher_name AS teacherName,
+			t2.id_number AS idNumber,
+			t2.section_name AS sectionName,
+			t2.subject_name AS subjectName,
+			t2.school_name AS schoolName,
+			t1.score AS expertScore,
+			t1.memo AS memo
+		FROM
+			edu_comparison_score t1
+		LEFT JOIN `edu_comparison_comment` t2 ON t1.teacher_id = t2.id
+		WHERE
+			t1.comparison_id = #comparisonId#
+		AND t1.master_id = #masterId#
+	</select>
+	<select id="query_judge_detail_count" parameterClass="java.util.HashMap" resultClass="int">
+		SELECT
+			count(*)
+		FROM
+			edu_comparison_score 
+		WHERE
+			comparison_id = #comparisonId#
+		AND master_id = #masterId#
+	</select>
+	
+	<select id="query_master_avaliable" parameterClass="java.util.HashMap" resultClass="project.master.pojo.EduComparisonMaster">
+	SELECT
+		t1.id AS id,
+		t1.real_name AS masterName,
+		t2.id as isCheck
+	FROM
+		edu_user t1
+	LEFT JOIN (
+		SELECT
+			*
+		FROM
+			edu_comparison_master
+		WHERE
+			comparison_id = #comparisonId#
+	) t2 ON t1.id = t2.master_id
+	WHERE
+		1 = 1
+		and t1.role_id = 41
+		and t1.status = 8
+	</select>
+	
+	<!-- 更新报名教师状态 byTMACJ-->
+	<update id="update_teacher_status" parameterClass="java.util.HashMap">
+		UPDATE edu_comparison_comment
+			SET 
+				<isNotNull property="status">
+				status = #status#,
+				</isNotNull>
+				<isNotNull property="memoName">
+				$memoName$ = #memoVal#,
+				</isNotNull>
+				<isNotNull property="memoDateName">
+				$memoDateName$ = now()
+				</isNotNull>
+			WHERE
+				id = #id#
+	</update>
+		<select id="query_comparison_bytype" parameterClass="java.util.HashMap" resultClass="project.master.pojo.EduComparison">
+		SELECT
+			t1.id AS id,
+			t1.comparison_name AS comparisonName,
+			t1.comparison_type_id AS comparisonTypeId,
+			t1.comparison_type_name AS comparisonTypeName,
+			t1.comparison_year AS comparisonYear,
+			t1.comparison_plan_num AS comparisonPlanNum,
+			t1.signup_start_date AS signupStartDate,
+			t1.signup_end_date AS signupEndDate,
+			t1.audit_start_date AS auditStartDate,
+			t1.audit_end_date AS auditEndDate,
+			t1.publish_date AS publishDate,
+			t1.memo AS memo,
+			t1.create_date AS createDate,
+			t1.`status` AS STATUS,
+			t1.schools as schools
+		FROM
+			edu_comparison t1
+		WHERE
+			1 = 1
+		<isNotNull prepend="and" property="id">
+			t1.id = #id#
+		</isNotNull>
+		<isNotNull prepend="and" property="status">
+			t1.status in ($status$)
+		</isNotNull>
+		<isNotNull prepend="and" property="roleId">
+			t1.create_level<![CDATA[<=]]>($roleId$)
+		</isNotNull>
+	</select>
+	<select id="query_comparison_review" parameterClass="java.util.HashMap" resultClass="project.master.pojo.EduComparison">
+		SELECT
+			t1.id AS id,
+			t1.comparison_name AS comparisonName,
+			t1.comparison_type_id AS comparisonTypeId,
+			t1.comparison_type_name AS comparisonTypeName,
+			t1.comparison_year AS comparisonYear,
+			t1.comparison_plan_num AS comparisonPlanNum,
+			t1.signup_start_date AS signupStartDate,
+			t1.signup_end_date AS signupEndDate,
+			t1.audit_start_date AS auditStartDate,
+			t1.audit_end_date AS auditEndDate,
+			t1.publish_date AS publishDate,
+			t1.memo AS memo,
+			t2.real_name AS createBy,
+			t1.create_date AS createDate,
+			t1.`status` AS STATUS,
+			t1.schools as schools,
+			t1.create_level as createLevel
+		FROM
+			edu_comparison t1
+		LEFT JOIN edu_user t2 ON t1.create_by = t2.id
+		WHERE
+			1 = 1
+		<isNotNull prepend="and" property="id">
+			t1.id = #id#
+		</isNotNull>
+		<isNotNull prepend="and" property="status">
+			t1.status in ($status$)
+		</isNotNull>
+	</select>
+	
+</sqlMap>

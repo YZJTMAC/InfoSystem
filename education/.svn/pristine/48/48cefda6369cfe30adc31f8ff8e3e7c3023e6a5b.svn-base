@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_teacher_nlts" >
+	 <resultMap id="fjimportSelectResult" class="project.system.pojo.Fjimport" >
+      <result column="id" property="id" jdbcType="INTEGER" />
+      <result column="org_name" property="orgName" jdbcType="VARCHAR" />
+      <result column="province_name" property="provinceName" jdbcType="VARCHAR" />
+      <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+      <result column="district_name" property="districtName" jdbcType="VARCHAR" />
+      <result column="school_name" property="schoolName" jdbcType="VARCHAR" />
+      <result column="province_id" property="provinceId" jdbcType="VARCHAR" />
+      <result column="city_id" property="cityId" jdbcType="VARCHAR" />
+      <result column="district_id" property="districtId" jdbcType="VARCHAR" />
+      <result column="school_id" property="schoolId" jdbcType="VARCHAR" />
+      <result column="shangbao_num" property="shangbaoNum" jdbcType="INTEGER" />
+      <result column="denglu_num" property="dengluNum" jdbcType="INTEGER" />
+      <result column="canxunlv" property="canxunlv" jdbcType="VARCHAR" />
+      <result column="youxiaoxuexi_num" property="youxiaoxuexiNum" jdbcType="INTEGER" />
+      <result column="xuexilv" property="xuexilv" jdbcType="VARCHAR" />
+      <result column="hege_num" property="hegenum" jdbcType="INTEGER" />
+      <result column="hegelv" property="hegelv" jdbcType="VARCHAR" />
+      
+      <result column="gongzuofang_num" property="gongzuofangNum" jdbcType="INTEGER" />
+      <result column="kechengzuoye_num" property="kechengzuoyeNum" jdbcType="INTEGER" />
+      <result column="yanxiuhuodong_num" property="yanxiuhuodongNum" jdbcType="INTEGER" />
+      <result column="yanxiuhuodongcanyu_num" property="yanxiuhuodongcanyuNum" jdbcType="INTEGER" />
+      <result column="shijianyanxiuchengguo_num" property="shijianyanxiuNum" jdbcType="INTEGER" />
+      <result column="xiangmujianbao_num" property="xiaomujianbaoNum" jdbcType="INTEGER" />
+      
+      <result column="create_time" property="createTime" jdbcType="DATETIME" />
+	  <result column="create_by" property="createBy" jdbcType="VARCHAR"/>
+      <result column="update_time" property="updateTime" jdbcType="DATETIME" />
+	  <result column="update_by" property="updateBy" jdbcType="VARCHAR"/>
+    </resultMap>
+    
+    <resultMap id="fjimportInfoResult" class="project.system.pojo.FjimportActivty" >
+      <result column="shangbao_num" property="shangbaoNum" jdbcType="INTEGER" />
+      <result column="hege_num" property="hegenum" jdbcType="INTEGER" />
+    </resultMap>
+  
+	<resultMap id="fjTeacherStudyResult" class="project.system.pojo.FjTeacherStudyInfo" >
+	<result column="areaId" property="areaId" jdbcType="INTEGER" />
+	<result column="areaName" property="areaName" jdbcType="VARCHAR" />
+      <result column="shangbaoSum" property="shangbaoSum" jdbcType="INTEGER" />
+      <result column="dengluSum" property="dengluSum" jdbcType="INTEGER" />
+      <result column="canxunlvSum" property="canxunlvSum" jdbcType="VARCHAR" />
+      <result column="youxiaoxuexiSum" property="youxiaoxuexiSum" jdbcType="INTEGER" />
+      <result column="xuexilvSum" property="xuexilvSum" jdbcType="VARCHAR" />
+      <result column="hegeSum" property="hegeSum" jdbcType="INTEGER" />
+      <result column="hegelvSum" property="hegelvSum" jdbcType="VARCHAR" />
+      
+      <result column="gongzuofangSum" property="gongzuofangSum" jdbcType="INTEGER" />
+      <result column="kechengzuoyeSum" property="kechengzuoyeSum" jdbcType="INTEGER" />
+      <result column="yanxiuhuodongSum" property="yanxiuhuodongSum" jdbcType="INTEGER" />
+      <result column="yanxiuhuodongcanyuSum" property="yanxiuhuodongcanyuSum" jdbcType="INTEGER" />
+      <result column="shijianyanxiuchengguoSum" property="shijianyanxiuchengguoSum" jdbcType="INTEGER" />
+      <result column="xiangmujianbaoSum" property="xiangmujianbaoSum" jdbcType="INTEGER" />
+    </resultMap>
+
+	<!-- 下载数据模板 -->
+	<select id="select_oldfjimport_list" parameterClass="java.util.HashMap" 
+   		resultClass="project.system.pojo.Fjimport">
+   		select 
+   		ifnull(province_name,'') as provinceName,
+		ifnull(city_name,'') as cityName,
+		ifnull(district_name,'') as districtName,
+		ifnull(school_name,'') as schoolName,
+   		ifnull(shangbao_num,'') as shangbaoNum,
+		ifnull(denglu_num,'') as dengluNum,
+		ifnull(round(f.denglu_num / f.shangbao_num * 100,2),'') as canxunlv,
+		ifnull(youxiaoxuexi_num,'') as youxiaoxuexiNum,
+		ifnull(round(f.youxiaoxuexi_num / f.denglu_num * 100,2),'') as xuexilv,
+		ifnull(hege_num,'') as hegenum,
+		ifnull(round(f.hege_num / f.youxiaoxuexi_num * 100,2),'') as hegelv,
+		ifnull(gongzuofang_num,'') as gongzuofangNum,
+		ifnull(kechengzuoye_num,'') as  kechengzuoyeNum,
+		ifnull(yanxiuhuodong_num,'') as yanxiuhuodongNum,
+		ifnull(yanxiuhuodongcanyu_num,'') as yanxiuhuodongcanyuNum,
+		ifnull(shijianyanxiuchengguo_num,'') as  shijianyanxiuNum,
+		ifnull(xiangmujianbao_num,'') as  xiaomujianbaoNum,
+		org_name as orgName
+   		from edu_teacher_nlts f
+   		where status = 1
+   		<isNotNull prepend="and" property="cityName">
+   			city_name=#cityName#
+   		</isNotNull>
+   		<isNotNull prepend="and" property="districtName">
+   			district_name=#districtName#
+   		</isNotNull>
+   		<isNotNull prepend="and" property="schoolName">
+   			school_name = #schoolName#
+   		</isNotNull>;
+   </select>
+	
+	<select id="select_fjimport_count" parameterClass="java.util.HashMap" 
+   		resultClass="int">
+   		select count(1) from edu_teacher_nlts f, edu_teacher_train_history h
+   		where h.id=#id#
+   		and h.create_by=f.create_by
+   		and h.create_date=f.create_time 
+   		<isNotEmpty prepend="and" property="schoolName">
+			f.school_name like '%$schoolName$%'
+		</isNotEmpty>
+   		<isNotEmpty prepend="and" property="provinceId">
+			f.province_id= #provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cityId">
+			f.city_id= #cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="districtId">
+			f.district_id= #districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			f.school_id = #schoolId#
+		</isNotEmpty>	
+   </select>
+	<!-- select_import_list -->
+   <select id="select_fjimport_list" parameterClass="java.util.HashMap" 
+   		resultClass="project.system.pojo.Fjimport">
+   		SELECT
+			f.province_name as provinceName,
+			f.city_name as cityName,
+			f.district_name as districtName,
+			f.school_name as schoolName,
+			ifnull(f.shangbao_num,'') as shangbaoNum,
+			ifnull(f.denglu_num,'') as dengluNum,
+			ifnull(round(f.denglu_num / f.shangbao_num * 100,2),'') AS canxunlv,
+			ifnull(f.youxiaoxuexi_num,'') as youxiaoxuexiNum,
+			ifnull(round(f.youxiaoxuexi_num / f.denglu_num * 100,2),'') AS xuexilv,
+			ifnull(f.hege_num,'') AS hegenum,
+			ifnull(round(f.hege_num / f.youxiaoxuexi_num * 100,2),'') AS hegelv,
+			ifnull(f.kechengzuoye_num,'') as kechengzuoyeNum,
+			ifnull(f.gongzuofang_num,'') as gongzuofangNum,
+			ifnull(f.yanxiuhuodong_num,'') as yanxiuhuodongNum,
+			ifnull(f.yanxiuhuodongcanyu_num,'') as yanxiuhuodongcanyuNum,
+			ifnull(f.shijianyanxiuchengguo_num,'') as yanxiuhuodongcanyuNum,
+			ifnull(f.xiangmujianbao_num,'') as  shijianyanxiuNum
+   		
+   		from edu_teacher_nlts f, edu_teacher_train_history h
+   		where h.id=#id#
+   		and h.create_by=f.create_by
+   		and h.create_date=f.create_time 
+   		<isNotEmpty prepend="and" property="schoolName">
+			f.school_name like '%$schoolName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="provinceId">
+			f.province_id= #provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cityId">
+			f.city_id= #cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="districtId">
+			f.district_id= #districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			f.school_id = #schoolId#
+		</isNotEmpty>
+   		order by f.create_time desc LIMIT #startIndex#,#endIndex#;		
+   </select>
+   
+   <!-- 福建能力提升接口使用 -->
+   <select id="select_import_list_by_area" parameterClass="java.util.HashMap" 
+   		resultMap="fjTeacherStudyResult">
+   		select
+        ifnull(area_id,0) as areaId,
+        area_name as areaName,
+   		ifnull(shangbaoSum,0) as shangbaoSum,
+		ifnull(dengluSum,0) as dengluSum,
+		ifnull(canxunlvSum,0) as canxunlvSum,
+		ifnull(youxiaoxuexiSum,0) as youxiaoxuexiSum,
+		ifnull(xuexilvSum,0) as xuexilvSum,
+		ifnull(hegeSum,0) as hegeSum,
+		ifnull(hegelvSum,0) as hegelvSum,
+		ifnull(kechengzuoyeSum,0) as kechengzuoyeSum,
+		ifnull(gongzuofangSum,0) as  gongzuofangSum,
+		ifnull(yanxiuhuodongSum,0) as yanxiuhuodongSum,
+		ifnull(yanxiuhuodongcanyuSum,0) as yanxiuhuodongcanyuSum,
+		ifnull(shijianyanxiuSum,0) as  shijianyanxiuchengguoSum,
+		ifnull(xiaomujianbaoSum,0) as  xiangmujianbaoSum
+   		
+   		from edu_statistic_nlts f
+   		where 1 = 1
+   		and (
+   		  f.area_id = #areaId#
+   		  or 
+   		  f.area_pid = #areaId#
+   		);		 		
+   </select>
+
+	<!-- 查询导入的能力提升数据是否存在 -->
+  <select id="fjimport_count_by_key" parameterClass="project.system.pojo.Fjimport" resultClass="java.lang.Integer">
+  		select count(*) from edu_teacher_nlts f
+  		 where 
+  		  f.status = 1 and 
+  		  f.city_name = #cityName#
+  		  and f.district_name = #districtName#
+  		  and f.school_name = #schoolName#
+  </select>
+  
+  <!-- 如果存在就将导入的历史数据状态修改为0 -->
+  <update id="fjimport_update" parameterClass="project.system.pojo.Fjimport">
+  		update edu_teacher_nlts set
+  		  status = 0
+		  where city_name=#cityName# and
+  		   district_name=#districtName# and 
+  		   school_name = #schoolName#;
+  </update>
+  
+  <!-- 查询能力提升导入数据中上报人数和合格人数 按继教板块统计-->
+  <select id="select_fjimportInfo_by_schoolId" parameterClass="java.util.HashMap" resultClass="project.system.pojo.FjimportActivty">
+		SELECT
+			count(1) as shangbaoNum,
+			sum(if(c.teacher_score_audit_status_id=13,1,0)) as hegeNum,
+			u.school_name
+		FROM
+			edu_project_comment c
+		LEFT JOIN edu_project p ON p.id = c.project_id
+		LEFT JOIN edu_model m ON m.id = p.edu_model_type
+		LEFT JOIN edu_user u ON u.id = c.teacher_id
+		WHERE 1 =1 	
+			AND m.model_name LIKE '%$eduModelName$%'		
+			AND p.year BETWEEN #startYear# AND DATE_FORMAT(NOW(), '%Y')
+			AND u.school_id = #schoolId#
+  </select>
+  
+  <!-- 导入福建继教能力提升数据 -->
+  <insert id="fjimport_insert" parameterClass="project.system.pojo.Fjimport" >
+   	insert into edu_teacher_nlts(
+   		org_name,
+   		province_name,
+   		city_name,
+  		district_name,
+  		school_name,
+  		province_id,
+  		city_id,
+  		district_id,
+  		school_id,
+  		shangbao_num,
+		denglu_num,
+		canxunlv,
+		youxiaoxuexi_num,
+		xuexilv,
+		hege_num,
+		hegelv,
+		gongzuofang_num,
+		kechengzuoye_num,
+		xiangmujianbao_num,
+		yanxiuhuodong_num,
+		yanxiuhuodongcanyu_num,
+		shijianyanxiuchengguo_num,
+		create_time,
+		create_by,
+		status
+	   	)
+	   	values(
+	   	#orgName#,
+	   	#provinceName#,
+	   	#cityName#,
+		#districtName#,
+		#schoolName#,
+		#provinceId#,
+		#cityId#,
+		#districtId#,
+		#schoolId#,
+		#shangbaoNum#,
+		#dengluNum#,
+		#canxunlv#,
+		#youxiaoxuexiNum#,
+		#xuexilv#,
+		#hegenum#,
+		#hegelv#,
+		#gongzuofangNum#,
+		#kechengzuoyeNum#,
+		#xiaomujianbaoNum#,
+		#yanxiuhuodongNum#,
+		#yanxiuhuodongcanyuNum#,
+		#shijianyanxiuNum#,
+		#createTime#,
+		#createBy#,
+		1
+		<selectKey resultClass="Integer" keyProperty="id">
+			SELECT
+			last_insert_id() as id ;    
+        </selectKey>
+	   	);	
+  </insert>
+  <select id="select_fjTeacherInfo_list" parameterClass="java.util.HashMap" 
+   		resultMap="fjimportSelectResult">
+   		select f.*,
+   		u.real_name,
+   		IFNULL(CONCAT(u.user_province_name,IFNULL(u.user_city_name,''),
+   		IFNULL(u.user_district_name,''),
+   		IFNULL(u.user_address,'')),'') as address
+   		from edu_teacher_nlts f,
+   		edu_user u where f.create_by=u.login_account
+   		
+   		<isNotNull prepend="and" property="cityName">
+   			city_name=#cityName#
+   		</isNotNull>
+   		<isNotNull prepend="and" property="districtName">
+   			district_name=#districtName#
+   		</isNotNull>
+   		<isNotNull prepend="and" property="schoolName">
+   			school_name = #schoolName#
+   		</isNotNull>
+  		   
+   		order by f.create_time DESC ;		 		
+   </select>
+  
+  <select id="fjimport_By_areaName" parameterClass="java.util.HashMap" resultMap="fjimportSelectResult">
+  		select * from edu_teacher_nlts f
+  		 where 
+  		  f.status = 1 and 
+  		  f.school_name = #schoolName#
+  </select>
+  
+  	
+  	<!-- delete_nlts_by_status -->
+  	<delete id="delete_nlts_by_status" parameterClass="java.util.ArrayList">
+  		delete from edu_teacher_nlts where status = 0
+  	</delete>
+  	
+</sqlMap>

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_certificate">
+
+	<insert id="insert_year_certificate" parameterClass="java.util.Map">
+		INSERT INTO edu_diploma (
+			start_date,
+			end_date,
+			need_period,
+			need_credit,
+			need_period1,
+			need_credit1,
+			change_rate,
+			repay_rate,
+			YEAR,
+			create_by,
+			create_date,
+			type,
+			content,
+			title,
+			status,
+			position_right,
+			position_top,
+			position_width,
+			position_height,
+			qrcode_right,
+			qrcode_top,
+			qrcode_width,
+			qrcode_height,
+			isProjectPrefix,
+			seal,
+			qrcode,
+			projectPrefix
+		) values
+		(
+			#startDate:DATE#,
+			#endDate:DATE#,
+			#needPeriod:INTEGER#,
+			#needCredit:INTEGER#, 
+			#needPeriod1:INTEGER#,
+			#needCredit1:INTEGER#,
+			#changeRate:INTEGER#,
+			#repayRate:INTEGER#,
+			#year:INTEGER#,
+			#createBy:VARCHAR#,
+			now(),
+			1,
+			#content:VARCHAR#,
+			#title:TEXT#,
+			#status:Integer#,
+			#positionRight:Integer#,
+			#positionTop:Integer#,
+			#positionWidth:Integer#,
+			#positionHeight:Integer#,
+			#qrcodeRight:Integer#,
+			#qrcodeTop:Integer#,
+			#qrcodeWidth:Integer#,
+			#qrcodeHeight:Integer#,
+			1,
+			1,
+			1,
+			#projectPrefixCode:VARCHAR#
+			
+		<selectKey resultClass="int" keyProperty="id">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		)
+	</insert>
+	
+	<select id="select_year_diploma" parameterClass="java.util.Map" resultClass="project.furtheredu.certificate.pojo.EduDiploma">
+		SELECT
+			t1.id as id,
+			t1.start_date as startDate,
+			t1.end_date as endDate,
+			t1.need_period as needPeriod,
+			t1.need_credit as needCredit,
+			t1.need_period1 as needPeriod1,
+			t1.need_credit1 as needCredit1,
+			t1.repay_rate as repayRate,
+			t1.change_rate as changeRate,
+			t1.`year` as year,
+			t1.update_by as updateBy,
+			t1.create_date as createDate,
+			t1.type as type,
+			t1.content as content,
+			t1.title as title,
+			t1.status as status,
+			t1.position_right as positionRight,
+			t1.position_top as positionTop,
+			t1.position_width as positionWidth,
+			t1.position_height as positionHeight,
+			t1.qrcode_right as qrcodeRight,
+			t1.qrcode_top as qrcodeTop,
+			t1.qrcode_width as qrcodeWidth,
+			t1.qrcode_height as qrcodeHeight,
+			t1.seal as seal,
+			t1.qrcode as qrcode,
+			t1.isProjectPrefix as isProjectPrefix,
+			t1.projectPrefix as projectPrefix,
+			t1.backgroundImg as backgroundImg,
+			t1.isYearCode as isYearCode,
+			t1.signet_id as signetId,
+			t1.periodCertificateTitle as periodCertificateTitle,
+			t1.qrbackgroundImg as qrbackgroundImg
+		FROM
+			`edu_diploma` t1
+		where 
+		1 = 1
+		<isNotEmpty prepend="and" property="year">
+			t1.year =  #year#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="id">
+			t1.id =  #id#
+		</isNotEmpty>
+		and type = 1
+		order by t1.year asc
+	</select>
+	
+	<delete id="delete_certificate" parameterClass="java.util.Map">
+	DELETE
+	FROM
+		edu_diploma
+	WHERE
+		id = #id#
+	and type = 1
+	</delete>
+	
+	<update id="update_certificate" parameterClass="java.util.Map">
+		UPDATE edu_diploma
+		<dynamic prepend="set">
+			<isNotEmpty prepend="," property="year">
+				YEAR = #year#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="startDate">
+				start_date = #startDate#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="endDate">
+				end_date = #endDate#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="needCredit">
+				need_credit = #needCredit#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="needPeriod">
+				need_period = #needPeriod#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="needCredit1">
+				need_credit1 = #needCredit1#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="needPeriod1">
+				need_period1 = #needPeriod1#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="title">
+				title = #title#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="repayRate">
+				repay_rate = #repayRate#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="changeRate">
+				change_rate = #changeRate#
+			</isNotEmpty>
+		</dynamic>
+		WHERE
+		1=1
+		<isNotEmpty prepend="AND" property="id">
+			id = #id#
+		</isNotEmpty>
+	</update>
+	<select id="query_teacher_need_credit_by_year" parameterClass="java.util.Map" resultClass="int">
+		SELECT
+			IFNULL(need_credit,0) as needPeriod
+		FROM
+			edu_diploma
+		WHERE
+		1=1 
+		<isNotEmpty prepend="and" property="year">
+			`year` = #year#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="type">
+			type = #type#
+		</isNotEmpty>
+		 
+	</select>
+	
+	
+</sqlMap>

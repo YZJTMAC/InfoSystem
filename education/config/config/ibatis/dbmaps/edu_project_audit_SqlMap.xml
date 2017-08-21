@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_project_audit" >
+  <resultMap id="abatorgenerated_EduProjectAuditResult" class="project.edupm.projectmanage.pojo.EduProjectAuditPOJO" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="auditor_id" property="auditorId" jdbcType="INTEGER" />
+     <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="applicant_id" property="applicantId" jdbcType="INTEGER" />
+    <result column="auditor_real_name" property="auditorRealName" jdbcType="VARCHAR" />
+    <result column="audit_date" property="auditDate" jdbcType="TIMESTAMP" />
+    <result column="audit_status" property="auditStatus" jdbcType="INTEGER" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  
+  <select id="select_audit_by_project_id" resultMap="abatorgenerated_EduProjectAuditResult" parameterClass="int" >
+    select id, 
+    auditor_id, 
+    applicant_id,
+    project_id, 
+    auditor_real_name, 
+    audit_date, 
+    audit_status,
+    update_date,
+     create_date, memo
+    from edu_project_audit
+    where id = (select MAX(id) from edu_project_audit where project_id = #projectId#)
+  </select>
+  
+  <delete id="delete_audit_ByPrimaryKey" parameterClass="project.edupm.projectmanage.pojo.EduProjectAuditPOJO" >
+    delete from edu_project_audit
+    where id = #id:INTEGER#
+  </delete>
+
+  
+  <insert id="insert_project_audit" parameterClass="project.edupm.projectmanage.pojo.EduProjectAuditPOJO" >
+    insert into edu_project_audit (id, auditor_id, applicant_id, auditor_real_name, audit_date,
+      audit_status, create_date, memo,project_id)
+    values (#id:INTEGER#, #auditorId:INTEGER#, #applicantId:INTEGER#, #auditorRealName:VARCHAR#,
+      #auditDate:TIMESTAMP#, #auditStatus:INTEGER#, now(),
+      #memo:LONGVARCHAR#,#projectId:INTEGER#)
+  </insert>
+  
+  <update id="update_audit_by_conditions" parameterClass="project.edupm.projectmanage.pojo.EduProjectAuditPOJO">
+  	update edu_project_audit
+  	set auditor_id = #auditorId#,
+  	audit_date = #auditDate#,
+  	auditor_real_name = #auditorRealName#,
+  	memo = #memo#,
+  	audit_status = #auditStatus#,
+  	update_date = now()
+  	 where id = #id#
+  </update>
+  
+  <select id="select_max_audit_id" parameterClass="int" resultClass="int">
+  	select MAX(id) from edu_project_audit where project_id = #projectId#
+  </select>
+</sqlMap>

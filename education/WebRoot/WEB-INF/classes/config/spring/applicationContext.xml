@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+	<!--
+		本文件是spring管理Bean定义的配置文件的入口 所有需要由Spring管理的Bean的定义都要由本文件导入(import)或间接导入
+		其中导入的顺序由配置文件的关联关系决定，亦即文件的导入顺序不是无序的 具体的顺序关系，请参考《架构参考》文档中的架构篇
+	-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:lang="http://www.springframework.org/schema/lang"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+ http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
+ http://www.springframework.org/schema/lang 
+ http://www.w3.org/2001/XMLSchema-instance 
+ http://www.springframework.org/schema/context 
+ http://www.springframework.org/schema/context/spring-context-2.5.xsd
+ http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
+ http://www.springframework.org/schema/lang/spring-lang-2.5.xsd
+ http://www.springframework.org/schema/aop
+ http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+ http://www.springframework.org/schema/tx 
+ http://www.springframework.org/schema/tx/spring-tx.xsd" default-autowire="byName">
+	<!--导入Spring全局配置文件-->
+	<import resource="SpringGlobalConfig.xml" />
+	<!-- 启用AOP -->
+	<aop:aspectj-autoproxy />
+	<!--导入ibatis配置文件	-->
+	<import resource="ibatisConfig.xml" />
+	
+	<!-- 定时任务配置文件 -->
+	<!-- 发现定时任务有时候会同时执行两次，第一次：web容器启动的时候，读取applicationContext.xml文件时，会加载一次。
+	第二次：Spring本身会加载applicationContext.xml一次。把定时器的配置单独写成一个配置文件，在web容器启动的时候只加载一次。
+	web.xml中context-param加入这个单独的文件	  -->
+	<!-- <import resource="scheduled.xml" /> -->
+	
+	<!--导入Xmemcached.xml 
+	<import resource="classpath:config/spring/Xmemcached.xml" />-->
+	<!--  -->
+	<!--<import resource="classpath:config/spring/client-beans.xml" /> -->
+	<!--导入redis.xml
+	<import resource="classpath:config/spring/Jedis.xml" />-->
+	<!--导入activeMQ配置
+	<import resource="activeMQ/spring-jms.xml" />-->
+	<!--导入solr配置
+	<import resource="classpath:config/spring/solr.xml" />  -->
+	
+	<!--导入mongodb配置
+	<import resource="classpath:config/spring/mongodb.xml" />-->
+	
+	<!--导入用户自定义模块的配置索引文件	-->
+	<import resource="common/beans.xml" />
+	<!-- 事务处理配置 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource">
+		</property>
+	</bean>
+
+	 
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="get*" read-only="true" />
+			<tx:method name="search*" read-only="true" />
+			<tx:method name="add*" propagation="REQUIRED" rollback-for="java.lang.Exception" />
+			<tx:method name="save*" propagation="REQUIRED" rollback-for="java.lang.Exception" />
+			<tx:method name="modify*" propagation="REQUIRED" rollback-for="java.lang.Exception" />
+			<tx:method name="proc*" propagation="REQUIRED" rollback-for="java.lang.Exception" />
+			<tx:method name="remove*" propagation="REQUIRED" rollback-for="java.lang.Exception" />
+			<tx:method name="delete*" propagation="REQUIRED" rollback-for="java.lang.Exception" />
+			<tx:method name="background*" propagation="REQUIRED" rollback-for="java.lang.Exception" />
+			<tx:method name="import*" propagation="REQUIRED" rollback-for="java.lang.Exception" />
+			<tx:method name="audit*" propagation="REQUIRED" rollback-for="java.lang.Exception" />
+			<tx:method name="cancel*" propagation="REQUIRED" rollback-for="java.lang.Exception" />
+			<tx:method name="create*" propagation="REQUIRED" rollback-for="java.lang.Exception" />
+			<tx:method name="send*" propagation="REQUIRED" rollback-for="java.lang.Exception" />
+			<tx:method name="testDao" propagation="REQUIRED" rollback-for="java.lang.Exception" />
+		</tx:attributes>
+	</tx:advice>
+	
+	<!--	
+		配置有那些类中的方法拥有事务的传播性-->
+	<aop:config>
+
+		<!-- 物流商网点信息 -->
+		<!--
+			<aop:pointcut id="supplierStation" expression="execution(* project.supplierStation.service.impl.*.*(..))" />
+		-->
+		<aop:pointcut id="teacherInfoChangeAudit" expression="execution(* project.teacher.teachermanage.service.impl.*.*(..))" />
+		<aop:pointcut id="projectAdd" expression="execution(* project.edupm.projectmanage.service.impl.*.*(..))" />
+		<aop:pointcut id="system" expression="execution(* project.system.service.impl.*.*(..))" />
+		<aop:pointcut id="message" expression="execution(* project.message.service.impl.*.*(..))" />
+		<aop:pointcut id="test" expression="execution(* project.test.service.*.*(..))" />
+		<!--
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="supplierStation" />
+		-->
+		<!-- 教师信息变更审核 -->
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="teacherInfoChangeAudit" />
+		<!-- 添加项目 -->
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="projectAdd" />
+		<!-- 系统管理 -->
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="system" />
+		<!-- 消息管理 -->
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="message" />
+		<!-- 测试事务 -->
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="test" />
+	</aop:config>
+	<context:component-scan base-package="com">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+	</context:component-scan>
+	
+	 <bean id="a" class="com.aop.test.A"/>  
+      
+    <bean id="b" class="com.aop.test.B" />  
+    <aop:config>  
+        <aop:aspect id="aspect" ref="b">  
+            <aop:pointcut id="pointA" expression="execution(* com.aop.test.A.a*(..))"/>  
+            <aop:before method="doBefore"  pointcut-ref="pointA"/>  
+            <aop:after method="doAfter"  pointcut-ref="pointA"/>  
+            <aop:around method="doAround"  pointcut-ref="pointA"/>  
+            <aop:after-returning method="doReturn"  pointcut-ref="pointA"/>  
+        </aop:aspect>  
+    </aop:config>  
+   
+</beans>

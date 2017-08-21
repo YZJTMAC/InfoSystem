@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap namespace="edu_teacher_basic_info">
+  <resultMap class="project.teacher.teachermanage.pojo.EduTeacherBasicInfo" id="abatorgenerated_EduTeacherBasicInfoResult">
+    <result column="id" jdbcType="INTEGER" property="id" />
+    <result column="teacher_id" jdbcType="INTEGER" property="teacherId" />
+    <result column="teacher_old_name" jdbcType="VARCHAR" property="teacherOldName" />
+    <result column="teacher_name_spelling" jdbcType="VARCHAR" property="teacherNameSpelling" />
+    <result column="teacher_born_date" jdbcType="DATE" property="teacherBornDate" />
+    <result column="teacher_political_status" jdbcType="VARCHAR" property="teacherPoliticalStatus" />
+    <result column="teacher_native_place" jdbcType="VARCHAR" property="teacherNativePlace" />
+    <result column="teacher_nation" jdbcType="VARCHAR" property="teacherNation" />
+    <result column="teacher_phone_num" jdbcType="VARCHAR" property="teacherPhoneNum" />
+    <result column="teacher_call_num" jdbcType="VARCHAR" property="teacherCallNum" />
+    <result column="teacher_qq" jdbcType="INTEGER" property="teacherQq" />
+    <result column="teacher_email" jdbcType="VARCHAR" property="teacherEmail" />
+    <result column="teacher_family_local" jdbcType="VARCHAR" property="teacherFamilyLocal" />
+    <result column="teacher_marital_status" jdbcType="VARCHAR" property="teacherMaritalStatus" />
+    <result column="teacher_health_condition" jdbcType="VARCHAR" property="teacherHealthCondition" />
+    <result column="version" jdbcType="INTEGER" property="version" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="teacher_create_by" jdbcType="VARCHAR" property="teacherCreateBy" />
+    <result column="teacher_update_by" jdbcType="VARCHAR" property="teacherUpdateBy" />
+    <result column="teacher_create_date" jdbcType="TIMESTAMP"  property="teacherCreateDate" />
+    <result column="teacher_update_date" jdbcType="TIMESTAMP"  property="teacherUpdateDate" />
+  </resultMap>
+   
+  <insert id="teacher_base_insert" parameterClass="project.teacher.teachermanage.pojo.EduTeacherBasicInfo">
+    insert into edu_teacher_basic_info (id, teacher_id, teacher_old_name, teacher_name_spelling,
+      teacher_born_date, teacher_political_status, teacher_native_place, teacher_nation,
+      teacher_phone_num, teacher_call_num, teacher_qq, teacher_email, teacher_family_local,
+      teacher_marital_status, teacher_health_condition, version, teacher_create_by,
+      teacher_update_by, teacher_create_date, teacher_update_date, status,teacher_country,party_time)
+    values (#id:INTEGER#, #teacherId:INTEGER#, #teacherOldName:VARCHAR#,
+      #teacherNameSpelling:VARCHAR#, #teacherBornDate:DATE#, #teacherPoliticalStatus:VARCHAR#,
+      #teacherNativePlace:VARCHAR#, #teacherNation:VARCHAR#, #teacherPhoneNum:VARCHAR#,
+      #teacherCallNum:VARCHAR#, #teacherQq:INTEGER#, #teacherEmail:VARCHAR#,
+      #teacherFamilyLocal:VARCHAR#, #teacherMaritalStatus:VARCHAR#,
+      #teacherHealthCondition:VARCHAR#, #version:INTEGER#, #teacherCreateBy:VARCHAR#,
+      #teacherUpdateBy:VARCHAR#, #teacherCreateDate:TIMESTAMP#, #teacherUpdateDate:TIMESTAMP#, 1,#teacherCountry#,#partyTime:DATE#)
+      <selectKey resultClass="Integer"  keyProperty="id" >     
+             SELECT last_insert_id() as id ;    
+        </selectKey> 
+  </insert>
+  
+    <insert id="teacher_base_insert_addversion" parameterClass="java.util.HashMap" >
+		INSERT INTO edu_teacher_basic_info (
+		      teacher_id, teacher_old_name, teacher_name_spelling,
+		      teacher_born_date, teacher_political_status, teacher_native_place, teacher_nation,
+		      teacher_phone_num, teacher_call_num, teacher_qq, teacher_email, teacher_family_local,
+		      teacher_marital_status, teacher_health_condition, version, teacher_create_by,
+		      teacher_update_by, teacher_create_date, teacher_update_date, status,teacher_country,party_time
+		) SELECT * FROM(
+			select 
+			teacher_id, teacher_old_name, teacher_name_spelling,
+		      teacher_born_date, teacher_political_status, teacher_native_place, teacher_nation,
+		      teacher_phone_num, teacher_call_num, teacher_qq, teacher_email, teacher_family_local,
+		      teacher_marital_status, teacher_health_condition, #version# as version, teacher_create_by,
+		      #updateBy# as teacher_update_by, teacher_create_date, now(), #status# as status,teacher_country,party_time
+			from edu_teacher_basic_info 
+			where teacher_id = #teacherIdA# 
+			      and version = (
+									SELECT versionId  from (
+															SELECT	MAX(version) as versionId FROM edu_teacher_basic_info 
+															where teacher_id = #teacherIdB# 
+															) a
+								) 
+		  		
+		) AS tb
+      <selectKey resultClass="Integer"  keyProperty="id" >     
+             SELECT last_insert_id() as id ;    
+        </selectKey> 
+  </insert>
+   
+   <!-- 修改教师基本信息 -->
+   <update id="teacher_base_update" parameterClass="project.teacher.teachermanage.pojo.EduTeacherBasicInfo">
+    update edu_teacher_basic_info
+    set teacher_id = #teacherId:INTEGER#,
+      teacher_old_name = #teacherOldName:VARCHAR#,
+      teacher_name_spelling = #teacherNameSpelling:VARCHAR#,
+      teacher_born_date = #teacherBornDate:DATE#,
+      teacher_political_status = #teacherPoliticalStatus:VARCHAR#,
+      teacher_native_place = #teacherNativePlace:VARCHAR#,
+      teacher_nation = #teacherNation:VARCHAR#,
+      teacher_phone_num = #teacherPhoneNum:VARCHAR#,
+      teacher_call_num = #teacherCallNum:VARCHAR#,
+      teacher_qq = #teacherQq:VARCHAR#,
+      teacher_email = #teacherEmail:VARCHAR#,
+      teacher_family_local = #teacherFamilyLocal:VARCHAR#,
+      teacher_marital_status = #teacherMaritalStatus:VARCHAR#,
+      teacher_health_condition = #teacherHealthCondition:VARCHAR#,
+      version = #version:INTEGER#,
+      teacher_create_by = #teacherCreateBy:VARCHAR#,
+      teacher_update_by = #teacherUpdateBy:VARCHAR#,
+      teacher_create_date = #teacherCreateDate:DATE#,
+      teacher_update_date = #teacherUpdateDate:DATE#,
+      teacher_country = #teacherCountry#,
+      party_time = #partyTime:DATE#
+    where teacher_id = #teacherId:INTEGER#
+    <isNotEmpty prepend="and" property="status">
+    	status = #status#
+    </isNotEmpty>
+		  and version = (
+		  			select versionId from (
+					 SELECT	MAX(version) as versionId FROM edu_teacher_basic_info 
+					 where teacher_id = #teacherId:INTEGER# 
+					  <isNotEmpty prepend="and" property="status">
+				    	status = #status#
+				      </isNotEmpty>
+					 ) a
+		  		)
+  </update>
+  
+  <update id="update_batch_base_status" parameterClass="java.util.HashMap" >
+    update edu_teacher_basic_info
+    set  
+      teacher_update_by = #updateBy#,
+      teacher_update_date = now(),
+      status = #status#
+    where teacher_id = #teacherId#
+  </update>
+  
+	<!-- create by yinxiaolong 
+			教师基本信息查询
+	 -->
+	<select id="selectTeacherBasicInfoByTeacherId" parameterClass="java.util.HashMap" resultClass="project.teacher.teachermanage.pojo.EduTeacherBasicInfo">
+	 SELECT
+	 id,
+	teacher_old_name AS teacherOldName,
+	teacher_name_spelling AS teacherNameSpelling,
+	teacher_born_date AS teacherBornDate,
+	teacher_political_status AS teacherPoliticalStatus,
+	teacher_native_place AS teacherNativePlace,
+	teacher_nation AS teacherNation,
+	teacher_phone_num AS teacherPhoneNum,
+	teacher_call_num AS teacherCallNum,
+	teacher_qq AS teacherQq,
+	teacher_email AS teacherEmail,
+	teacher_family_local AS teacherFamilyLocal,
+	teacher_marital_status AS teacherMaritalStatus,
+	teacher_health_condition AS teacherHealthCondition,
+	teacher_country as teacherCountry,
+	party_time as partyTime,
+	version as version
+FROM
+	edu_teacher_basic_info 
+WHERE
+	teacher_id = #teacherId# 
+	<isNotEmpty prepend="and" property="status">
+		status = #status#
+	</isNotEmpty>
+	and version = (
+		  			select versionId from (
+					 SELECT	MAX(version) as versionId FROM edu_teacher_basic_info 
+					 where teacher_id = #teacherId#
+					 <isNotEmpty prepend="and" property="status">
+						status = #status#
+					</isNotEmpty>
+					  ) a
+		  		)
+	
+	</select>
+	
+		<!-- create by yinxiaolong 
+			教师基本信息查询
+	 -->
+	<select id="selectTeacherBasicInfoByTeacherIdAndVersion" parameterClass="java.util.HashMap" resultClass="project.teacher.teachermanage.pojo.EduTeacherBasicInfo">
+	 SELECT
+	 id,
+	teacher_old_name AS teacherOldName,
+	teacher_name_spelling AS teacherNameSpelling,
+	teacher_born_date AS teacherBornDate,
+	teacher_political_status AS teacherPoliticalStatus,
+	teacher_native_place AS teacherNativePlace,
+	teacher_nation AS teacherNation,
+	teacher_phone_num AS teacherPhoneNum,
+	teacher_call_num AS teacherCallNum,
+	teacher_qq AS teacherQq,
+	teacher_email AS teacherEmail,
+	teacher_family_local AS teacherFamilyLocal,
+	teacher_marital_status AS teacherMaritalStatus,
+	teacher_health_condition AS teacherHealthCondition,
+	teacher_country as teacherCountry,
+	party_time as partyTime
+FROM
+	edu_teacher_basic_info 
+WHERE
+	teacher_id = #teacherId# 
+	and version = (select max(version) from edu_teacher_basic_info where teacher_id = #teacherId# ) 
+	</select>
+
+</sqlMap>

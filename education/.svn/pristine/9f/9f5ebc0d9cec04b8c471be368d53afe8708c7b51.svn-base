@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:lang="http://www.springframework.org/schema/lang"
+	xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+	 http://www.springframework.org/schema/lang http://www.springframework.org/schema/lang/spring-lang-3.0.xsd
+	 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	 http://www.springframework.org/schema/data/mongo http://www.springframework.org/schema/data/mongo/spring-mongo-1.0.xsd" >
+	 	
+	<mongo:mongo host="${mongo.host}" port="${mongo.port}">
+	</mongo:mongo>
+	<!-- supplier DB -->
+	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg ref="mongo"></constructor-arg>
+		<constructor-arg name="databaseName" value="${mongo.SupplierDB}"/>
+	</bean>
+	<bean id="mongoBase" class="framelib.dao.MongoBaseDAO">
+		<property name="template" ref="mongoTemplate"></property>
+	</bean>
+	<!-- 系统消息 -->
+	<bean id="mongoTemplateForMessage" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg ref="mongo"></constructor-arg>
+		<constructor-arg name="databaseName" value="${mongo.messageDB}"/>
+	</bean>
+	
+	<bean id="messageMongoDao" class="project.message.dao.impl.MessageMongoDaoImpl" parent="mongoBase">
+		<property name="template" ref="mongoTemplateForMessage"></property>
+	</bean>
+	
+	 <bean id="messageDAOforMongo" class="project.message.dao.impl.MessageDaoImpl" parent="mongoBase">
+		<property name="template" ref="mongoTemplateForMessage"></property>
+	</bean>
+	
+	<bean id="userMessageDAOforMongo" class="project.message.dao.impl.UserMessageDaoImpl" parent="mongoBase">
+		<property name="template" ref="mongoTemplateForMessage"></property>
+	</bean>
+	
+	<!-- 订单 -->
+	<bean id="mongoTemplateForOrder" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg ref="mongo"></constructor-arg>
+		<constructor-arg name="databaseName" value="${mongo.orderDB}"/>
+	</bean>
+	<!-- Log -->
+	<bean id="mongoTemplateForLog" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg ref="mongo"></constructor-arg>
+		<constructor-arg name="databaseName" value="${mongo.LogDB}"/>
+	</bean>	
+	<!-- cms -->
+	<bean id="mongoTemplateForCMS" class="org.springframework.data.mongodb.core.MongoTemplate">
+		<constructor-arg ref="mongo"></constructor-arg>
+		<constructor-arg name="databaseName" value="${mongo.CMSDB}"/>
+	</bean>	
+	<!-- 物流服务-线路 -->
+	<bean id="mongoSupplierLineDAO" class="project.supplierLine.dao.impl.SupplierLineMongoDAOImpl" parent="mongoBase"/>
+	<!-- 物流服务-网点 -->
+	<bean id="mongoSupplierStationDAO" class="project.supplierStation.dao.impl.SupplierStationMongoDAOImpl" parent="mongoBase"/>
+	<!-- 物流服务-增值服务 -->
+	<bean id="mongoSupplierIVSDAO" class="project.ivs.dao.impl.SupplierIvsMongoDaoImpl" parent="mongoBase"/>
+	
+	<!-- 订单-退款单-留言 -->
+	<bean id="mongoOrderRefundDAO" class="project.refund.dao.impl.OrderRefundMongoDAOImpl" parent="mongoBase">
+		<property name="template" ref="mongoTemplateForOrder"></property>
+	</bean>
+	<!-- 订单-评论 -->
+	<bean id="mongoOrderCommentDAO" class="project.comment.dao.impl.CommentMongoDaoImpl" parent="mongoBase">
+		<property name="template" ref="mongoTemplateForOrder"></property>
+	</bean>
+	
+	<!-- CMS -->
+	<bean id="mongoCMSDAO" class="project.cms.dao.impl.CMSMongoDAO" parent="mongoBase">
+		<property name="template" ref="mongoTemplateForCMS"></property>
+	</bean>
+	
+	<!-- 添加新DAO时，请注意不同的业务模块DAO使用不同的template,见下述例子 -->
+	<!-- 系统消息 -->
+	<!--bean id="messageDAOforMongo" class="project.message.dao.impl.MessageDaoImpl" parent="mongoBase">
+		<property name="template" ref="mongoTemplateForMessage"></property>
+	</bean-->
+	<!-- 投诉-留言  add by zhangxiaoqi -->
+	<bean id="complainCommentsMongoDAO" class="project.complain.dao.impl.ComplainCommentsMongoDAOImpl" parent="mongoBase">
+		<property name="template" ref="mongoTemplateForOrder"></property>
+	</bean>
+	
+</beans>

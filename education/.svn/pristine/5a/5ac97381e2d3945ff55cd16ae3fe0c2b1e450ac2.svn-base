@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_project_summary" >
+  <resultMap id="summay_EduProjectSummaryResult" class="project.edupm.projectmanage.pojo.EduProjectSummary" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="attchement_title" property="attchementTitle" jdbcType="VARCHAR" />
+    <result column="attchement_url" property="attchementUrl" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+    <result column="content" property="content" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  
+  
+  <sql id="Summay_Where_Clause" >
+    <iterate property="oredCriteria" conjunction="or" prepend="where" removeFirstPrepend="iterate" >
+      <isEqual property="oredCriteria[].valid" compareValue="true" >
+        (
+        <iterate prepend="and" property="oredCriteria[].criteriaWithoutValue" conjunction="and" >
+          $oredCriteria[].criteriaWithoutValue[]$
+        </iterate>
+        <iterate prepend="and" property="oredCriteria[].criteriaWithSingleValue" conjunction="and" >
+          $oredCriteria[].criteriaWithSingleValue[].condition$
+            #oredCriteria[].criteriaWithSingleValue[].value#
+        </iterate>
+        <iterate prepend="and" property="oredCriteria[].criteriaWithListValue" conjunction="and" >
+          $oredCriteria[].criteriaWithListValue[].condition$
+          <iterate property="oredCriteria[].criteriaWithListValue[].values" open="(" close=")" conjunction="," >
+            #oredCriteria[].criteriaWithListValue[].values[]#
+          </iterate>
+        </iterate>
+        <iterate prepend="and" property="oredCriteria[].criteriaWithBetweenValue" conjunction="and" >
+          $oredCriteria[].criteriaWithBetweenValue[].condition$
+          #oredCriteria[].criteriaWithBetweenValue[].values[0]# and
+          #oredCriteria[].criteriaWithBetweenValue[].values[1]#
+        </iterate>
+        )
+      </isEqual>
+    </iterate>
+  </sql>
+  <select id="summay_selectByPrimaryKey" resultMap="summay_EduProjectSummaryResult" parameterClass="java.lang.Integer" >
+    select id, project_id, type, title, attchement_title, attchement_url, create_date, create_by,
+      content
+    from edu_project_summary
+    where id = #id:INTEGER#
+  </select>
+  
+  <select id="summary_select_of_organiztion" resultClass="project.edupm.projectmanage.pojo.EduProjectSummary" parameterClass="java.util.Map">
+	select a.id as id,a.title as title,c.organization_name as orgName from edu_project_summary as a join edu_user b on(a.create_by=b.id) join edu_organization c on(c.organization_id=b.organization_id)
+where 1=1 
+	<isNotEmpty prepend="and" property="projectId">
+		a.project_id=#projectId#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="type">
+		a.type=#type#
+	</isNotEmpty>
+group by a.create_by order by a.id DESC
+	<isNotEmpty prepend=" " property="startIndex">
+		LIMIT #startIndex#, #endIndex#
+	</isNotEmpty>
+  </select>
+  
+  
+  	<!-- 行政管理员/实施机构管理员查看教师的培训总结 -->
+    <select id="summary_select_of_teacher" resultClass="project.teacher.teacherProject.pojo.TeacherSummary" parameterClass="java.util.Map">
+		select a.project_id as projectId ,a.id as summaryId ,a.user_id as userId,b.real_name as name,b.id_number as sno,c.school_name as school,b.subject_name,d.project_score as score  
+  	  from edu_file  as a join edu_user as b on(a.user_id =b.id) join edu_school as c on (c.school_id=b.school_id)
+  	 join edu_project_comment as d on(d.teacher_id=b.id)
+  	  where   a.type='summarry'
+	  	<isNotNull prepend="and" property="projectId" >
+	        a.project_id = #projectId#
+	    </isNotNull>
+	  	<isNotNull prepend="and" property="name" >
+	        b.real_name like '%$name$%'
+	    </isNotNull>
+		<isNotNull prepend="and" property="sno" >
+		  	b.id_number = #sno#
+		</isNotNull>
+		<isNotNull prepend="and" property="school" >
+		 	c.school_name like '%$school$%'
+		</isNotNull>
+		<isNotNull prepend="and" property="subject" >
+		  	b.subject_name like '%subject$%'
+		</isNotNull>
+		<isNotNull prepend="and" property="score" >
+		  	d.project_score = #score#
+		</isNotNull>
+		<isNotNull prepend="and" property="summaryId" >
+		  	a.id = #summaryId#
+		</isNotNull>
+      
+       GROUP by a.user_id 
+  			ORDER BY
+			a.create_date DESC 
+		<isNotNull prepend="LIMIT" property="startIndex" >
+		 #startIndex#, #endIndex#
+		</isNotNull>	
+			
+  </select>
+  
+  
+  
+  
+  <select id="summay_selectByClause" resultMap="summay_EduProjectSummaryResult" parameterClass="project.edupm.projectmanage.pojo.EduProjectSummary" >
+    select * from edu_project_summary where 1=1 
+      <isNotNull prepend="and" property="projectId" >
+        project_id = #projectId:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="and" property="type" >
+        type = #type:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="and" property="title" >
+        title = #title:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="and" property="attchementTitle" >
+        attchement_title = #attchementTitle:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="and" property="attchementUrl" >
+        attchement_url = #attchementUrl:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="and" property="createDate" >
+        create_date = #createDate:TIMESTAMP#
+      </isNotNull>
+      <isNotNull prepend="and" property="createBy" >
+        create_by = #createBy:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="and" property="content" >
+        content = #content:LONGVARCHAR#
+      </isNotNull>
+      <isNotNull prepend="and" property="id" >
+        id = #id:INTEGER#
+      </isNotNull>
+  </select>
+  <delete id="summay_deleteByPrimaryKey" parameterClass="project.edupm.projectmanage.pojo.EduProjectSummary" >
+    delete from edu_project_summary
+    where id = #id:INTEGER#
+  </delete>
+  <delete id="summay_deleteByClause" parameterClass="project.edupm.projectmanage.pojo.EduProjectSummary" >
+    delete from edu_project_summary
+    <include refid="Summay_Where_Clause" />
+  </delete>
+  <insert id="summay_insert" parameterClass="project.edupm.projectmanage.pojo.EduProjectSummary" >
+    insert into edu_project_summary (project_id, type, title, attchement_title, attchement_url,
+      create_date, create_by, content)
+    values (#projectId:INTEGER#, #type:INTEGER#, #title:VARCHAR#,
+      #attchementTitle:VARCHAR#, #attchementUrl:VARCHAR#, #createDate:TIMESTAMP#,
+      #createBy:INTEGER#, #content:LONGVARCHAR#)
+  </insert>
+  <update id="summay_updateByPrimaryKeySelective" parameterClass="project.edupm.projectmanage.pojo.EduProjectSummary" >
+    update edu_project_summary
+    <dynamic prepend="set" >
+      <isNotNull prepend="," property="projectId" >
+        project_id = #projectId:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="type" >
+        type = #type:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="title" >
+        title = #title:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="attchementTitle" >
+        attchement_title = #attchementTitle:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="attchementUrl" >
+        attchement_url = #attchementUrl:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="createDate" >
+        create_date = #createDate:TIMESTAMP#
+      </isNotNull>
+      <isNotNull prepend="," property="createBy" >
+        create_by = #createBy:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="content" >
+        content = #content:LONGVARCHAR#
+      </isNotNull>
+    </dynamic>
+    where id = #id:INTEGER#
+  </update>
+  <select id="summay_countByClause" parameterClass="project.edupm.projectmanage.pojo.EduProjectSummary" resultClass="java.lang.Integer" >
+    select count(*) from edu_project_summary
+    <include refid="Summay_Where_Clause" />
+  </select>
+  <update id="summay_updateByClauseSelective" >
+    update edu_project_summary
+    <dynamic prepend="set" >
+      <isNotNull prepend="," property="record.id" >
+        id = #record.id:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="record.projectId" >
+        project_id = #record.projectId:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="record.type" >
+        type = #record.type:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="record.title" >
+        title = #record.title:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="record.attchementTitle" >
+        attchement_title = #record.attchementTitle:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="record.attchementUrl" >
+        attchement_url = #record.attchementUrl:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="record.createDate" >
+        create_date = #record.createDate:TIMESTAMP#
+      </isNotNull>
+      <isNotNull prepend="," property="record.createBy" >
+        create_by = #record.createBy:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="record.content" >
+        content = #record.content:LONGVARCHAR#
+      </isNotNull>
+    </dynamic>
+    <isParameterPresent >
+      <include refid="Summay_Where_Clause" />
+    </isParameterPresent>
+  </update>
+  <update id="summay_updateByClause" >
+    update edu_project_summary
+    set id = #record.id:INTEGER#,
+      project_id = #record.projectId:INTEGER#,
+      type = #record.type:INTEGER#,
+      title = #record.title:VARCHAR#,
+      attchement_title = #record.attchementTitle:VARCHAR#,
+      attchement_url = #record.attchementUrl:VARCHAR#,
+      create_date = #record.createDate:TIMESTAMP#,
+      create_by = #record.createBy:INTEGER#
+    <isParameterPresent >
+      <include refid="Summay_Where_Clause" />
+    </isParameterPresent>
+  </update>
+</sqlMap>

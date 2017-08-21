@@ -1,0 +1,670 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_user" >
+
+<resultMap id="abatorgenerated_EduAreaResult" class="project.system.pojo.SysArea" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="area_code" property="areaCode" jdbcType="VARCHAR" />
+    <result column="up_lv_code" property="upLvCode" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <!--
+    <result column="belong_province_id" property="belongProvinceId" jdbcType="INTEGER" />
+    <result column="belong_city_id" property="belongCityId" jdbcType="INTEGER" />
+    -->
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="DATE" />
+    <result column="update_date" property="updateDate" jdbcType="DATE" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+     <result column="type" property="type" jdbcType="VARCHAR" />
+  </resultMap>
+  	<select id="selectAreaByProScopeId" parameterClass="java.lang.String" resultMap="abatorgenerated_EduAreaResult">
+  		SELECT
+  			*
+  		FROM
+  			edu_sys_area
+  		WHERE
+  			code = #projectScopeId#
+  	</select>
+  
+  
+   <insert id="area_insert" parameterClass="project.system.pojo.SysArea" >
+	    insert into edu_sys_area (id, name, create_by, update_by, create_date, update_date,
+	      status,up_lv_code,type,area_code)
+	    values (#id:INTEGER#,  #name:VARCHAR#, 
+	    #createBy:VARCHAR#, #updateBy:VARCHAR#,
+	      now(), now(), #status:INTEGER#,#upLvCode:VARCHAR#,#type:VARCHAR#,#areaCode#)
+
+	    <selectKey resultClass="Integer"  keyProperty="id" >     
+             SELECT last_insert_id() as id ;    
+        </selectKey> 
+   </insert>
+   
+  <select id="selectArea" resultClass="project.system.pojo.ZTree">
+     select code as id ,up_lv_code as pid  ,name from edu_sys_area
+  </select>
+  
+  <select id="selectAreaForNotice" resultClass="project.message.pojo.NoticeTree" parameterClass="java.lang.String">
+     select code as id ,up_lv_code as pid  ,name ,type,area_code as areaCode from edu_sys_area 
+     where   status = 1 and  id= #id# or status = 1 and  up_lv_code = #id#
+  </select>
+  
+  <select id="select_area" resultClass="project.system.pojo.SysArea" parameterClass="java.util.HashMap">
+  select 
+  id,
+  area_code as areaCode,
+  name,
+  type,
+  up_lv_code as upLvCode
+  from edu_sys_area
+  where 
+  status = 1 and up_lv_code = #upLvCode#
+ 
+  <!--
+  <dynamic >
+  	<isNotNull prepend="and" property="belongProvinceId">
+  		belong_province_id = #belongProvinceId#
+  	</isNotNull>
+  	<isNotNull prepend="and" property="belongCityId">
+		belong_city_id = #belongCityId#  	
+  	</isNotNull>
+  	<isEqual prepend="and"  compareValue="0" property="belongProvinceId">
+  		belong_city_id = 0
+  	</isEqual>
+  </dynamic> -->
+   order by create_date desc limit #startIndex#,#endIndex#
+ 
+  </select>
+  
+  
+  
+    <select id="count_area" resultClass="int" parameterClass="java.util.HashMap">
+  select 
+  count(1)
+  from edu_sys_area
+  where 
+  status = 1 and up_lv_code = #upLvCode#
+  <!--<dynamic >
+  	<isNotNull prepend="and" property="belongProvinceId">
+  		belong_province_id = #belongProvinceId#
+  	</isNotNull>
+  	<isNotNull prepend="and" property="belongCityId">
+		belong_city_id = #belongCityId#  	
+  	</isNotNull>
+  </dynamic>
+  --></select>
+  
+  <select id="selectAreaByBelong" parameterClass="java.util.HashMap" resultClass="project.system.pojo.SysArea">
+	select 
+	  a.id,
+	  a.area_code areaCode,
+	  a.code,
+	  a.name,
+	  a.up_lv_code as upLvCode,
+	  (select count(1) from edu_sys_area where up_lv_code= a.code ) as childrenCount,
+	  (select count(1) from edu_school where school_district_id = a.code ) as schoolCount
+	  from edu_sys_area a
+	where 
+	  a.status = 1 
+	  <isNotEmpty prepend="and" property="code">
+		 a.code = #code#
+	  </isNotEmpty>
+	  <isNotEmpty prepend="and" property="belong">
+		 a.up_lv_code = #belong#
+	  </isNotEmpty>
+	 
+  </select>
+  
+  <select id="select_all_area" resultClass="project.system.pojo.SysArea">
+  	select 
+  	code,
+  	name,
+  	type,
+  	up_lv_code upLvCode
+  	from edu_sys_area where status = 1
+  </select>
+  
+  <select id="selectAreaByCode" parameterClass="java.lang.String" resultMap="abatorgenerated_EduAreaResult">
+  	select * from edu_sys_area where code = #code#
+  
+  </select>
+  
+  <update id="update_area" parameterClass="java.util.HashMap">
+  	update edu_sys_area 
+  	<dynamic prepend="set">
+  		<isNotNull prepend="," property="name">
+  			name = #name#
+  		</isNotNull>
+  		<isNotNull prepend="," property="areaCode">
+  			area_code = #areaCode#
+  		</isNotNull>
+  		<isNotNull prepend="," property="code">
+  			code = #code#
+  		</isNotNull>
+  		<isNotNull prepend="," property="status">
+  			status = #status#
+  		</isNotNull>
+  		where id = #id#
+  	</dynamic>
+  
+  </update>
+  <!-- 逐级删除地区 -->
+  <update id="delete_area" parameterClass="java.util.ArrayList">
+	update edu_sys_area set status = 0
+	<dynamic prepend="where">
+		<iterate open="(" close=")" conjunction="or">
+		id = #ids[]#
+		</iterate>
+	
+	</dynamic>
+  </update>
+  
+  <!-- 通过ID找出所有下级机构 -->
+  <select id="select_all_belong" parameterClass="int" resultClass="int">
+  	select id from edu_sys_area where up_lv_code = #id#
+			UNION 
+		select id from edu_sys_area where up_lv_code in (select id from edu_sys_area where up_lv_code = #id#)
+  </select>
+  
+  <select id="select_areas_by_user_code" parameterClass="java.util.HashMap" resultClass="project.system.pojo.SysArea">
+	SELECT
+		code, name 
+	FROM 
+		edu_sys_area 
+	WHERE
+		1=1
+		<isNotEmpty prepend="AND" property="provinceId">
+			up_lv_code = #provinceId#	
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="cityId">
+			up_lv_code = #cityId#	
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="districtId">
+			up_lv_code = #districtId#	
+		</isNotEmpty>
+	UNION 
+	SELECT
+		code, name 
+	FROM 
+		edu_sys_area 
+	WHERE 
+		up_lv_code IN 
+		(
+			SELECT  
+				id 
+			FROM 
+				edu_sys_area 
+			WHERE 
+				1=1
+			<isNotEmpty prepend="AND" property="provinceId">
+				up_lv_code = #provinceId#	
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="cityId">
+				up_lv_code = #cityId#	
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="districtId">
+				up_lv_code = #districtId#	
+			</isNotEmpty>
+		)
+	UNION
+	SELECT  
+		code, name 
+	FROM 
+		edu_sys_area 
+	WHERE 
+		up_lv_code IN 
+		(
+			SELECT 
+				id 
+			FROM 
+				edu_sys_area 
+			WHERE 
+				up_lv_code IN 
+				(
+				SELECT 
+					id 
+				FROM 
+					edu_sys_area 
+				WHERE 
+					1=1
+				<isNotEmpty prepend="AND" property="provinceId">
+					up_lv_code = #provinceId#	
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="cityId">
+					up_lv_code = #cityId#	
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="districtId">
+					up_lv_code = #districtId#	
+				</isNotEmpty>
+				)
+		)
+  </select>
+  
+  <select id="select_child_area" resultClass="project.system.pojo.ZTree"  parameterClass="java.util.HashMap">
+       select 
+	  CONVERT(a.id, CHAR(50)) as id,
+	  a.up_lv_code as pId,
+	  CONCAT(a.name,'[校:',(case a.type when 0 then (select count(*) from edu_school s1 where s1.school_province_id=a.id) when 1 then (select count(*) from edu_school s1 where s1.school_city_id=a.id) when 2 then (select count(*) from edu_school s1 where s1.school_district_id=a.id) end),'/师:',(case a.type when 0 then (select count(*) from edu_user u1,edu_project_comment c1 where u1.user_province_id=a.id and u1.id=c1.teacher_id and c1.project_id=#projectId#) when 1 then (select count(*) from edu_user u1,edu_project_comment c1 where u1.user_city_id=a.id and u1.id=c1.teacher_id and c1.project_id=#projectId#) when 2 then (select count(*) from edu_user u1,edu_project_comment c1 where u1.user_district_id=a.id and u1.id=c1.teacher_id and c1.project_id=#projectId#) end),']') as name,
+	  
+	   CONVERT(a.type, CHAR(50)) as  type,
+	  'true' as isParent
+	  from edu_sys_area a
+	  where 
+	   status = 1 and up_lv_code = #id#
+  </select>
+  
+   <select id="select_child_area_teacher" resultClass="project.system.pojo.ZTree"  parameterClass="java.util.HashMap">
+       select 
+	  CONVERT(a.id, CHAR(50)) as id,
+	  a.up_lv_code as pId,
+	  CONCAT(a.name,'[校:',(case a.type when 0 then 
+	  (select count(*) from edu_school s1 where s1.school_province_id=a.id) 
+	  when 1 then (select count(*) from edu_school s1 where s1.school_city_id=a.id) 
+	  when 2 then (select count(*) from edu_school s1 where s1.school_district_id=a.id) end),'/师:',
+	  (case a.type when 0 then (select count(*) from edu_user u1
+	  where u1.user_province_id=a.id and u1.role_id in (4,5) and u1.status in (1,8)) 
+	  when 1 then (select count(*) from edu_user u1
+	  where u1.user_city_id=a.id and u1.role_id in (4,5) and u1.status in (1,8)) 
+	  when 2 then (select count(*) from edu_user u1
+	  where u1.user_district_id=a.id and u1.role_id in (4,5) and u1.status in (1,8)) end),']') as name,
+	  
+	   CONVERT(a.type, CHAR(50)) as  type,
+	  'true' as isParent
+	  from edu_sys_area a
+	  where 
+	   status = 1 and up_lv_code = #id#
+  </select>
+  
+  
+    <select id="getSchoolTypeListOfArea" resultClass="project.system.pojo.ZTree"  parameterClass="java.lang.Integer">
+		  
+	  select CONCAT(school_district_id,school_type_id)   as id,
+             school_district_id as pId,
+             school_type_id as type,
+              school_type_name  as name,
+             'true' as isParent,
+             'true' as isSchool
+             from edu_school where school_district_id=#id# group by school_type_id;
+  </select>
+  
+  
+    <select id="getSchoolListOfAreaByType" resultClass="project.system.pojo.ZTree"  parameterClass="java.util.HashMap">
+	        select school_id as id,
+             CONCAT(school_district_id,',',school_type_id)   as pId,
+             CONCAT(school_name,'[师:',(select count(*) from edu_user u,edu_project_comment c  where u.id=c.teacher_id and  u.school_id=a.school_id and c.project_id=#projectId#),']') as name,
+             'school' as isSchool
+      from edu_school a
+      where school_district_id=#pid# and school_type_id=#type#
+  </select>
+  
+  <select id="getSchoolListOfTeacherByType" resultClass="project.system.pojo.ZTree"  parameterClass="java.util.HashMap">
+	        select school_id as id,
+             CONCAT(school_district_id,',',school_type_id)   as pId,
+             CONCAT(school_name,'[师:',(select count(*) from edu_user u
+              where u.school_id = a.school_id and  u.role_id in (4,5) AND u.STATUS in (1,8)),']') as name,
+             'school' as isSchool
+      from edu_school a
+      where school_district_id=#pid# and school_type_id=#type#
+  </select>
+  
+  <select id="select_by_it" resultClass="project.system.pojo.ZTree"  parameterClass="java.util.HashMap">
+     select 
+	  CONVERT(a.id, CHAR(50)) as id,
+	  a.up_lv_code as pId,
+	  CONCAT(a.name,'[校:',(case a.type when 0 then (select count(*) from edu_school s1 where s1.school_province_id=a.id) when 1 then (select count(*) from edu_school s1 where s1.school_city_id=a.id) when 2 then (select count(*) from edu_school s1 where s1.school_district_id=a.id) end),'/师:',(case a.type when 0 then (select count(*) from edu_user u1,edu_project_comment c1 where u1.user_province_id=a.id and u1.id=c1.teacher_id and c1.project_id=#projectId#) when 1 then (select count(*) from edu_user u1,edu_project_comment c1 where u1.user_city_id=a.id and u1.id=c1.teacher_id and c1.project_id=#projectId#) when 2 then (select count(*) from edu_user u1,edu_project_comment c1 where u1.user_district_id=a.id and u1.id=c1.teacher_id and c1.project_id=#projectId#) end),']') as name,
+	  
+	   CONVERT(a.type, CHAR(50)) as  type,
+	  'true' as isParent
+	  from edu_sys_area a
+	  where 
+	  status = 1 and id = #id#
+  </select>
+  
+    <select id="select_area_teacher_by_it" resultClass="project.system.pojo.ZTree"  parameterClass="java.util.HashMap">
+     select 
+	  CONVERT(a.id, CHAR(50)) as id,
+	  a.up_lv_code as pId,
+	  CONCAT(a.name,'[校:',(case a.type when 0 then (select count(*) from edu_school s1 where s1.school_province_id=a.id) 
+	  when 1 then (select count(*) from edu_school s1 where s1.school_city_id=a.id) 
+	  when 2 then (select count(*) from edu_school s1 where s1.school_district_id=a.id) end),'/师:',
+	  (case a.type when 0 then (select count(*) from edu_user u1 
+	  where u1.user_province_id=a.id and u1.role_id in (4,5) and u1.status in (1,8)) 
+	  when 1 then (select count(*) from edu_user u1
+	  where u1.user_city_id=a.id and u1.role_id in (4,5) and u1.status in (1,8)) 
+	  when 2 then (select count(*) from edu_user u1 
+	  where u1.user_district_id=a.id and u1.role_id in (4,5) and u1.status in (1,8)) end),']') as name,
+	  
+	   CONVERT(a.type, CHAR(50)) as  type,
+	  'true' as isParent
+	  from edu_sys_area a
+	  where 
+	  status = 1 and id = #id#
+  </select>
+  
+  
+  <select id="getAreaById" resultClass="project.system.pojo.ZTree"  parameterClass="java.util.HashMap">
+     select 
+	  CONVERT(a.id, CHAR(50)) as id,
+	  a.up_lv_code as pId,
+	  a.name,
+	   CONVERT(a.type, CHAR(50)) as  type,
+	  'true' as isParent
+	  from edu_sys_area a
+	  where 
+	  status = 1 and id = #id#
+  </select>
+  
+  
+    <select id="getChildrenAreaById" resultClass="project.system.pojo.ZTree"  parameterClass="java.util.HashMap">
+       select 
+	  CONVERT(a.id, CHAR(50)) as id,
+	  a.up_lv_code as pId,
+	  a.name,
+	   CONVERT(a.type, CHAR(50)) as  type,
+	  'true' as isParent
+	  from edu_sys_area a
+	  where 
+	   status = 1 and up_lv_code = #id#
+  </select>
+   <select id="getSchoolTypeList" resultClass="project.system.pojo.ZTree"  parameterClass="java.util.HashMap">
+		  
+	  select CONCAT(school_district_id,school_type_id)   as id,
+             school_district_id as pId,
+             school_type_id as type,
+              school_type_name  as name,
+             'true' as isParent,
+             'true' as isSchool
+             from edu_school where school_district_id=#id# group by school_type_id;
+  </select>
+  
+  
+    <select id="getSchoolList" resultClass="project.system.pojo.ZTree"  parameterClass="java.util.HashMap">
+	        select school_id as id,
+             CONCAT(school_city_id,school_type_id)   as pId,
+			school_name as name,
+             'school' as isSchool
+      from edu_school a
+      where school_district_id=#pid# and school_type_id=#type#
+  </select>
+  
+  <!-- 
+  <select id="getAreaById" resultClass="project.system.pojo.ZTree"  parameterClass="java.util.HashMap">
+     select 
+	  CONVERT(a.id, CHAR(50)) as id,
+	  a.up_lv_code as pId,
+	  a.name,
+	   CONVERT(a.type, CHAR(50)) as  type,
+	  'true' as isParent
+	  from edu_sys_area a
+	  where 
+	  status = 1 and id = #id#
+  </select>
+  
+  
+    <select id="getChildrenAreaById" resultClass="project.system.pojo.ZTree"  parameterClass="java.util.HashMap">
+       select 
+	  CONVERT(a.id, CHAR(50)) as id,
+	  a.up_lv_code as pId,
+	  a.name,
+	   CONVERT(a.type, CHAR(50)) as  type,
+	  'true' as isParent
+	  from edu_sys_area a
+	  where 
+	   status = 1 and up_lv_code = #id#
+  </select>
+   <select id="getSchoolTypeList" resultClass="project.system.pojo.ZTree"  parameterClass="java.util.HashMap">
+		  
+	  select CONCAT(school_district_id,school_type_id)   as id,
+             school_district_id as pId,
+             school_type_id as type,
+              school_type_name  as name,
+             'true' as isParent,
+             'true' as isSchool
+             from edu_school where school_district_id=#id# group by school_type_id;
+  </select>
+  
+  
+    <select id="getSchoolList" resultClass="project.system.pojo.ZTree"  parameterClass="java.util.HashMap">
+	        select school_id as id,
+             CONCAT(school_city_id,school_type_id)   as pId,
+			school_name as name,
+             'school' as isSchool
+      from edu_school a
+      where school_district_id=#pid# and school_type_id=#type#
+  </select> -->
+  
+  <select id="select_area_count_by_areaId" parameterClass="int" resultClass="int">
+  	select count(1) from edu_project where pid = #areaId# or cid = #areaId# or did = #areaId#
+	UNION
+	select count(1) from edu_user where user_province_id = #areaId# or user_city_id =#areaId# or user_district_id = #areaId#
+	UNION
+	select count(1) from edu_school where school_city_id = #areaId# or school_province_id = #areaId# or school_district_id = #areaId#
+  </select>
+  
+  <select id="all_down_lv_allocated" parameterClass="java.util.HashMap" resultClass="int">
+  	select 
+  	(select count(1) from edu_sys_area where up_lv_code = #areaId#) 
+  	= 
+  	(select count(1) from edu_project_allocate_by_area where area_id in(select id from edu_sys_area where up_lv_code = #areaId#) and project_id=#projectId# 
+  	and type = 0 and status = 1) as vv
+  
+  </select>
+  
+   <select id="all_down_lv_allocated2" parameterClass="java.util.HashMap" resultClass="int">
+  	select 
+  	(select count(1) from edu_school where school_district_id = #areaId#) 
+  	= 
+  	(select count(1) from edu_project_allocate_by_area where area_id in(
+  		select school_id from edu_school where school_district_id = #areaId#
+  	) and project_id=#projectId# and type = 1 and status = 1) as vv
+  </select>
+  
+  
+  <select id="all_down_lv_allocated3" parameterClass="java.util.HashMap" resultClass="int">
+  select count(1) from edu_project_allocate_by_area where area_id in(
+  		select school_id from edu_school where school_district_id = #areaId#
+  	) and project_id=#projectId# and type = 1 and status = 0
+  </select>
+  
+  <select id="all_down_lv_allocated4" parameterClass="java.util.HashMap" resultClass="int">
+ select count(1) from edu_project_allocate_by_area where area_id in(select id from edu_sys_area where up_lv_code = #areaId#) and project_id=#projectId# 
+  	and type = 0 and status = 0
+  
+  </select>
+  
+  
+   <select id="select_area_by_name" resultClass="project.system.pojo.SysArea" parameterClass="java.util.HashMap">
+  select 
+  id,
+  code,
+  area_code as areaCode,
+  name,
+  type,
+  up_lv_code as upLvCode
+  from edu_sys_area
+  where 
+  status = 1 and name = #name# 
+  <isNotNull prepend="and" property="code">
+  	 up_lv_code = #code#
+  </isNotNull>
+  </select>
+  
+    <select id="select_district_list" resultClass="project.system.pojo.SysArea" parameterClass="java.util.HashMap">
+		  select 
+		  id,
+		  area_code as areaCode,
+		  name,
+		  type,
+		  up_lv_code as upLvCode
+		  from edu_sys_area
+		  where 
+		  status = 1 and type=2;
+  	</select>
+  	
+  	<select id="select_area_list_by_upcode" resultClass="project.system.pojo.SysArea" parameterClass="java.util.HashMap">
+		  select 
+		  id,
+		  area_code as areaCode,
+		  name,
+		  type,
+		  up_lv_code as upLvCode
+		  from edu_sys_area
+		  where 
+		  status = 1 and up_lv_code=#upcode#;
+  	</select>
+  	
+  	<!-- 注意：以下所有tree的id,pId需根据实际情况重命名(重命名规则自定义)，因为不同表的id值可能存在相同值，会导致生成的tree结构错乱，所以需保证最终查询结果的每个id值唯一 -->
+  	<!-- 行政管理员tree -->
+	<select id="select_administrator_node" resultClass="project.message.pojo.MessageTree" parameterClass="java.util.HashMap">
+		SELECT 
+			u.id, 
+			u.real_name as name, 
+			'3' as type, 
+			'false' as isParent,
+			CONCAT("1_",(case 
+				when (u.user_province_id is not null and u.user_city_id is null and u.user_district_id is null) then u.user_province_id 
+				when (u.user_province_id is not null and u.user_city_id is not null and u.user_district_id is null) then u.user_city_id 
+				when (u.user_province_id is not null and u.user_city_id is not null and u.user_district_id is not null) then u.user_district_id end
+			)) as pId
+		FROM edu_user u
+		INNER JOIN edu_sys_role r ON u.role_id=r.id
+		WHERE r.role_type in (1,2,3) AND u.status!=0 AND (u.user_province_id=#areaId# or u.user_city_id=#areaId# or u.user_district_id=#areaId#) 				  
+		
+			UNION
+		
+		SELECT 
+			CONCAT("1_",code) AS id,	
+		  	name,
+		  	type,
+			'true' AS isParent,	
+			CONCAT("1_",up_lv_code) AS pId 
+		FROM
+			edu_sys_area WHERE status=1 
+		
+		<!-- 和当前登录用户区域关联 -->
+		<!-- <isEqual property="roleId" compareValue="2">
+			and (id=#areaId# or up_lv_code=#areaId#)	
+		</isEqual>
+		<isEqual property="roleId" compareValue="3">	
+			and id=#areaId#
+		</isEqual> -->
+  	</select>
+  	
+  	<!-- 实施机构管理员tree -->
+  	<select id="select_org_administrator_node" resultClass="project.message.pojo.MessageTree" parameterClass="java.util.HashMap">
+		<!-- 实施机构 -->
+		SELECT
+			CONCAT('2_',o.organization_id) as id,
+			o.organization_name as name,
+			'4' as type,
+			'true' as isParent,
+			CONCAT('1_',
+				(case 
+					when (o.organization_province_id is not null and o.organization_city_id is null and o.organization_district_id is null) then o.organization_province_id 
+					when (o.organization_province_id is not null and o.organization_city_id is not null and o.organization_district_id is null) then o.organization_city_id 
+					when (o.organization_province_id is not null and o.organization_city_id is not null and o.organization_district_id is not null) then o.organization_district_id end
+				)) as pId
+		FROM
+			edu_organization o
+		WHERE o.status=1 and (o.organization_province_id=#areaId# or o.organization_city_id=#areaId# or o.organization_district_id=#areaId#)
+		
+			UNION
+			
+		<!-- 实施机构管理员 -->
+		SELECT 
+			u.id, 
+			u.real_name as name, 
+			'5' as type, 
+			'false' as isParent,
+			CONCAT('2_',o.organization_id) as pId
+		FROM edu_user u
+		INNER JOIN edu_organization o ON u.organization_id=o.organization_id AND o.status=1
+		WHERE u.status!=0 and (o.organization_province_id=#areaId# or o.organization_city_id=#areaId# or o.organization_district_id=#areaId#) 				  
+			
+			UNION
+			
+		<!-- 区域 -->
+		SELECT 
+			CONCAT("1_",code) AS id,	
+		  	name,
+		  	type,
+			'true' AS isParent,	
+			CONCAT("1_",up_lv_code) AS pId 
+		FROM
+			edu_sys_area WHERE status=1 
+  	</select>
+  	
+  	<!-- 校管理员tree -->
+  	<select id="select_school_administrator_node" resultClass="project.message.pojo.MessageTree" parameterClass="java.util.HashMap">
+		<!-- 区域 -->
+		SELECT 
+			CONCAT("1_",code) AS id,	
+		  	name,
+		  	type,
+			'true' AS isParent,	
+			CONCAT("1_",up_lv_code) AS pId 
+		FROM edu_sys_area WHERE status=1 
+			
+			UNION
+		
+		<!-- 学校类型 -->	
+		SELECT 
+			DISTINCT
+			CONCAT('2_',school_district_id,'_',school_type_id) as id,
+			school_type_name  as name,
+			'6' as type,
+			'true' as isParent,
+			CONCAT("1_",school_district_id) as pId
+		FROM edu_school
+		WHERE status=1 and (school_province_id=#areaId# or school_city_id=#areaId# or school_district_id=#areaId#)
+		
+			UNION
+		
+		<!-- 学校 -->	
+		SELECT 
+			CONCAT('3_',school_id) as id,
+			school_name as name,
+			'7' as type,
+			'true' as isParent,	
+			CONCAT('2_',school_district_id,'_',school_type_id) as pId
+		FROM edu_school
+		WHERE status=1 and (school_province_id=#areaId# or school_city_id=#areaId# or school_district_id=#areaId#)
+			
+			UNION
+		
+		<!-- 校管理员 -->	
+		SELECT 
+			u.id, 
+			u.real_name as name, 
+			'8' as type, 
+			'false' as isParent,
+			CONCAT('3_',u.school_id) as pId 
+		FROM edu_user u
+		INNER JOIN edu_sys_role r ON u.role_id=r.id
+		WHERE r.role_type=4 and u.status!=0 and (u.user_province_id=#areaId# or u.user_city_id=#areaId# or u.user_district_id=#areaId#)
+  	</select>
+  	
+  	<!-- 学校下教师tree -->
+  	<select id="select_school_teacher_node" resultClass="project.message.pojo.MessageTree" parameterClass="java.util.HashMap">
+		<!-- 学校 -->
+		SELECT 
+			CONCAT('1_',school_id) as id,
+		  	school_name as name, 
+		  	'0' as pId,
+			'7' as type,
+			'true' as isParent
+		FROM edu_school WHERE status=1 and school_id=#areaId#
+			
+			UNION
+			
+		<!-- 教师 -->
+		SELECT 
+			id, 
+			real_name as name, 
+			CONCAT('1_', #areaId#) as pId, 
+			'9' as type, 
+			'false' as isParent
+		FROM edu_user WHERE status!=0 and school_id=#areaId#
+  	</select>
+</sqlMap>

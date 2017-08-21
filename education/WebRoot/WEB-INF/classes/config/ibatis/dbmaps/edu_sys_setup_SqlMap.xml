@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap>
+	<!-- 系统设置查询功能设置 -->
+	<!--
+			teacher_info_audit_level as teacherInfoAuditLevel,
+			transfer_audit_level as transferAuditLevel,
+			retired_audit_level as retiredAuditLevel,
+			furtheredu_audit_level as furthereduAuditLevel,
+			year_appraisal_level as yearAppraisalLevel,
+	 -->
+	<select id="selectSysSetupInfo" resultClass="project.system.pojo.SysSetup">
+		SELECT
+			account_type as accountType,
+			use_teacher_role as useTeacherRole,
+			open_register_teacher as openRegisterTeacher,
+			teacher_info_change_audit as teacherInfoChangeAudit,
+			teacher_info_safe as teacherInfoSafe,
+			enable_org as enableOrg,
+			teacher_module_auther_id as teacherModuleAutherId,
+			teacher_module_auther_name as teacherModuleAutherName,
+			furtheredu_module_auther_id as furthereduModuleAutherId,
+			furtheredu_module_auther_name as furthereduModuleAutherName,
+			create_by as createBy,
+			create_date as createDate,
+			update_by as updateBy,
+			update_date as updateDate
+		FROM
+			edu_sys_setup
+		WHERE
+			id = 1
+	</select>
+	
+	<!-- 系统设置更改功能设置  -->
+	<update id="updateSysSetup" parameterClass="project.system.pojo.SysSetup">
+		UPDATE 
+			edu_sys_setup
+		<dynamic prepend="set" >
+      		<isNotNull prepend="," property="accountType">
+        		account_type = #accountType:VARCHAR#
+      		</isNotNull>
+      		<isNotNull prepend="," property="useTeacherRole">
+        		use_teacher_role = #useTeacherRole:INTEGER#
+      		</isNotNull>
+      		<isNotNull prepend="," property="openRegisterTeacher">
+        		open_register_teacher = #openRegisterTeacher:INTEGER#
+      		</isNotNull>
+      		<isNotNull prepend="," property="teacherInfoChangeAudit">
+        		teacher_info_change_audit = #teacherInfoChangeAudit:VARCHAR#
+      		</isNotNull>
+      		<isNotNull prepend="," property="teacherInfoSafe">
+        		teacher_info_safe = #teacherInfoSafe:INTEGER#
+      		</isNotNull>
+    		<isNotNull prepend="," property="enableOrg">
+        		enable_org = #enableOrg:INTEGER#
+      		</isNotNull>
+      		<isNotNull prepend="," property="teacherInfoAuditLevel">
+        		teacher_info_audit_level = #teacherInfoAuditLevel:INTEGER#
+      		</isNotNull>
+      		<isNotNull prepend="," property="transferAuditLevel">
+        		transfer_audit_level = #transferAuditLevel:INTEGER#
+      		</isNotNull>
+      		<isNotNull prepend="," property="retiredAuditLevel">
+        		retired_audit_level = #retiredAuditLevel:INTEGER#
+      		</isNotNull>
+      		<isNotNull prepend="," property="furthereduAuditLevel">
+        		furtheredu_audit_level = #furthereduAuditLevel:INTEGER#
+      		</isNotNull>
+      		<isNotNull prepend="," property="yearAppraisalLevel">
+        		year_appraisal_level = #yearAppraisalLevel:INTEGER#
+      		</isNotNull>
+        		, update_by = #updateBy#,
+        		update_date = NOW()
+        	WHERE
+        		id = 1
+		</dynamic>
+	</update>
+</sqlMap>

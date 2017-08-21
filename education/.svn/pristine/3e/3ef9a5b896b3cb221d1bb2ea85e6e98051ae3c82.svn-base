@@ -1,0 +1,452 @@
+package project.master.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import project.master.pojo.EduComparison;
+import project.master.pojo.EduComparisonComment;
+import project.master.service.IEduMasterService;
+import project.system.controller.SysSchoolController;
+import framelib.controller.AbsController;
+import framelib.utils.StringUtil;
+import framelib.utils.page.PageObject;
+import framelib.utils.page.PageParser;
+
+@Controller
+@RequestMapping("/master")
+public class MasterController extends AbsController {
+	private static final Logger log = Logger.getLogger(SysSchoolController.class);
+	
+	@Autowired
+	@Qualifier("eduMasterService")
+	IEduMasterService eduMasterService;
+	
+	
+	
+	
+	/**
+	 * 跳转到专家管理
+	 * @return
+	 */
+	@RequestMapping("toMasterManage.htm")
+	public String toMasterManage(HttpServletRequest request){
+		return "master/masterManage";
+	}
+	
+	/**
+	 * 跳转到评比活动管理
+	 * @return
+	 */
+	@RequestMapping("toManageComparison.htm")
+	public String toManageComparison(HttpServletRequest request){
+		return "master/manageComparison";
+	}
+	
+	/**
+	 * 跳转到创建评比活动
+	 * @return
+	 */
+	@RequestMapping("toCreateComparison.htm")
+	public String toCreateComparison(HttpServletRequest request){
+		return "master/createComparison";
+	}
+	
+	/**
+	 * 跳转到评选活动通知
+	 * @return
+	 */
+	@RequestMapping("toReceiveComparison.htm")
+	public String toReceiveComparison(HttpServletRequest request){
+		return "master/receiveComparison";
+	}
+	
+	/**
+	 * 跳转到评比活动报名
+	 * @return
+	 */
+	@RequestMapping("toSignUpComparison.htm")
+	public String toSignUpComparison(HttpServletRequest request){
+		String comparisonId = request.getParameter("comparisonId");//要报名的评比活动
+		Map<String, Object> condition = new HashMap<String, Object>();
+		condition.put("id", comparisonId);
+		PageObject pageObject = eduMasterService.queryComparison(condition);
+		EduComparison eduComparison = (EduComparison) pageObject.getObjects().get(0);
+		request.setAttribute("comparisonName", eduComparison.getComparisonName());
+		request.setAttribute("comparisonId", comparisonId);
+		request.setAttribute("areaName", this.getCode(request).get("areaName"));
+		request.setAttribute("areaId", this.getCode(request).get("areaId"));
+		request.setAttribute("areaType", this.getCode(request).get("areaType"));
+		return "master/signUpComparison";
+	}
+	/**
+	 * 跳转到评比活动报名
+	 * @return
+	 */
+	@RequestMapping("viewSignUpComparison.htm")
+	public String viewSignUpComparison(HttpServletRequest request){
+		String comparisonId = request.getParameter("comparisonId");//要报名的评比活动
+		Map<String, Object> condition = new HashMap<String, Object>();
+		condition.put("id", comparisonId);
+		PageObject pageObject = eduMasterService.queryComparison(condition);
+		EduComparison eduComparison = (EduComparison) pageObject.getObjects().get(0);
+		request.setAttribute("comparisonName", eduComparison.getComparisonName());
+		request.setAttribute("comparisonId", comparisonId);
+		request.setAttribute("areaName", this.getCode(request).get("areaName"));
+		request.setAttribute("areaId", this.getCode(request).get("areaId"));
+		request.setAttribute("areaType", this.getCode(request).get("areaType"));
+		return "master/viewComparisonTeacher";
+	}
+	
+	/**
+	 * 添加评比活动
+	 * addComparison
+	 */
+	@RequestMapping("addComparison.do")
+	public @ResponseBody Map<String,Object> addComparison(HttpServletRequest request){
+		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> condition = new HashMap<String, Object>();
+		String comparisonName = request.getParameter("comparisonName");
+		String comparisonType = request.getParameter("comparisonType");
+		String comparisonTypeName = request.getParameter("comparisonTypeName");
+		String comparisonNum = request.getParameter("comparisonNum");
+		String startDate = request.getParameter("startDate");
+		String endDate = request.getParameter("endDate");
+		String memo = request.getParameter("memo");
+		condition.put("comparisonName",comparisonName);
+		condition.put("comparisonType",comparisonType);
+		condition.put("comparisonTypeName",comparisonTypeName);
+		condition.put("comparisonNum",comparisonNum);
+		condition.put("startDate",startDate);
+		condition.put("endDate",endDate);
+		condition.put("memo",memo);
+		condition.put("createBy",getAccountId(request));
+		
+		if(eduMasterService.addComparison(condition)){
+			result.put("success", true);
+			result.put("message", "添加成功");
+		}else{
+			result.put("success", false);
+			result.put("message", "添加失败！");
+		}
+		return result;
+	}
+	
+	/**
+	 * 修改评比活动
+	 * addComparison
+	 */
+	@RequestMapping("updateComparison.do")
+	public @ResponseBody Map<String,Object> updateComparison(HttpServletRequest request){
+		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> condition = new HashMap<String, Object>();
+		String comparisonName = request.getParameter("comparisonName");
+		String comparisonType = request.getParameter("comparisonType");
+		String comparisonTypeName = request.getParameter("comparisonTypeName");
+		String comparisonNum = request.getParameter("comparisonNum");
+		String startDate = request.getParameter("startDate");
+		String endDate = request.getParameter("endDate");
+		String memo = request.getParameter("memo");
+		String status = request.getParameter("status");
+		String id = request.getParameter("id");
+		condition.put("comparisonName",StringUtil.isEmpty(comparisonName) ? null : comparisonName);
+		condition.put("comparisonType",StringUtil.isEmpty(comparisonType) ? null : comparisonType);
+		condition.put("comparisonTypeName",StringUtil.isEmpty(comparisonTypeName) ? null : comparisonTypeName);
+		condition.put("comparisonNum",StringUtil.isEmpty(comparisonNum) ? null : comparisonNum);
+		condition.put("startDate",StringUtil.isEmpty(startDate) ? null : startDate);
+		condition.put("endDate",StringUtil.isEmpty(endDate) ? null : endDate);
+		condition.put("memo",StringUtil.isEmpty(memo) ? null : memo);
+		condition.put("updateBy",getAccountId(request));
+		condition.put("status",StringUtil.isEmpty(status) ? null : status);
+		condition.put("id",StringUtil.isEmpty(id) ? null : id);
+		
+		if(eduMasterService.updateComparison(condition)){
+			result.put("success", true);
+			result.put("message", "修改成功");
+		}else{
+			result.put("success", false);
+			result.put("message", "修改失败！");
+		}
+		return result;
+	}
+	
+	/**
+	 * 删除评比活动
+	 * addComparison
+	 */
+	@RequestMapping("deleteComparison.do")
+	public @ResponseBody Map<String,Object> deleteComparison(HttpServletRequest request){
+		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> condition = new HashMap<String, Object>();
+		String id = request.getParameter("id");
+		condition.put("id",id);
+		if(eduMasterService.deleteComparison(condition)){
+			result.put("success", true);
+			result.put("message", "删除成功");
+		}else{
+			result.put("success", false);
+			result.put("message", "删除失败！");
+		}
+		return result;
+	}
+
+	/**
+	 * 查询评比活动
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("queryComparison.do")
+	public @ResponseBody Map<String,Object> queryComparison(HttpServletRequest request){
+		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> condition = new HashMap<String, Object>();
+		String id = request.getParameter("id");
+		String status = request.getParameter("status");
+		if(id != null){//查询单个
+			condition.put("id", id);
+		}
+		condition.put("status", status);
+		PageObject pageObject = eduMasterService.queryComparison(condition);
+		
+		result.put("rows", pageObject.getObjects());
+		return result;
+	}
+	/**
+	 * 查询教师
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("queryComparisonTeacher.do")
+	public @ResponseBody Map<String,Object> queryComparisonTeacher(HttpServletRequest request){
+		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> condition = new HashMap<String, Object>();
+		String comparisonId = request.getParameter("comparisonId");
+		String teacherName = request.getParameter("teacherName");
+		Integer startIndex = Integer.parseInt(request.getParameter("startIndex"));
+		Integer pageSize = Integer.parseInt(request.getParameter("pageSize"));
+		startIndex = (startIndex - 1) * pageSize;
+		String areaId = request.getParameter("areaId");
+		String areaType = request.getParameter("areaType");
+		if(areaType.equals("provinceId")){
+			condition.put("provinceId", areaId);
+		}else if(areaType.equals("cityId")){
+			condition.put("cityId", areaId);
+		}else if(areaType.equals("districtId")){
+			condition.put("districtId", areaId);
+		}else if(areaType.equals("schoolId")){
+			condition.put("schoolId", areaId);
+		}
+		condition.put("teacherName", StringUtils.isEmpty(teacherName)?null:teacherName);
+		condition.put("startIndex", startIndex);
+		condition.put("pageSize", pageSize);
+		condition.put("comparisonId", comparisonId);
+		
+		PageObject pageObject = eduMasterService.queryComparisonTeacher(condition);
+		PageParser.getPageObject(PageParser.getPageInfo(startIndex, pageSize, pageObject.getCount()), pageObject);
+		result.put("success",true);
+		result.put("rows", pageObject.getObjects());
+		result.put("total", pageObject.getCount());
+		result.put("pageSize", pageObject.getPagesize());
+		result.put("pages", pageObject.getPages());
+		result.put("currentPage", pageObject.getCurrentPage());
+		result.put("pageNumbers", pageObject.getPageNumbers());
+		result.put("startIndex", pageObject.getStartIndex());
+		return result;
+	}
+	/**
+	 * 教师报名评比活动（逐个）
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("signUpComparisonTeacher.do")
+	public @ResponseBody Map<String,Object> signUpComparisonTeacher(HttpServletRequest request){
+		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> condition = new HashMap<String, Object>();
+		String comparisonId = request.getParameter("comparisonId");
+		String teacherId = request.getParameter("teacherId");
+		condition.put("comparisonId", comparisonId);
+		condition.put("teacherId", teacherId);
+		condition.put("createBy", getAccountId(request));
+		
+		if(eduMasterService.signUpComparisonTeacher(condition)){
+			result.put("success",true);
+			result.put("message","报名成功");
+		}else{
+			result.put("success",false);
+			result.put("message","报名失败");
+		}
+		return result;
+	}
+	/**
+	 * 重新教师报名评比活动（逐个）
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("resignUpComparisonTeacher.do")
+	public @ResponseBody Map<String,Object> resignUpComparisonTeacher(HttpServletRequest request){
+		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> condition = new HashMap<String, Object>();
+		String comparisonId = request.getParameter("comparisonId");
+		String teacherId = request.getParameter("teacherId");
+		condition.put("comparisonId", comparisonId);
+		condition.put("teacherId", teacherId);
+		condition.put("updateBy", getAccountId(request));
+		
+		if(eduMasterService.resignUpComparisonTeacher(condition)){
+			result.put("success",true);
+			result.put("message","报名成功");
+		}else{
+			result.put("success",false);
+			result.put("message","报名失败");
+		}
+		return result;
+	}
+	
+	/**
+	 * 教师取消报名评比活动（逐个）
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("canelSignUpComparisonTeacher.do")
+	public @ResponseBody Map<String,Object> canelSignUpComparisonTeacher(HttpServletRequest request){
+		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> condition = new HashMap<String, Object>();
+		String comparisonId = request.getParameter("comparisonId");
+		String teacherId = request.getParameter("teacherId");
+		condition.put("comparisonId", comparisonId);
+		condition.put("teacherId", teacherId);
+		condition.put("updateBy", getAccountId(request));
+		
+		if(eduMasterService.canelSignUpComparisonTeacher(condition)){
+			result.put("success",true);
+			result.put("message","取消成功");
+		}else{
+			result.put("success",false);
+			result.put("message","取消失败");
+		}
+		return result;
+	}
+	/**
+	 * 教师报名评比活动（批量）
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("signupComparisonBatch.do")
+	public @ResponseBody Map<String,Object> signupComparisonBatch(HttpServletRequest request){
+		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> condition = new HashMap<String, Object>();
+		String comparisonId = request.getParameter("comparisonId");
+		String teacherIds = request.getParameter("teacherIds");
+		
+		//查询是否有已经报名的教师
+		condition.put("status", "11,12,13,3");
+		condition.put("comparisonId", comparisonId);
+		condition.put("teacherIds", teacherIds);
+		condition.put("createBy", getAccountId(request));
+		List<EduComparisonComment> list = eduMasterService.querySignUpComparisonTeacher(condition);
+		if(list.size() > 0){//包含已经报名的教师
+			result.put("success",false);
+			result.put("message","存在已报名教师");
+		}else{
+			if(eduMasterService.signUpComparisonTeacherBatch(condition)){
+				result.put("success",true);
+				result.put("message","报名成功");
+			}else{
+				result.put("success",false);
+				result.put("message","报名失败");
+			}
+		}
+		return result;
+	}
+	/**
+	 * 教师取消报名评比活动（批量）
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("canelSignupComparisonBatch.do")
+	public @ResponseBody Map<String,Object> canelSignupComparisonBatch(HttpServletRequest request){
+		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> condition = new HashMap<String, Object>();
+		String comparisonId = request.getParameter("comparisonId");
+		String teacherIds = request.getParameter("teacherIds");
+		
+		//查询是否有已经报名的教师
+		condition.put("status", "0,2");
+		condition.put("comparisonId", comparisonId);
+		condition.put("teacherIds", teacherIds);
+		condition.put("updateBy", getAccountId(request));
+		List<EduComparisonComment> list = eduMasterService.querySignUpComparisonTeacher(condition);
+		if(list.size() > 0){//包含已经报名的教师
+			result.put("success",false);
+			result.put("message","存在未报名教师");
+		}else{
+			if(eduMasterService.canelSignUpComparisonTeacherBatch(condition)){
+				result.put("success",true);
+				result.put("message","取消报名成功");
+			}else{
+				result.put("success",false);
+				result.put("message","取消报名失败");
+			}
+		}
+		return result;
+	}
+	/**
+	 * 查看教师报名评比活动
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping("queryComparisonCommntTeacher.do")
+	public @ResponseBody Map<String,Object> queryComparisonCommntTeacher(HttpServletRequest request){
+		Map<String, Object> result = new HashMap<String, Object>();
+		Map<String, Object> condition = new HashMap<String, Object>();
+		String comparisonId = request.getParameter("comparisonId");
+		String teacherName = request.getParameter("teacherName");
+		String areaId = request.getParameter("areaId");
+		String areaType = request.getParameter("areaType");
+		Integer startIndex = Integer.parseInt(request.getParameter("startIndex"));
+		Integer pageSize = Integer.parseInt(request.getParameter("pageSize"));
+		startIndex = (startIndex - 1) * pageSize;
+		if(areaType.equals("provinceId")){
+			condition.put("provinceId", areaId);
+		}else if(areaType.equals("cityId")){
+			condition.put("cityId", areaId);
+		}else if(areaType.equals("districtId")){
+			condition.put("districtId", areaId);
+		}else if(areaType.equals("schoolId")){
+			condition.put("schoolId", areaId);
+		}
+		condition.put("teacherName", StringUtils.isEmpty(teacherName)?null:teacherName);
+		condition.put("status", "11,12,13,3");
+		condition.put("comparisonId", comparisonId);
+		condition.put("startIndex", startIndex);
+		condition.put("pageSize", pageSize);
+		
+		List<EduComparisonComment> list = eduMasterService.querySignUpComparisonTeacher(condition);
+		PageObject po = new PageObject();
+		po.setCount(eduMasterService.querySignUpComparisonTeacherCount(condition));
+		po.setObjects(list);
+		PageParser.getPageObject(PageParser.getPageInfo(startIndex, pageSize, po.getCount()), po);
+		result.put("success",true);
+		result.put("rows", po.getObjects());
+		result.put("total", po.getCount());
+		result.put("pageSize", po.getPagesize());
+		result.put("pages", po.getPages());
+		result.put("currentPage", po.getCurrentPage());
+		result.put("pageNumbers", po.getPageNumbers());
+		result.put("startIndex", po.getStartIndex());
+		
+		
+		
+		return result;
+	}
+	
+}

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_audit">
+
+	<!-- 活动返回的dto -->
+	<resultMap class="project.master.pojo.EduComparison" id="comparisonResultMap">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="comparison_name" property="comparisonName" jdbcType="VARCHAR" />
+		<result column="comparison_type_id" property="comparisonTypeId" jdbcType="INTEGER" />
+		<result column="comparison_type_name" property="comparisonTypeName" jdbcType="VARCHAR" />
+		<result column="comparison_plan_num" property="comparisonPlanNum" jdbcType="INTEGER" />
+		<result column="start_date" property="startDate" jdbcType="TIMESTAMP" />
+		<result column="end_date" property="endDate" jdbcType="TIMESTAMP" />
+		<result column="memo" property="memo" jdbcType="VARCHAR" />
+		<result column="create_by" property="createBy" jdbcType="VARCHAR" />
+		<result column="create_date" property="createDate" jdbcType="TIMESTAMP"/>
+		<result column="update_by" property="updateBy" jdbcType="TIMESTAMP"/>
+		<result column="update_date" property="updateDate" jdbcType="TIMESTAMP"/>
+		<result column="status" property="status" jdbcType="VARCHAR"/>
+	</resultMap>
+
+	<!-- 教师返回的dto -->
+	<resultMap class="" id=""></resultMap>
+	
+	<!-- 根据活动名查询活动 -->
+	<select id="selectComparisonByName" parameterClass="java.util.Map" resultMap="comparisonResultMap">
+		select 
+			* 
+		from 
+			edu_comparison 
+		where
+			comparison_name=#comparisonName#
+	</select>
+	
+	<!-- 插入报名信息 -->
+	<insert id="insertTeacherInfo" parameterClass="java.util.Map" >
+	insert into edu_comparison_comment
+	(
+		comparison_id
+		teacher_name
+		idcard
+		period
+		subject
+		attachment_path
+		remark
+	)
+	values
+	(
+		#comparisonId#
+		#teacherName#
+		#idcard#
+		#period#
+		#subject#
+		#attachmentPath#
+		#remark#
+	)
+		<selectKey resultClass="int" keyProperty="id">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+	
+
+
+	<!-- 查询所有活动列表 -->
+	<select id=""></select>
+
+	<!-- 查询所有教师列表 -->
+	<select id=""></select>
+</sqlMap>

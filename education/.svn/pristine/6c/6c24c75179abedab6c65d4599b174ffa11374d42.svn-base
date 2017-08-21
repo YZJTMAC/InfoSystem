@@ -1,0 +1,79 @@
+package project.master.dao.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import project.master.dao.IEduMasterReadDAO;
+import project.master.pojo.EduComparison;
+import project.master.pojo.EduComparisonComment;
+import project.system.pojo.EduSchool;
+import project.system.pojo.SysArea;
+import framelib.dao.BaseDAOImpl;
+import framelib.utils.page.PageObject;
+
+public class EduMasterReadDaoImpl  extends BaseDAOImpl implements IEduMasterReadDAO{
+
+	@Override
+	public PageObject queryComparison(Map<String, Object> condition) {
+		PageObject po = new PageObject();
+		po.setCount((Integer) this.getSqlMapClientTemplate().queryForObject("query_comparison_count",condition));
+		List<EduComparison> proList = this.getSqlMapClientTemplate().queryForList("query_comparison",condition);
+		po.setObjects(proList);
+		return po;
+	}
+
+	@Override
+	public PageObject queryComparisonTeacher(Map<String, Object> condition) {
+		PageObject po = new PageObject();
+		int count = (Integer) this.getSqlMapClientTemplate().queryForObject("query_comparison_teacher_count",condition);
+		po.setCount(count);
+		List<EduComparison> proList = this.getSqlMapClientTemplate().queryForList("query_comparison_teacher",condition);
+		po.setObjects(proList);
+		return po;
+	}
+
+	@Override
+	public List<EduComparisonComment> querySignUpComparisonTeacher(
+			Map<String, Object> condition) {
+		List<EduComparisonComment> proList = this.getSqlMapClientTemplate().queryForList("query_signup_comparison_teacher",condition);
+		return proList;
+	}
+
+	@Override
+	public int querySignUpComparisonTeacherCount(Map<String, Object> condition) {
+		return (Integer) this.getSqlMapClientTemplate().queryForObject("query_signup_comparison_teacher_count", condition);
+	}
+
+	@Override
+	public PageObject queryComparisonMaster(Map<String, Object> condition) {
+		PageObject po = new PageObject();
+		po.setCount((Integer) this.getSqlMapClientTemplate().queryForObject("query_comparison_master_count",condition));
+		List<EduComparison> proList = this.getSqlMapClientTemplate().queryForList("query_comparison_master",condition);
+		po.setObjects(proList);
+		return po;
+	}
+
+	@Override
+	public PageObject queryComparisonCheck(Map<String, Object> condition) {
+		PageObject po = new PageObject();
+		List<EduComparison> proList = this.getSqlMapClientTemplate().queryForList("query_comparison_check",condition);
+		po.setObjects(proList);
+		return po;
+	}
+
+	@Override
+	public List<SysArea> getArea(Map<String, Object> condition) {
+		return this.getSqlMapClientTemplate().queryForList("get_area",condition);
+	}
+
+	@Override
+	public List<EduSchool> getSchool(Map<String, Object> condition) {
+		return this.getSqlMapClientTemplate().queryForList("get_school",condition);
+	}
+
+	@Override
+	public List<EduComparisonComment> queryMemo(Map<String, Object> condition) {
+		return this.getSqlMapClientTemplate().queryForList("get_memos",condition);
+	}
+
+}

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_project_class" >
+  <resultMap id="abatorgenerated_EduProjectClassResult" class="project.edupm.projectclass.pojo.EduProjectClass" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="class_name" property="className" jdbcType="VARCHAR" />
+    <result column="class_subject_name" property="classSubjectName" jdbcType="VARCHAR" />
+    <result column="class_subject_id" property="classSubjectId" jdbcType="VARCHAR" />
+    <result column="class_type" property="classType" jdbcType="VARCHAR" />
+    <result column="class_type_id" property="classTypeId" jdbcType="INTEGER" />
+    <result column="class_url" property="classUrl" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="DATE" />
+    <result column="update_date" property="updateDate" jdbcType="DATE" />
+  </resultMap>
+  <resultMap id="abatorgenerated_EduProjectClassResultWithBLOBs" class="project.edupm.projectclass.pojo.EduProjectClass" extends="edu_project_class.abatorgenerated_EduProjectClassResult" >
+    <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  
+  <select id="select_class_ByPrimaryKey" resultMap="abatorgenerated_EduProjectClassResultWithBLOBs" parameterClass="int" >
+    select id, class_name, class_type, class_type_id, class_url, status, create_by, update_by,class_subject_name,
+      create_date, update_date, memo,class_subject_id
+    from edu_project_class
+    where id = #classId:INTEGER#
+  </select>
+  
+  
+  <insert id="insert_class" parameterClass="project.edupm.projectclass.pojo.EduProjectClass" >
+    insert into edu_project_class (id, class_name, class_type, class_type_id, class_url, status,
+      create_by, update_by, create_date, update_date, memo,class_subject_name,class_subject_id,
+      role_id, user_id)
+    values (#id:INTEGER#, #className:VARCHAR#, #classType:VARCHAR#, #classTypeId:INTEGER#,
+      #classUrl:VARCHAR#, #status:INTEGER#, #createBy:VARCHAR#, #updateBy:VARCHAR#,
+      #createDate:DATE#, #updateDate:DATE#, #memo:LONGVARCHAR#,#classSubjectName#,#classSubjectId#,
+      #roleId:INTEGER#, #userId:INTEGER#)
+       <selectKey resultClass="int" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+  </insert>
+  
+  <delete id="delete_class_By_id"  parameterClass="int">
+  	delete from edu_project_class where id = #classId#
+  </delete>
+  
+  
+  <delete id="delete_class_category_by_class_id"  parameterClass="int">
+  	delete from edu_project_class_category where class_id = #classId#
+  </delete>
+  
+  <update id="update_class_ByPrimaryKeyWithBLOBs" parameterClass="project.edupm.projectclass.pojo.EduProjectClass" >
+    update edu_project_class
+    set class_name = #className:VARCHAR#,
+      class_type = #classType:VARCHAR#,
+      class_type_id = #classTypeId:INTEGER#,
+      class_url = #classUrl:VARCHAR#,
+      update_by = #updateBy:VARCHAR#,
+      update_date = #updateDate:DATE#,
+      memo = #memo:LONGVARCHAR#,
+      class_subject_name = #classSubjectName#,
+      class_subject_id = #classSubjectId#
+    where id = #id:INTEGER#
+  </update>
+
+  
+  <update id="update_class_ByPrimaryKeySelective" parameterClass="project.edupm.projectclass.pojo.EduProjectClass" >
+    update edu_project_class
+    <dynamic prepend="set" >
+      <isNotNull prepend="," property="className" >
+        class_name = #className:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="classType" >
+        class_type = #classType:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="classTypeId" >
+        class_type_id = #classTypeId:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="classUrl" >
+        class_url = #classUrl:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="status" >
+        status = #status:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="createBy" >
+        create_by = #createBy:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="updateBy" >
+        update_by = #updateBy:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="createDate" >
+        create_date = #createDate:DATE#
+      </isNotNull>
+      <isNotNull prepend="," property="updateDate" >
+        update_date = #updateDate:DATE#
+      </isNotNull>
+      <isNotNull prepend="," property="memo" >
+        memo = #memo:LONGVARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="classSubjectName">
+      	class_subject_name = #classSubjectName#
+      </isNotNull>
+      <isNotNull prepend="," property="classSubjectId">
+      	class_subject_id = #classSubjectId#
+      </isNotNull>
+    </dynamic>
+    where id = #id:INTEGER#
+  </update>
+  
+  <select id="select_classes_by_project_id" parameterClass="int" resultClass="project.edupm.projectclass.pojo.EduProjectClass">
+  	select 
+  	class_name as className
+  	from edu_project_class c
+  	join edu_project_class_category r
+  	on c.id = r.class_id 
+  	where r.project_id = #proId# and role_id != 6
+  </select>
+  
+  
+  <insert id="insert_project_class_category" parameterClass="java.util.HashMap">
+  insert into edu_project_class_category(project_id, class_id, status)
+       values(#projectId#,#classId#,#status#)
+  </insert>
+  
+  
+    <select id="select_classes_by_project_id_page" parameterClass="java.util.HashMap" resultClass="project.edupm.projectclass.pojo.EduProjectClass">
+  	select 
+  	c.id as id,
+  	class_subject_name as classSubjectName,
+  	class_name as className,
+  	class_type as classType
+  	from edu_project_class c
+  	join edu_project_class_category r
+  	on c.id = r.class_id 
+  	where r.project_id = #proId# and c.status = 1 and role_id != 6
+	<dynamic>
+		<isNotNull prepend="and" property="className">
+			class_name like '%$className$%'
+		</isNotNull>
+		<isNotNull prepend="and" property="classSubjectId">
+		class_subject_id = #classSubjectId#
+		</isNotNull>
+	</dynamic>
+  	order by c.create_date desc limit #startIndex#,#endIndex#
+  </select>
+  
+  <select id="count_classes_by_project_id_page" parameterClass="java.util.HashMap" resultClass="int">
+  	select 
+  	count(1)
+  	from edu_project_class c
+  	join edu_project_class_category r
+  	on c.id = r.class_id 
+  	where r.project_id = #proId# and c.status = 1
+	<dynamic>
+		<isNotNull prepend="and" property="className">
+			class_name like '%$className$%'
+		</isNotNull>
+		<isNotNull prepend="and" property="classSubjectId">
+		class_subject_id = #classSubjectId#
+		</isNotNull>
+	</dynamic>
+  </select>
+  
+  
+  <select id="select_class_by_org" parameterClass="int" resultClass="project.edupm.projectclass.pojo.OrgClass">
+  	select 
+  	o.organization_name as orgName,
+  	c.class_name as classes
+	from edu_project_class c 
+	join edu_project_class_category r 
+	on c.id = r.class_id 
+	LEFT JOIN edu_organization o on o.user_id = c.user_id
+	where c.role_id = 6 and r.project_id = #projectId#
+  </select>
+</sqlMap>

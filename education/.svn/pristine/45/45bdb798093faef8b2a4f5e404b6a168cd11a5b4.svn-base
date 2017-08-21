@@ -1,0 +1,40 @@
+package project.master.dao;
+
+import java.util.List;
+import java.util.Map;
+
+import project.master.pojo.EduComparisonComment;
+
+import framelib.utils.page.PageObject;
+
+public interface IEduMasterReadDAO {
+
+	/**
+	 * 查询评比活动
+	 * @param condition
+	 * @return
+	 */
+	PageObject queryComparison(Map<String, Object> condition);
+
+	/**
+	 * 评比活动教师报名时的教师查询
+	 * @param condition
+	 * @return
+	 */
+	PageObject queryComparisonTeacher(Map<String, Object> condition);
+
+	/**
+	 * 查询已经报名的教师
+	 * @param condition
+	 * @return
+	 */
+	List<EduComparisonComment> querySignUpComparisonTeacher(Map<String, Object> condition);
+
+	/**
+	 * 查询报名活动评比教师数量
+	 * @param condition
+	 * @return
+	 */
+	int querySignUpComparisonTeacherCount(Map<String, Object> condition);
+
+}

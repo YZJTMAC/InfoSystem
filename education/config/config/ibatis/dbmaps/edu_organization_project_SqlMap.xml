@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap>
+	<resultMap id="edu_project_org" class="project.edupm.projectmanage.pojo.EduProjectOrg" >
+	    <result column="id" property="id" jdbcType="INTEGER" />
+	    <result column="organization_id" property="organizationId" jdbcType="INTEGER" />
+	    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+	    <result column="training_home_address" property="trainingHomeAddress" jdbcType="VARCHAR" />
+	    <result column="training_address" property="trainingAddress" jdbcType="INTEGER" />
+	    <result column="project_status" property="projectStatus" jdbcType="INTEGER" />
+	    <result column="plan_num" property="planNum" jdbcType="INTEGER" />
+	    <result column="actual_num" property="actualNum" jdbcType="INTEGER" />
+	    <result column="create_by" property="createBy" jdbcType="INTEGER" />
+	    <result column="create_date" property="createDate" jdbcType="DATE" />
+	    <result column="update_by" property="updateBy" jdbcType="INTEGER" />
+	    <result column="update_date" property="updateDate" jdbcType="DATE" />
+	    <result column="organization_name" property="organizationName" jdbcType="VARCHAR" />
+	    <result column="class_subject_id" property="classSubjectId" jdbcType="INTEGER" />
+	    <result column="class_subject_name" property="classSubjectName" jdbcType="VARCHAR" />
+	    <result column="area_code" property="areaCode" jdbcType="VARCHAR" />
+	    <result column="area_name" property="areaName" jdbcType="VARCHAR" />
+	    <result column="comment" property="comment" jdbcType="VARCHAR" />
+	    <result column="comment_content" property="commentContent" jdbcType="VARCHAR" />
+  	</resultMap>
+
+	<sql id="projectOrgAllColumns">
+		<isNotEmpty  prepend="and" property="id">
+			b.id=#id#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="organizationId">
+			b.organization_id=#organizationId#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="projectId">
+			b.project_id=#projectId#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="trainingHomeAddress">
+			b.training_home_address=#trainingHomeAddress#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="trainingAddress">
+			b.training_address=#trainingAddress#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="projectStatus">
+			b.project_status=#projectStatus#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="planNum">
+			b.plan_num=#planNum#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="actualNum">
+			b.actual_num=#actualNum#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="createBy">
+			b.create_by=#createBy#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="createDate">
+			b.create_date=#createDate#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="updateBy">
+			b.update_by=#updateBy#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="updateDate">
+			b.update_date=#updateDate#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="organizationName">
+			b.organization_name=#organizationName#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="classSubjectId">
+			b.class_subject_id=#classSubjectId#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="classSubjectName">
+			b.class_subject_name=#classSubjectName#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="areaCode">
+			b.area_code=#areaCode#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="areaName">
+			b.area_name=#areaName#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="comment">
+			b.comment=#comment#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="commentContent">
+			b.comment_content=#commentContent#
+		</isNotEmpty>
+	</sql>
+	
+	<sql id="projectColumns">
+	<isNotNull prepend="and" property="projectName">
+		a.project_name like '%$projectName$%'
+	</isNotNull>
+	<isNotNull prepend="and" property="beginYear">
+		a.year>= #beginYear#
+	</isNotNull>
+	<isNotNull prepend="and" property="endYear">
+		#endYear#>=a.year 
+	</isNotNull>
+	<isNotNull prepend="and" property="startDate">
+		a.start_date = #startDate#
+	</isNotNull>
+	<isNotNull prepend="and" property="endDate">
+		a.end_date = #endDate#
+	</isNotNull>
+	<isNotNull prepend="and" property="status">
+		a.status = #status#
+	</isNotNull>
+		
+	<isNotNull prepend="and" property="pid">
+		 a.pid =#pid#
+	</isNotNull>
+	<isNotNull prepend="and" property="cid">
+       (a.cid=#cid# or a.cid is null)
+    </isNotNull>
+	<isNotNull prepend="and" property="did">
+	  (a.did=#did# or a.did is null)
+	</isNotNull>
+	
+  </sql>
+
+	<select id="selectOrganizationProjectByParam" parameterClass="java.util.Map" resultMap="edu_project_org">
+		select * from edu_organization_project a where 1=1
+		<include refid="projectOrgAllColumns"/>
+	<isNotEmpty prepend="" property="startIndex">
+		limit #startIndex#,#endIndex#
+	</isNotEmpty>
+	</select>
+	
+	<select id="selectOrganizationProjectCountByParam" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select count(*) from edu_organization_project a where 1=1
+		<include refid="projectOrgAllColumns"/>
+	</select>
+
+
+
+
+
+	<select id="selectOrganizationProject" parameterClass="java.util.Map" resultClass="project.edupm.projectmanage.pojo.EduProjectOrg">
+		select a.id as id,a.project_name as projectName,a.year as year,a.start_date as startDate,a.end_date as endDate from edu_project a left join edu_organization_project b
+		on(a.id=b.project_id) where 1=1
+		<include refid="projectOrgAllColumns"/>
+		<include refid="projectColumns"/>
+	<isNotEmpty prepend="" property="startIndex">
+		limit #startIndex#,#endIndex#
+	</isNotEmpty>
+	</select>
+	
+	<select id="selectOrganizationProjectCount" parameterClass="java.util.Map" resultClass="java.lang.Integer">
+		select count(*) from edu_project  a left join edu_organization_project b
+		on(a.id=b.project_id) where 1=1
+		<include refid="projectOrgAllColumns"/>
+		<include refid="projectColumns"/>
+	</select>
+
+
+
+
+
+
+
+	<!-- 指定承培机构  add by zxq 	-->
+	<insert id="insertProForOrg" parameterClass="java.util.Map">
+	INSERT INTO 
+		edu_organization_project
+		(
+			organization_id,
+			project_id,
+			training_home_address,
+			training_address,
+			class_subject_id,
+			class_subject_name,
+			plan_num,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			project_status,
+			area_code,
+			area_name,
+			organization_name
+		)
+	VALUES
+		(
+			#orgId#,
+			#projectId#,
+			#trainingHomeAddress#,
+			#trainingAddress#,
+			#classSubjectId#,
+			#classSubjectName#,
+			#planNum#,
+			#account#,
+			now(),
+			#account#,
+			now(),
+			30,
+			#areaCode#,
+			#areaName#,
+			#orgName#
+		)
+	</insert>
+
+	<update id="updateOrgProjectStatus" parameterClass="java.util.Map">
+		UPDATE
+			edu_organization_project
+		SET
+			project_status = #status#
+		WHERE
+		1=1
+		<isNotEmpty prepend="AND" property="orgId">
+			organization_id = #orgId#
+		</isNotEmpty>
+		AND
+			project_id = #projectId#
+	</update>
+	
+	<update id="updateOrgProject" parameterClass="java.util.Map">
+		UPDATE
+			edu_organization_project
+		SET
+			training_address = #trainingAddress#,
+			training_home_address = #trainingHomeAddress#
+		WHERE
+			organization_id = #orgId#
+		AND
+			project_id = #projectId#
+	</update>
+
+	<!-- 查询某一项目分配给的机构名称 -->
+	<select id="selectOrgNameByProjectId" parameterClass="int" resultClass="String">
+		SELECT
+			organization_name as organizationName
+		FROM
+			edu_organization_project
+		WHERE
+			project_id = #projectId#
+	</select>
+	
+	<!-- 查看项目结项 -->
+	<select id="selectOrgProject" parameterClass="java.util.Map" resultClass="project.organization.pojo.OrganizationProject">
+		SELECT
+			organization_id as organizationId,project_id as projectId, organization_name as organizationName,
+			training_address as trainingAddress, update_date as updateDate,comment as comment,comment_content as commentContent
+		FROM
+			edu_organization_project
+		WHERE
+			project_id = #projectId#
+		AND 
+			organization_id = #orgId#
+	</select>
+	
+	<!-- 添加结项评价 -->
+	<update id="updateOrgProjectComment" parameterClass="java.util.Map">
+		UPDATE
+			edu_organization_project
+		SET
+			comment = #comment#,
+			comment_content = #commentContent#
+		WHERE
+			organization_id = #orgId#
+		AND
+			project_id = #projectId#
+	</update>
+	
+	<select id="selectOrgProject_forLock" parameterClass="java.util.Map" resultClass="project.organization.pojo.OrganizationProject">
+		SELECT
+			organization_id as organizationId, organization_name as organizationName, project_status as projectStatus,
+			training_address as trainingAddress, update_date as updateDate
+		FROM
+			edu_organization_project
+		WHERE
+			project_id = #projectId#
+		AND 
+			organization_id = #orgId#
+	</select>
+	
+	<insert id="inser_project_org">
+	insert into edu_organization_project(organization_id,project_id,plan_num,class_subject_id,class_subject_name,area_code,
+	area_name,create_by,create_date,update_by,update_date,project_status,organization_name)
+	 values(#organizationId#,#projectId#,#planNum#,#classSubjectId#,#classSubjectName#,#areaCode#,
+	 #areaName#,#createBy#,now(),#updateBy#,now(),#projectStatus#,#organizationName#)
+	</insert>
+	
+	<select id="select_OP_by_project_id" parameterClass="java.util.HashMap" resultClass="project.organization.pojo.OrganizationProject">
+		select 
+		id,
+		o.project_id as projectId,
+		o.organization_name as organizationName,
+		o.class_subject_name as classSubjectName,
+		o.project_status as projectStatus,
+		o.plan_num as planNum,
+		o.area_name as areaName
+ 			from edu_organization_project o 
+		where 
+		o.project_id = #projectId#
+		order by update_date limit #startIndex#,#endIndex#
+	</select>
+	
+	
+<select id="count_OP_by_project_id" parameterClass="java.util.HashMap" resultClass="int">
+		select 
+		count(1)
+ 			from edu_organization_project o 
+		where 
+		o.project_id = #projectId#
+	</select>
+	
+	<update id="setOP" parameterClass="java.util.HashMap">
+	UPDATE
+			edu_organization_project
+		SET
+		plan_num = #planNum#
+		<isNotNull prepend="," property="subjectName">
+			class_subject_name = #subjectName#
+		</isNotNull>
+		<isNotNull prepend="," property="subjectId">
+		class_subject_id = #subjectId#
+		</isNotNull>
+		<isNotNull prepend="," property="areaCode">
+			area_code = #areaCode#
+		</isNotNull>
+		<isNotNull prepend="," property="areaName">
+			area_name  = #areaName#
+		</isNotNull>
+		WHERE
+			id = #id#
+	</update>
+<!-- 取消项目分配的机构 -->	
+	<delete id="cancel_OP_by_id" parameterClass="int">
+		delete from edu_organization_project where id = #id#
+	</delete>	
+</sqlMap>

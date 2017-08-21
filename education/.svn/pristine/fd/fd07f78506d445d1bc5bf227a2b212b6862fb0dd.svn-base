@@ -1,0 +1,19 @@
+package project.message.dao;
+
+import java.util.Map;
+
+public interface IMessageWriteDaoIF {
+	
+	public boolean deleteMessage(Map<String, Object> paramMap) throws Exception;
+	
+	public boolean deleteMessageUsers(Map<String, Object> paramMap) throws Exception;
+	
+	public boolean updateReadMessageStatus(Map<String, Object> paramMap) throws Exception;
+	
+	public Integer insertMessage(Map<String, Object> paramMap) throws Exception;
+	
+	public boolean insertMessageUsers(Map<String, Object> paramMap) throws Exception;
+
+	boolean batchMessage(Map<String, Object> paramMap) throws Exception;
+	
+}

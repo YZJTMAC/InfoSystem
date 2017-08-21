@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="sysVisitLog" >
+	 <resultMap id="systemVisitLog" class="project.system.pojo.SysVisitLog" >
+      <result column="id" property="id" jdbcType="INTEGER" />
+      <result column="user_ip" property="userip" jdbcType="VARCHAR" />
+      <result column="message" property="message" jdbcType="VARCHAR" />
+      <result column="org_info" property="orgInfo" jdbcType="VARCHAR" />
+      <result column="create_date" property="createDate" jdbcType="VARCHAR" />
+    </resultMap>
+  
+	  <insert id="sys_log_insert" parameterClass="java.util.HashMap">
+	   	insert into edu_sys_log(
+	   		id,
+	   		user_ip,
+	   		message,
+	   		org_info,
+	   		create_date
+		   	)
+		   	values(
+		   	#id#,
+		   	#userIp:VARCHAR#,
+		   	#Message:VARCHAR#,
+		   	#orgInfo:VARCHAR#,
+		   	#createDate:VARCHAR#
+			<selectKey resultClass="Integer" keyProperty="id">
+				SELECT
+				last_insert_id() as id ;    
+	        </selectKey>
+		   	);	
+	  </insert>
+  
+  
+  
+  
+  
+  
+</sqlMap>

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_target_by_year" >
+  <resultMap id="abatorgenerated_EduTargetByYearResult" class="project.furtheredu.eduTarget.pojo.EduTargetByYear" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="year" property="year" jdbcType="VARCHAR" />
+    <result column="class_period" property="classPeriod" jdbcType="VARCHAR" />
+    <result column="class_score" property="classScore" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="province_id" property="provinceId" jdbcType="INTEGER" />
+    <result column="province_name" property="provinceName" jdbcType="VARCHAR" />
+    <result column="city_id" property="cityId" jdbcType="INTEGER" />
+    <result column="city_name" property="cityName" jdbcType="VARCHAR" />
+    <result column="district_id" property="districtId" jdbcType="INTEGER" />
+    <result column="district_name" property="districtName" jdbcType="VARCHAR" />
+    <result column="school_id" property="schoolId" jdbcType="INTEGER" />
+    <result column="school_name" property="schoolName" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="DATE" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_date" property="updateDate" jdbcType="DATE" />
+    <result column="school_id" property="schoolId" jdbcType="INTEGER" />
+    <result column="school_name" property="schoolName" jdbcType="VARCHAR" />
+  </resultMap>
+   
+  <select id="selectTargetList" resultMap="abatorgenerated_EduTargetByYearResult"  parameterClass="java.util.HashMap" >
+    select id, year, class_period, class_score, status, province_id, province_name, city_id,
+      city_name, district_id, district_name, create_by, create_date, update_by, update_date,school_id,school_name
+    from edu_target_by_year
+    where  1=1
+     <isNotNull property="year" >
+        and year = #year#
+     </isNotNull>
+     <isNotNull property="provinceId" >
+        and province_id =  #provinceId#
+     </isNotNull>
+     <isNotNull property="cityId" >
+       and city_id =  #cityId#
+     </isNotNull>
+     <isNotNull property="districtId" >
+       and district_id =  #districtId#
+     </isNotNull>
+      <isNotNull property="schoolId" >
+       and school_id =  #schoolId#
+     </isNotNull>
+    order by create_date desc LIMIT #startIndex#,#endIndex#
+  </select>
+  
+  <select id="selectTargetListCount" resultClass="java.lang.Integer" parameterClass="java.util.HashMap" >
+    select count(1) 
+    from edu_target_by_year
+      where  1=1
+      <isNotNull property="year" >
+        and year = #year#
+     </isNotNull>
+     <isNotNull property="provinceId" >
+        and province_id =  #provinceId#
+     </isNotNull>
+     <isNotNull property="cityId" >
+       and city_id =  #cityId#
+     </isNotNull>
+     <isNotNull property="districtId" >
+       and district_id =  #districtId#
+     </isNotNull>
+      <isNotNull property="schoolId" >
+       and school_id =  #schoolId#
+     </isNotNull>
+    
+  </select>
+  
+   <select id="selectTargetInfo" resultMap="abatorgenerated_EduTargetByYearResult"  parameterClass="java.util.HashMap" >
+    select id, year, class_period, class_score, status, province_id, province_name, city_id,
+      city_name, district_id, district_name, school_id, school_name,  create_by, create_date, update_by, update_date
+    from edu_target_by_year
+    where  1=1
+     <isNotNull property="queryYear" >
+        and year = #queryYear#
+     </isNotNull>
+     <isNotNull property="qid" >
+        and province_id =  #qid#
+        and city_id is null
+        and district_id is null
+        and school_id is null
+     </isNotNull>
+     <isNotNull property="cid" >
+       and city_id =  #cid#
+       and district_id is null
+        and school_id is null
+     </isNotNull>
+     <isNotNull property="did" >
+        and district_id =  #did#
+        and school_id is null
+     </isNotNull>
+     <isNotNull property="sid" >
+       and school_id = #sid#
+     </isNotNull>
+  </select>
+   
+   <select id="selectTargetListCount2" resultClass="java.lang.Integer" parameterClass="java.util.HashMap" >
+    select count(1) 
+    from edu_target_by_year
+      where  1=1
+     <isNotNull property="year" >
+        and year = #year#
+     </isNotNull>
+    <isNotEmpty property="provinceId">
+    and province_id =  #provinceId#
+    </isNotEmpty>
+    <isEmpty property="provinceId">
+    and province_id is #provinceId#
+    </isEmpty>  
+    <isNotEmpty property="cityId">
+    and city_id =  #cityId#
+    </isNotEmpty>
+    <isEmpty property="cityId">
+    and city_id is  #cityId#
+    </isEmpty> 
+    <isNotEmpty property="districtId">
+    and district_id =  #districtId#
+    </isNotEmpty>
+    <isEmpty property="districtId">
+    and district_id is  #districtId#
+    </isEmpty> 
+    <isNotEmpty property="schoolId">
+    and school_id =  #schoolId#
+    </isNotEmpty>
+    <isEmpty property="schoolId">
+    and school_id is  #schoolId#
+    </isEmpty> 
+    
+  </select>
+  
+  <select id="selectTargetByKey" resultMap="abatorgenerated_EduTargetByYearResult" parameterClass="java.lang.Integer" >
+    select id, year, class_period, class_score, status, province_id, province_name, city_id,
+      city_name, district_id, district_name, create_by, create_date, update_by, update_date,school_id,school_name
+    from edu_target_by_year
+    where id = #id#
+  </select>
+  
+    <update id="updateTarget" parameterClass="project.furtheredu.eduTarget.pojo.EduTargetByYear" >
+    update edu_target_by_year
+    set year = #year:VARCHAR#,
+      class_period = #classPeriod:VARCHAR#,
+      class_score = #classScore:VARCHAR#,
+      status = #status:INTEGER#,
+      province_id = #provinceId:INTEGER#,
+      province_name = #provinceName:VARCHAR#,
+      city_id = #cityId:INTEGER#,
+      city_name = #cityName:VARCHAR#,
+      district_id = #districtId:INTEGER#,
+      district_name = #districtName:VARCHAR#,
+      school_id = #schoolId:INTEGER#,
+      school_name = #schoolName:VARCHAR#,
+      create_by = #createBy:VARCHAR#,
+      update_by = #updateBy:VARCHAR#,
+      update_date = now()
+    where id = #id:INTEGER#
+  </update>
+  
+  <delete id="deleteTargetById" parameterClass="java.lang.Integer" >
+     delete from edu_target_by_year
+    where id = #id:INTEGER#
+  </delete>
+  
+   <insert id="target_insert" parameterClass="project.furtheredu.eduTarget.pojo.EduTargetByYear" >
+    insert into edu_target_by_year (id, year, class_period, class_score, status, province_id,
+      province_name, city_id, city_name, district_id, district_name, create_by, create_date,
+      update_by, update_date,school_id,school_name)
+    values (#id:INTEGER#, #year:VARCHAR#, #classPeriod:VARCHAR#, #classScore:VARCHAR#,
+      #status:INTEGER#, #provinceId:INTEGER#, #provinceName:VARCHAR#, #cityId:INTEGER#,
+      #cityName:VARCHAR#, #districtId:INTEGER#, #districtName:VARCHAR#, #createBy:VARCHAR#,
+      #createDate:DATE#, #updateBy:VARCHAR#, #updateDate:DATE#,#schoolId:INTEGER#,#schoolName:VARCHAR#)
+        <selectKey resultClass="Integer"  keyProperty="id" >     
+             SELECT last_insert_id() as id ;    
+        </selectKey> 
+  </insert>
+</sqlMap>

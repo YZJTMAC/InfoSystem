@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_diploma" >
+  <resultMap id="abatorgenerated_EduDiplomaResult" class="project.furtheredu.certificate.pojo.EduDiploma" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="year" property="year" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="head" property="head" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="foot" property="foot" jdbcType="VARCHAR" />
+    <result column="position_right" property="positionRight" jdbcType="INTEGER" />
+    <result column="position_top" property="positionTop" jdbcType="INTEGER" />
+    <result column="position_width" property="positionWidth" jdbcType="INTEGER" />
+    <result column="position_height" property="positionHeight" jdbcType="INTEGER" />
+    <result column="seal" property="seal" jdbcType="VARCHAR" />
+    
+    <result column="qrcodeRight" property="qrcodeRight" jdbcType="INTEGER" />
+    <result column="qrcodeTop" property="qrcodeTop" jdbcType="INTEGER" />
+    <result column="qrcodeWidth" property="qrcodeWidth" jdbcType="INTEGER" />
+    <result column="qrcodeHeight" property="qrcodeHeight" jdbcType="INTEGER" />
+    <result column="qrcode" property="qrcode" jdbcType="VARCHAR" />
+    <result column="periodCertificateTitle" property="periodCertificateTitle" jdbcType="VARCHAR" />
+    
+    <result column="projectPrefix" property="projectPrefix" jdbcType="VARCHAR" />
+    <result column="isProjectPrefix" property="isProjectPrefix" jdbcType="VARCHAR" />
+    <result column="isAreaCode" property="isAreaCode" jdbcType="VARCHAR" />
+    <result column="isYearCode" property="isYearCode" jdbcType="VARCHAR" />
+    <result column="isProjectScopeCode" property="isProjectScopeCode" jdbcType="VARCHAR" />
+    <result column="isProjectTrainTypeCode" property="isProjectTrainTypeCode" jdbcType="VARCHAR" />
+    <result column="isOrgCode" property="isOrgCode" jdbcType="VARCHAR" />
+    <result column="projectCode" property="projectCode" jdbcType="VARCHAR" />
+	
+    <result column="certificateCodeRight" property="certificateCodeRight" jdbcType="INTEGER" />
+    <result column="certificateCodeTop" property="certificateCodeTop" jdbcType="INTEGER" />
+    <result column="certificateCodeFontType" property="certificateCodeFontType" jdbcType="INTEGER" />
+    <result column="certificateCodeFontStyle" property="certificateCodeFontStyle" jdbcType="VARCHAR" />
+    <result column="certificateCodeFontSize" property="certificateCodeFontSize" jdbcType="INTEGER" />
+    
+    <result column="teacherRight" property="teacherRight" jdbcType="INTEGER" />
+    <result column="teacherTop" property="teacherTop" jdbcType="INTEGER" />
+    <result column="teacherFontType" property="teacherFontType" jdbcType="INTEGER" />
+    <result column="teacherFontStyle" property="teacherFontStyle" jdbcType="VARCHAR" />
+    <result column="teacherFontSize" property="teacherFontSize" jdbcType="INTEGER" />
+    
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="DATE" />
+    <result column="update_date" property="updateDate" jdbcType="DATE" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="signet_id" property="signetId" jdbcType="INTEGER" />
+    <result column="backgroundImg" property="backgroundImg" jdbcType="INTEGER" />
+    <result column="qrbackgroundImg" property="qrbackgroundImg" jdbcType="INTEGER" />
+    <result column="backgroundImgUrl" property="backgroundImgUrl" jdbcType="VARCHAR" />
+  </resultMap>
+  
+   <resultMap id="EduDiplomaActivity" extends="abatorgenerated_EduDiplomaResult" class="project.furtheredu.certificate.pojo.EduDiploma">
+     <result column="signet_url" property="signetUrl" jdbcType="VARCHAR" />
+     <result column="periodCertificateCode" property="periodCertificateCode" jdbcType="VARCHAR" />
+    <result column="projectCertificateCode" property="projectCertificateCode" jdbcType="VARCHAR" />
+    <result column="periodCertificateUrl" property="periodCertificateUrl" jdbcType="VARCHAR" />
+    <result column="projectCertificateUrl" property="projectCertificateUrl" jdbcType="VARCHAR" />
+    <result column="qrcodeUrl" property="qrcodeUrl" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <!-- 年度证书模板设置列表 -->   
+  <select id="select_diploma_page" resultMap="abatorgenerated_EduDiplomaResult" parameterClass="java.util.HashMap" >
+    select d.id, title, year, d.status, head, content, foot, position_right, position_top,
+      position_width, position_height, seal,qrcode_right as qrcodeRight,qrcode_top as qrcodeTop , qrcode_width as qrcodeWidth,qrcode_height as qrcodeHeight,qrcode,
+       projectPrefix,isProjectPrefix,isAreaCode,isYearCode,isProjectScopeCode,isProjectTrainTypeCode,isOrgCode,projectCode,
+      d.create_by, d.update_by, d.create_date, d.update_date ,project_id, signet_id,backgroundImg,qrbackgroundImg
+    from edu_diploma d
+    INNER JOIN edu_user u ON d.create_by = u.login_account
+    where 1=1
+     and project_id is null
+     and u.user_province_id = #provinceId#
+     <isNotNull prepend="and" property="queryYear" >
+        year = #queryYear#
+     </isNotNull>
+    order by create_date desc LIMIT #startIndex#,#endIndex# 
+  </select>
+	
+	<!-- 年度证书模板设置count -->   
+    <select id="select_diploma_page_count" resultClass="java.lang.Integer" parameterClass="java.util.HashMap" >
+    select 
+    	count(1) 
+    from edu_diploma d
+	 INNER JOIN edu_user u ON d.create_by = u.login_account
+    where 1=1
+     and project_id is null
+     and u.user_province_id = #provinceId#
+	 <isNotNull prepend="and" property="queryYear" >
+        year = #queryYear#
+     </isNotNull>
+  </select>
+  
+  <select id="select_diploma_no_page" resultClass="project.furtheredu.certificate.pojo.EduDiploma">
+	    SELECT
+		d.id,
+		title,
+		YEAR,
+		STATUS,
+		head,
+		seal,
+		content,
+		foot,
+		position_right AS positionRight,
+		position_top AS positionTop,
+		signet_id AS signetId,
+		position_width AS positionWidth,
+		position_height AS positionHeight,
+		qrcode_right AS qrcodeRight,
+		qrcode_top AS qrcodeTop,
+		qrcode_width AS qrcodeWidth,
+		qrcode_height AS qrcodeHeight,
+		qrcode,
+		projectPrefix as projectPrefix,
+		isProjectPrefix,
+		isAreaCode,
+		isYearCode,
+		isProjectScopeCode,
+		isProjectTrainTypeCode,
+		isOrgCode,
+		projectCode,
+		d.create_by,
+		d.update_by,
+		d.create_date,
+		d.update_date,
+		d.project_id,
+		backgroundImg,
+		qrbackgroundImg,
+		periodCertificateTitle,
+		certificateCodeRight,
+		certificateCodeTop,
+		certificateCodeFontType,
+		certificateCodeFontStyle,
+		certificateCodeFontSize,
+		teacherRight,
+		teacherTop,
+		teacherFontType,
+		teacherFontStyle,
+		teacherFontSize
+	FROM
+		edu_diploma d
+  </select>
+  
+   <!-- 保存证书设置 -->
+   <insert id="certificate_insert" parameterClass="project.furtheredu.certificate.pojo.EduDiploma" >
+    insert into edu_diploma (id, title, year, status, head, content, foot, position_right,
+      position_top, position_width, position_height, seal, qrcode_right,qrcode_top,qrcode_width,qrcode_height,qrcode,
+      create_by, update_by, create_date, update_date, project_id, signet_id, type,backgroundImg,qrbackgroundImg,periodCertificateTitle,
+       projectPrefix,isProjectPrefix,isAreaCode,isYearCode,isProjectScopeCode,isProjectTrainTypeCode,isOrgCode,projectCode,
+       certificateCodeRight,certificateCodeTop,certificateCodeFontType,certificateCodeFontStyle,certificateCodeFontSize,
+       teacherRight,teacherTop,teacherFontType,teacherFontStyle,teacherFontSize)
+    values (#id:INTEGER#, #title:VARCHAR#, #year:INTEGER#, #status:INTEGER#, #head:VARCHAR#,
+       #content:VARCHAR#, #foot:VARCHAR#, #positionRight:INTEGER#, #positionTop:INTEGER#,
+       #positionWidth:INTEGER#, #positionHeight:INTEGER#, #seal:VARCHAR#,
+       #qrcodeRight:INTEGER#,#qrcodeTop:INTEGER#,#qrcodeWidth:INTEGER#,#qrcodeHeight:INTEGER#,#qrcode:VARCHAR#,
+       #createBy:VARCHAR#, #updateBy:VARCHAR#, #createDate:DATE#, #updateDate:DATE#, #projectId:INTEGER#, #signetId:INTEGER#, #type#,#backgroundImg:INTEGER#,#qrbackgroundImg:INTEGER#,#periodCertificateTitle:VARCHAR#,
+       #projectPrefix:VARCHAR#,#isProjectPrefix:VARCHAR#,#isAreaCode:VARCHAR#,#isYearCode:VARCHAR#,#isProjectScopeCode:VARCHAR#,#isProjectTrainTypeCode:VARCHAR#,#isOrgCode:VARCHAR#,#projectCode:VARCHAR#,
+       #certificateCodeRight:INTEGER#,#certificateCodeTop:INTEGER#,#certificateCodeFontType:INTEGER#,#certificateCodeFontStyle:VARCHAR#,#certificateCodeFontSize:VARCHAR#,
+       #teacherRight:INTEGER#,#teacherTop:INTEGER#,#teacherFontType:INTEGER#,#teacherFontStyle:VARCHAR#,#teacherFontSize:VARCHAR#
+       )
+       <selectKey resultClass="Integer"  keyProperty="id" >     
+             SELECT last_insert_id() as id ;    
+       </selectKey> 
+  </insert>
+  
+   <delete id="certificate_delete" parameterClass="java.lang.Integer" >
+    delete from edu_diploma
+    where id = #id:INTEGER#
+  </delete>
+  
+  <update id="certificate_update" parameterClass="project.furtheredu.certificate.pojo.EduDiploma" >
+    update edu_diploma
+    <dynamic prepend="set" >
+      <isNotNull prepend="," property="title" >
+        title = #title:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="year" >
+        year = #year:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="status" >
+        status = #status:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="head" >
+        head = #head:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="content" >
+        content = #content:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="foot" >
+        foot = #foot:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="positionRight" >
+        position_right = #positionRight:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="positionTop" >
+        position_top = #positionTop:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="positionWidth" >
+        position_width = #positionWidth:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="positionHeight" >
+        position_height = #positionHeight:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="seal" >
+        seal = #seal:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="qrcodeRight" >
+        qrcode_right = #qrcodeRight:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="qrcodeTop" >
+        qrcode_top = #qrcodeTop:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="qrcodeWidth" >
+        qrcode_width = #qrcodeWidth:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="qrcodeHeight" >
+        qrcode_height = #qrcodeHeight:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="qrcode" >
+        qrcode = #qrcode:VARCHAR#
+      </isNotNull>
+    
+       <isNotNull prepend="," property="certificateCodeRight" >
+        certificateCodeRight = #certificateCodeRight:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="certificateCodeTop" >
+        certificateCodeTop = #certificateCodeTop:INTEGER#
+      </isNotNull>
+      
+      <isNotNull prepend="," property="certificateCodeFontType" >
+        certificateCodeFontType = #certificateCodeFontType:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="certificateCodeFontStyle" >
+        certificateCodeFontStyle = #certificateCodeFontStyle:VARCHAR#
+      </isNotNull>
+      
+      <isNotNull prepend="," property="certificateCodeFontSize" >
+        certificateCodeFontSize = #certificateCodeFontSize:VARCHAR#
+      </isNotNull>
+       <isNotNull prepend="," property="teacherRight" >
+        teacherRight = #teacherRight:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="teacherTop" >
+        teacherTop = #teacherTop:INTEGER#
+      </isNotNull>
+      
+      <isNotNull prepend="," property="teacherFontType" >
+        teacherFontType = #teacherFontType:INTEGER#
+      </isNotNull>
+      
+      <isNotNull prepend="," property="teacherFontStyle" >
+        teacherFontStyle = #teacherFontStyle:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="teacherFontSize" >
+        teacherFontSize = #teacherFontSize:VARCHAR#
+      </isNotNull>
+      
+      <isNotNull prepend="," property="projectPrefix" >
+        projectPrefix = #projectPrefix:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="isProjectPrefix" >
+        isProjectPrefix = #isProjectPrefix:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="isAreaCode" >
+        isAreaCode = #isAreaCode:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="isYearCode" >
+        isYearCode = #isYearCode:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="isProjectScopeCode" >
+        isProjectScopeCode = #isProjectScopeCode:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="isProjectTrainTypeCode" >
+        isProjectTrainTypeCode = #isProjectTrainTypeCode:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="isOrgCode" >
+        isOrgCode = #isOrgCode:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="projectCode" >
+        projectCode = #projectCode:VARCHAR#
+      </isNotNull>
+      
+      <isNotNull prepend="," property="createBy" >
+        create_by = #createBy:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="updateBy" >
+        update_by = #updateBy:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="createDate" >
+        create_date = #createDate:DATE#
+      </isNotNull>
+      <isNotNull prepend="," property="updateDate" >
+        update_date = #updateDate:DATE#
+      </isNotNull>
+      <isNotNull prepend="," property="signetId" >
+        signet_id = #signetId:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="backgroundImg" >
+        backgroundImg = #backgroundImg:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="qrbackgroundImg" >
+        qrbackgroundImg = #qrbackgroundImg:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="periodCertificateTitle" >
+        periodCertificateTitle = #periodCertificateTitle:VARCHAR#
+      </isNotNull>
+      
+      <isNotNull prepend="," property="periodCertificateUrl" >
+        periodCertificateUrl = #periodCertificateUrl:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="projectCertificateUrl" >
+        projectCertificateUrl = #projectCertificateUrl:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="qrcodeUrl" >
+        qrcodeUrl = #qrcodeUrl:VARCHAR#
+      </isNotNull>
+    </dynamic>
+    where id = #id:INTEGER#
+  </update>
+  
+  	<!-- 查询项目证书 -->
+    <select id="select_certificate_byId" resultClass="project.furtheredu.certificate.pojo.EduDiploma" parameterClass="java.util.HashMap" >
+     select d.id, title, year, status, head, seal,s.signet_url as signetUrl,content, foot, position_right as positionRight, position_top as positionTop,signet_id as signetId,
+      position_width as positionWidth, position_height as positionHeight,f.url as backgroundImgUrl,qrcode_right as qrcodeRight,qrcode_top as qrcodeTop , qrcode_width as qrcodeWidth,qrcode_height as qrcodeHeight,qrcode,
+      projectPrefix,isProjectPrefix,isAreaCode,isYearCode,isProjectScopeCode,isProjectTrainTypeCode,isOrgCode,projectCode as projectCode,
+      d.create_by, d.update_by, d.create_date, d.update_date ,d.project_id,backgroundImg,qrbackgroundImg,periodCertificateTitle,
+      certificateCodeRight,certificateCodeTop,certificateCodeFontType,certificateCodeFontStyle,certificateCodeFontSize,teacherRight,teacherTop,teacherFontType,teacherFontStyle,teacherFontSize,
+      start_date as startDate,end_date as endDate,need_credit as needCredit, need_period as needPeriod
+    from edu_diploma d
+		LEFT JOIN edu_sys_signet s on d.signet_id = s.id
+		LEFT JOIN edu_file f on f.id = d.backgroundImg
+	WHERE
+		1 = 1
+	<isNotEmpty prepend="AND" property="type">
+		d.type = #type#
+	</isNotEmpty>
+    <isNotEmpty prepend="and" property="diplomaId" >
+        d.id = #diplomaId#
+    </isNotEmpty>
+    <isNotEmpty prepend="and" property="projectId" >
+        d.project_id = #projectId#
+    </isNotEmpty>
+  </select>
+  
+  <select id="select_certificate_byYear" resultMap="EduDiplomaActivity" parameterClass="java.util.HashMap" >
+     select d.id,  s.signet_url ,title, year, status, head, content, foot, position_right, position_top,
+      position_width, position_height  , seal,qrcode_right as qrcodeRight,qrcode_top as qrcodeTop , qrcode_width as qrcodeWidth,qrcode_height as qrcodeHeight,qrcode, 
+      projectPrefix,isProjectPrefix,isAreaCode,isYearCode,isProjectScopeCode,isProjectTrainTypeCode,isOrgCode,projectCode,
+      d.create_by, d.update_by, d.create_date, d.update_date ,project_id, signet_id,backgroundImg,qrbackgroundImg,periodCertificateTitle,
+      certificateCodeRight,certificateCodeTop,certificateCodeFontStyle,certificateCodeFontSize,teacherRight,teacherTop,teacherFontStyle,teacherFontSize
+    from edu_diploma d
+		LEFT JOIN edu_sys_signet s on d.signet_id = s.id
+	WHERE
+		1 = 1
+	and d.status = 1
+	<isNotEmpty prepend="AND" property="type">
+		d.type = #type#
+	</isNotEmpty>
+    <isNotEmpty prepend="and" property="year" >
+        year = #year:INTEGER#
+    </isNotEmpty>
+    <isNotEmpty prepend="and" property="projectId" >
+        project_id = #projectId#
+    </isNotEmpty>
+    
+  </select>
+  
+  <select id="select_certificate_projectInfo" resultClass="project.furtheredu.certificate.pojo.EduDiploma" parameterClass="java.util.HashMap" >
+     select d.id,  s.signet_url as signetUrl,title, d.year, d.status, head, content, foot, position_right as positionRight, position_top as positionTop,
+      position_width as positionWidth, position_height as positionHeight, seal,qrcode_right as qrcodeRight,qrcode_top as qrcodeTop , qrcode_width as qrcodeWidth,qrcode_height as qrcodeHeight,qrcode, 
+      projectPrefix,isProjectPrefix,isAreaCode,isYearCode,isProjectScopeCode,isProjectTrainTypeCode,isOrgCode,projectCode,
+      d.create_by, d.update_by, d.create_date, d.update_date ,d.project_id as projectId, signet_id,backgroundImg,qrbackgroundImg,periodCertificateTitle,
+      certificateCodeRight,certificateCodeTop,certificateCodeFontStyle,certificateCodeFontSize,
+      teacherRight,teacherTop,teacherFontStyle,teacherFontSize,d.type as type,
+      c.period_certificate_code as periodCertificateCode,c.project_certificate_code as projectCertificateCode,
+      c.teacher_class_score as teacherClassScore,c.teacher_class_period as teacherClassPeriod,
+      c.period_certificate_url as periodCertificateUrl,c.project_certificate_url as projectCertificateUrl,c.qrcode_url as qrcodeUrl,f.url as backgroundImgUrl
+    from edu_diploma d
+		LEFT JOIN edu_sys_signet s on d.signet_id = s.id
+		LEFT JOIN edu_project_comment c on c.project_id = d.project_id
+		LEFT JOIN edu_file f on f.id = d.backgroundImg
+		LEFT JOIN edu_user u on u.id = c.teacher_id
+	WHERE
+		1 = 1
+	and d.status = 1
+	<isNotEmpty prepend="AND" property="type">
+		d.type = #type#
+	</isNotEmpty>
+    <isNotEmpty prepend="and" property="year" >
+        d.year = #year:INTEGER#
+    </isNotEmpty>
+    <isNotEmpty prepend="and" property="projectId" >
+        d.project_id = #projectId#
+    </isNotEmpty>
+    <isNotEmpty prepend="and" property="teacherId" >
+        c.teacher_id = #teacherId#
+    </isNotEmpty>
+    
+  </select>
+</sqlMap>

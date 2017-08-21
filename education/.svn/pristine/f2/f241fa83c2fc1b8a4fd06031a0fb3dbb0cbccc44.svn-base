@@ -1,0 +1,1180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_audit">
+	<resultMap id="abatorgenerated_EduAuditResult" class="project.teacher.teacherProject.pojo.EduAudit">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="teacher_id" property="teacherId" jdbcType="INTEGER" />
+		<result column="audit_status" property="auditStatus" jdbcType="INTEGER" />
+		<result column="audit_auditor" property="auditAuditor"
+			jdbcType="VARCHAR" />
+		<result column="audit_date" property="auditDate" jdbcType="DATE" />
+		<result column="audit_create_by" property="auditCreateBy"
+			jdbcType="VARCHAR" />
+		<result column="audit_update_by" property="auditUpdateBy"
+			jdbcType="VARCHAR" />
+		<result column="audit_create_date" property="auditCreateDate"
+			jdbcType="TIMESTAMP" />
+		<result column="audit_update_date" property="auditUpdateDate"
+			jdbcType="TIMESTAMP" />
+		<result column="old_version" property="oldVersion" jdbcType="INTEGER" />
+		<result column="new_version" property="newVersion" jdbcType="INTEGER" />
+		<result column="change_type" property="changeType" jdbcType="INTEGER" />
+		<result column="past_province_id" property="pastProvinceId"
+			jdbcType="INTEGER" />
+		<result column="past_province_name" property="pastProvinceName"
+			jdbcType="VARCHAR" />
+		<result column="past_city_id" property="pastCityId" jdbcType="INTEGER" />
+		<result column="past_city_name" property="pastCityName"
+			jdbcType="VARCHAR" />
+		<result column="past_district_id" property="pastDistrictId"
+			jdbcType="INTEGER" />
+		<result column="past_district_name" property="pastDistrictName"
+			jdbcType="VARCHAR" />
+		<result column="past_school_id" property="pastSchoolId"
+			jdbcType="INTEGER" />
+		<result column="past_school_name" property="pastSchoolName"
+			jdbcType="VARCHAR" />
+		<result column="new_province_id" property="newProvinceId"
+			jdbcType="INTEGER" />
+		<result column="new_province_name" property="newProvinceName"
+			jdbcType="VARCHAR" />
+		<result column="new_city_id" property="newCityId" jdbcType="INTEGER" />
+		<result column="new_city_name" property="newCityName" jdbcType="VARCHAR" />
+		<result column="new_district_id" property="newDistrictId"
+			jdbcType="INTEGER" />
+		<result column="new_district_name" property="newDistrictName"
+			jdbcType="VARCHAR" />
+		<result column="new_school_id" property="newSchoolId" jdbcType="INTEGER" />
+		<result column="new_school_name" property="newSchoolName"
+			jdbcType="VARCHAR" />
+		<result column="audit_option" property="auditOption" jdbcType="LONGVARCHAR" />
+	</resultMap>
+
+	<insert id="TeacherAudit_insert" parameterClass="project.teacher.teacherProject.pojo.EduAudit">
+		insert into edu_audit (id, teacher_id, audit_status, audit_auditor,
+		audit_date, audit_create_by,
+		audit_update_by, audit_create_date, audit_update_date, old_version, new_version,
+		change_type,
+		past_province_id, past_province_name, past_city_id, past_city_name, past_district_id,
+		past_district_name, past_school_id, past_school_name, new_province_id,
+		new_province_name,
+		new_city_id, new_city_name, new_district_id, new_district_name, new_school_id,
+		new_school_name, audit_option,mobilizeMark)
+		values (#id:INTEGER#, #teacherId:INTEGER#, #auditStatus:INTEGER#,
+		#auditAuditor:VARCHAR#,
+		#auditDate:DATE#, #auditCreateBy:VARCHAR#, #auditUpdateBy:VARCHAR#,
+		#auditCreateDate:TIMESTAMP#, #auditUpdateDate:TIMESTAMP#,
+		#oldVersion:INTEGER#,
+		#newVersion:INTEGER#, #changeType:INTEGER#, #pastProvinceId:INTEGER#,
+		#pastProvinceName:VARCHAR#, #pastCityId:INTEGER#,
+		#pastCityName:VARCHAR#,
+		#pastDistrictId:INTEGER#, #pastDistrictName:VARCHAR#, #pastSchoolId:INTEGER#,
+		#pastSchoolName:VARCHAR#, #newProvinceId:INTEGER#,
+		#newProvinceName:VARCHAR#,
+		#newCityId:INTEGER#, #newCityName:VARCHAR#, #newDistrictId:INTEGER#,
+		#newDistrictName:VARCHAR#, #newSchoolId:INTEGER#,
+		#newSchoolName:VARCHAR#,
+		#auditOption:LONGVARCHAR#,#mobilizeMark:LONGVARCHAR#)
+		<selectKey resultClass="Integer" keyProperty="id">
+			SELECT
+			last_insert_id() as id ;    
+        </selectKey>
+	</insert>
+
+	<select id="selectTeacherAuditInfoByTeacherId" parameterClass="java.util.HashMap"
+		resultClass="project.teacher.teacherProject.pojo.EduAudit">
+		select
+		audit_status as auditStatus,
+		audit_auditor as auditAuditor,
+		audit_date as auditDate,
+		audit_option as auditOption
+		from edu_audit
+		WHERE teacher_id = #teacherId#
+		<isNotNull prepend="and" property="lastVersion">
+			old_version = 1
+		</isNotNull>
+	</select>
+
+	<!-- 信息变更记录查询 -->
+	<select id="selectTeacherChangeList" parameterClass="java.util.HashMap"
+		resultClass="project.teacher.teachermanage.pojo.EduAudit">
+		select
+		a.id,
+		a.audit_create_by auditCreateBy,
+		a.audit_create_date
+		auditCreateDate,
+		b.dictionary_name dictionaryName,
+		a.audit_status as auditStatus,
+		a.audit_update_date auditUpdateDate,
+		old_version as oldVersion,
+		new_version as newVersion,
+		audit_option as auditOption,
+		mobilizeMark as
+		mobilizeMark,
+		teacher_id as
+		teacherId
+		from edu_audit a
+		left join
+		edu_sys_dictionary b on
+		a.change_type=b.dictionary_id and
+		b.dictionary_type='change_type'
+		where
+		1=1
+		<isNotNull prepend="and" property="changeType">
+			a.change_type=#changeType#
+		</isNotNull>
+		<isNotNull prepend="and" property="auditStatus">
+			a.audit_status in
+			<iterate property="auditStatus" open="(" close=")" conjunction=",">
+				#auditStatus[]#
+     		</iterate>
+		</isNotNull>
+		<isNotNull prepend="and" property="auditCreateDate">
+			CAST(a.audit_create_date
+			AS DATE) = #auditCreateDate#
+		</isNotNull>
+		<isNotNull prepend="and" property="teacherId">
+			a.teacher_id=#teacherId#
+		</isNotNull>
+		<isNotNull prepend="and" property="id">
+			a.id=#id#
+		</isNotNull>
+
+		order by a.audit_create_date desc
+	</select>
+
+	<!-- 已发起病休/离岗/死亡登记/离退休列表 -->
+	<select id="selectTeacherRetiressActivetyList" resultClass="project.teacher.teachermanage.pojo.EduAuditRetiress"
+		parameterClass="java.util.HashMap">
+		SELECT
+		a.audit_auditor as auditAuditor,
+		a.audit_create_by as auditCreateBy,
+		a.id as auditId,
+		u.id as teacherId,
+		u.real_name as realName,
+		u.id_number as idNumber,
+		u.gender,
+		a.new_province_name as newProvinceName,
+		a.new_city_name as newCityName,
+		a.new_district_name as newDistrictName,
+		a.new_school_id as newSchoolId,
+		a.new_school_name as newSchoolName,
+		j.job_former_teaching_subject as
+		jobFormerTeachingSubject,
+		j.job_former_teaching_section as
+		jobFormerTeachingSection,
+		a.audit_create_date as auditCreateDate,
+		a.audit_status as auditStatus,
+		a.change_type as changeType
+		FROM
+		edu_audit a
+		INNER JOIN edu_user u ON a.teacher_id = u.id
+		LEFT JOIN edu_teacher_job j ON
+		j.teacher_id = a.teacher_id and u.version = j.version
+		where 1 = 1
+		and a.change_type > 30
+		<isNotEmpty prepend="and" property="queryYear">
+			a.audit_create_date
+			between '$queryYear$-01-01' and '$queryYear$-12-31'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="changeType">
+			a.change_type = #changeType#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="changeTypeRetirees">
+			a.change_type in (31, 33)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="realName">
+			u.real_name like
+			'%$realName$%' 
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="idNumber">
+			u.id_number like
+			'%$idNumber$%'   
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="provinceId">
+			u.user_province_id =
+			#provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cityId">
+			u.user_city_id =
+			#cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="districtId">
+			u.user_district_id =
+			#districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			u.school_id = #schoolId#
+		</isNotEmpty>
+
+		order by a.audit_create_date desc LIMIT #startIndex#,#endIndex#
+	</select>
+
+	<!-- 已发起病休/离岗/死亡登记/离退休count -->
+	<select id="selectTeacherRetiressActivetyListCount" resultClass="java.lang.Integer"
+		parameterClass="java.util.HashMap">
+		select count(1)
+		FROM
+		edu_audit a
+		INNER JOIN edu_user u ON a.teacher_id = u.id
+		LEFT JOIN edu_teacher_job j ON j.teacher_id = a.teacher_id and u.version =
+		j.version
+		where 1 = 1
+		and a.change_type > 30
+		<isNotEmpty prepend="and" property="queryYear">
+			a.audit_create_date
+			between '$queryYear$-01-01' and '$queryYear$-12-31'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="changeType">
+			a.change_type =
+			#changeType#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="changeTypeRetirees">
+			a.change_type in (31, 33)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="realName">
+			u.real_name like
+			'%$realName$%' 
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="idNumber">
+			u.id_number like
+			'%$idNumber$%' 
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="provinceId">
+			u.user_province_id =
+			#provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cityId">
+			u.user_city_id =
+			#cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="districtId">
+			u.user_district_id =
+			#districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			u.school_id = #schoolId#
+		</isNotEmpty>
+	</select>
+
+	<!-- 信息变更审核列表 -->
+	<select id="select_change_record" resultClass="project.teacher.teachermanage.pojo.TeacherInfoChangeRecord"
+		parameterClass="java.util.HashMap">
+		select
+		DISTINCT
+		a.id as id,
+		u.real_name as name,
+		u.id_number as IDNo,
+		(CASE when u.gender	=0 then '女' else '男' end) as gender,
+		IFNULL(CONCAT(u.user_province_name,u.user_city_name,u.user_district_name),'') as
+		address,
+		IFNULL(a.audit_create_by,'') as applier,
+		a.audit_create_date as applyDate,
+		a.audit_status as status
+		from
+		edu_teacher_basic_info b
+		right JOIN
+		edu_user u on
+		u.id = b.teacher_id
+		JOIN edu_audit a on u.id =
+		a.teacher_id and a.change_type = 1
+		where 1=1
+		<isNotNull prepend="and" property="name">
+			u.real_name like '%$name$%'
+		</isNotNull>
+		<isNotNull prepend="and" property="IDNo">
+			u.id_number like
+			'%$IDNo$%'
+		 </isNotNull>
+		<isNotNull prepend="and" property="auditStatus">
+			a.audit_status =
+			#auditStatus#
+		 </isNotNull>
+		<isNotNull prepend="and" property="area">
+			(u.user_province_id =
+			#area# or u.user_city_id = #area# or u.user_district_id = #area#
+			 or u.school_id = #area#)
+		</isNotNull>
+		<!-- GROUP BY a.teacher_id-->
+		order by a.audit_create_date DESC 
+		limit #startIndex#,#endIndex#
+	</select>
+
+
+	<!-- 信息变更审核count -->
+	<select id="select_count_change_record" resultClass="int" parameterClass="java.util.HashMap">
+	select count(1) from (
+				select
+		DISTINCT
+		a.id as id,
+		u.real_name as name,
+		u.id_number as IDNo,
+		(CASE when u.gender	=0 then '男' else '女' end) as gender,
+		IFNULL(CONCAT(u.user_province_name,u.user_city_name,u.user_district_name),'') as
+		address,
+		IFNULL(a.audit_create_by,'') as applier,
+		a.audit_create_date as applyDate,
+		a.audit_status as status
+		from
+		edu_teacher_basic_info b
+		right JOIN
+		edu_user u on
+		u.id = b.teacher_id
+		JOIN edu_audit a on u.id =
+		a.teacher_id and a.change_type = 1
+		where 1=1
+		<isNotNull prepend="and" property="name">
+			u.real_name like '%$name$%'
+		</isNotNull>
+		<isNotNull prepend="and" property="IDNo">
+			u.id_number like
+			'%$IDNo$%'
+		 </isNotNull>
+		<isNotNull prepend="and" property="auditStatus">
+			a.audit_status =
+			#auditStatus#
+		 </isNotNull>
+		<isNotNull prepend="and" property="area">
+			(u.user_province_id =
+			#area# or u.user_city_id = #area# or u.user_district_id = #area#
+			 or u.school_id = #area#)
+		</isNotNull>
+	) aa
+		
+	</select>
+
+	<update id="update_audit" parameterClass="java.util.HashMap">
+		update edu_audit
+		set
+		audit_update_date = now(),
+		audit_update_by =
+		#auditor#,
+		audit_date = now()
+		<isNotNull prepend="," property="status">
+			audit_status = #status#
+		</isNotNull>
+		<isNotNull prepend="," property="memo">
+			audit_option = #memo#
+		</isNotNull>
+		<isNotNull prepend="," property="auditor">
+			audit_auditor = #auditor#
+		</isNotNull>
+		<isNotNull prepend="," property="auditor">
+			audit_update_by = #auditor#
+		</isNotNull>
+
+		where id = #auditId#
+	</update>
+	<update id="update_audit_info" parameterClass="java.util.HashMap">
+		update edu_audit
+		set
+		audit_update_date = now(),
+		audit_update_by =
+		#auditor#,
+		audit_date = now()
+		<isNotNull prepend="," property="status">
+			audit_status = #status#
+		</isNotNull>
+		<isNotNull prepend="," property="memo">
+			audit_option = #memo#
+		</isNotNull>
+		<isNotNull prepend="," property="auditor">
+			audit_auditor = #auditor#
+		</isNotNull>
+		<isNotNull prepend="," property="auditor">
+			audit_update_by = #auditor#
+		</isNotNull>
+
+		where id = #id#
+	</update>
+
+	<!-- 已发起调动教师/已发起返聘教师/待审核病休 or 离岗 or 离退休 or 死亡登记教师列表 -->
+	<select id="selectMobilizeList" parameterClass="java.util.Map" resultClass="project.teacher.teachermanage.pojo.EduTeacherMobilize">
+		select
+		a.change_type as changeType,
+		a.old_version oldVersion,
+		a.new_version newVersion,
+		a.id,
+		a.teacher_id teacherId,
+		b.real_name realName,
+		(case when b.gender=1 then
+		'男' else '女' END)sex,
+		b.id_number idNumber,
+		IFNULL(a.past_province_name,'')pastProvinceName,
+		IFNULL(a.past_city_name,'')pastCityName,
+		IFNULL(a.past_district_name,'')pastDistrictName,
+		IFNULL(a.past_school_name,'')pastSchoolName,
+		IFNULL(a.new_province_name,'')newProvinceName,
+		IFNULL(a.new_city_name,'')newCityName,
+		IFNULL(a.new_district_name,'')newDistrictName,
+		IFNULL(a.new_school_name,'')newSchoolName,
+		a.new_province_id
+		newProvinceId,
+		a.new_city_id newCityId,
+		a.new_district_id newDistrictId,
+		a.new_school_id newSchoolId,
+		a.audit_create_by
+		auditCreateBy,
+		a.audit_create_date auditCreateDate,
+		a.audit_status auditStatus
+		from
+		edu_audit a
+		join
+		edu_user b on a.teacher_id=b.id 
+		<isNotEmpty prepend="AND" property="changeType">
+			a.change_type=#changeType#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="changeTypeRetiees">
+			a.change_type in (31,33)
+		</isNotEmpty>
+		
+		where 1=1
+		<isNotEmpty prepend="AND" property="realName">
+			b.real_name like
+			'%$realName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="idNumber">
+			b.id_number=
+			#idNumber#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="pastProvinceId">
+			a.past_province_id=
+			#pastProvinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="pastCityId">
+			a.past_city_id=
+			#pastCityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="pastDistrictId">
+			and a.past_district_id=
+			#pastDistrictId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="pastSchoolId">
+			a.past_school_id=
+			#pastSchoolId#
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="provinceId">
+			b.user_province_id =
+			#provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cityId">
+			b.user_city_id =
+			#cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="districtId">
+			b.user_district_id =
+			#districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			b.school_id = #schoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="auditStatusStr">
+			a.audit_status in
+			<iterate property="auditStatusStr" open="(" close=")"
+				conjunction=",">
+				#auditStatusStr[]#
+     		 </iterate>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="roleAuditY">
+			b.role_id >= #roleId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="roleAuditN">
+			b.role_id > #roleId#
+		</isNotEmpty>
+		
+
+		ORDER BY
+		a.audit_create_date desc
+		LIMIT
+		#startIndex#, #endIndex#
+	</select>
+
+	<!-- 已发起调动教师/已发起返聘教师/待审核病休 or 离岗 or 离退休 or 死亡登记教师count -->
+	<select id="selectMobilizeCount" parameterClass="java.util.Map"
+		resultClass="int">
+		select
+		count(1)counts
+		from edu_audit a
+		join edu_user b on
+		a.teacher_id=b.id 
+		<isNotEmpty prepend="AND" property="teacherId">
+			a.teacher_id=#teacherId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="changeType">
+			a.change_type=#changeType#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="changeTypeRetiees">
+			a.change_type in (31,33)
+		</isNotEmpty>
+		where 1=1
+		<isNotEmpty prepend="AND" property="realName">
+			b.real_name like
+			'%$realName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="idNumber">
+			b.id_number=
+			#idNumber#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="pastProvinceId">
+			a.past_province_id=
+			#pastProvinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="pastCityId">
+			a.past_city_id=
+			#pastCityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="pastDistrictId">
+			and a.past_district_id=
+			#pastDistrictId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="pastSchoolId">
+			a.past_school_id=
+			#pastSchoolId#
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="provinceId">
+			b.user_province_id =
+			#provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cityId">
+			b.user_city_id =
+			#cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="districtId">
+			b.user_district_id =
+			#districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			b.school_id = #schoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="auditStatus">
+			a.audit_status =  #auditStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="auditStatusStr">
+			a.audit_status in
+			<iterate property="auditStatusStr" open="(" close=")"
+				conjunction=",">
+				#auditStatusStr[]#
+     		 </iterate>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="roleAuditY">
+			b.role_id >= #roleId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="roleAuditN">
+			b.role_id > #roleId#
+		</isNotEmpty>
+	</select>
+
+	<!-- 教师调动详情 -->
+	<select id="selectMobilizeInfo" parameterClass="java.util.HashMap"
+		resultClass="project.teacher.teachermanage.pojo.EduTeacherMobilize">
+		SELECT
+		T.realName,T.idNumber,T.sex,T.teacherNo,T.teacherStauts,T.userImageUrl,
+		GROUP_CONCAT(cast(T.version as char) ORDER BY T.version)status,
+		GROUP_CONCAT(T.jobCommentPosition ORDER BY
+		T.version)jobCommentPosition,
+		GROUP_CONCAT(T.jobRecruitmentPosition
+		ORDER BY
+		T.version)jobRecruitmentPosition,
+		GROUP_CONCAT(T.jobSchoolAdministrationOffice ORDER BY
+		T.version)jobSchoolAdministrationOffice,
+		GROUP_CONCAT(T.jobFormerTeachingSubject ORDER BY
+		T.version)jobFormerTeachingSubject,
+		GROUP_CONCAT(T.jobCoreTeacher ORDER
+		BY T.version)jobCoreTeacher,
+		GROUP_CONCAT(T.jobWhetherTeacher ORDER BY
+		T.version)jobWhetherTeacher,
+		GROUP_CONCAT(T.jobCountyRuralTeacher ORDER
+		BY
+		T.version)jobCountyRuralTeacher,
+		T.pastProvinceName,
+		T.pastCityName,
+		T.pastDistrictName,
+		T.pastSchoolName,
+		T.newProvinceName,
+		T.newCityName,
+		T.newDistrictName,
+		T.newSchoolName
+
+		FROM (
+		select
+		a.user_image_url
+		userImageUrl,
+		a.real_name realName,
+		a.id_number idNumber,
+		b.status,b.version,
+		(case
+		when a.gender=1 then '男' else '女' end) sex,
+		a.teacher_no teacherNo,
+		(case when a.status=8 then '在职' else (case when
+		a.status=9 then '已离退休'
+		else
+		'' end)end)teacherStauts,
+		IFNULL(b.job_comment_position,'--') jobCommentPosition,
+		IFNULL(b.job_recruitment_position,'--') jobRecruitmentPosition,
+		IFNULL(b.job_school_administration_office,'--')
+		jobSchoolAdministrationOffice,
+		IFNULL(b.job_core_teacher,'--')
+		jobCoreTeacher,
+		REPLACE (
+		IFNULL(b.job_former_teaching_subject,'--'),
+		',',
+		'，'
+		) jobFormerTeachingSubject,
+		<!-- (case when
+		b.job_core_teacher=1 THEN '是' else
+		'否' end)jobCoreTeacher, -->
+		(case when
+		b.job_whether_teacher=1 THEN '是' else
+		'否' end)jobWhetherTeacher,
+		(case
+		when b.job_county_rural_teacher=1 THEN
+		'是' else '否'
+		end)jobCountyRuralTeacher,
+		case when c.past_province_name is null or c.past_province_name='null' then '' else c.past_province_name end pastProvinceName,
+		case when c.past_city_name is null or c.past_city_name='null' then '' else c.past_city_name end pastCityName,
+		case when c.past_district_name is null or c.past_district_name='null' then '' else c.past_district_name end pastDistrictName,
+		case when c.past_school_name is null or c.past_school_name='null' then '' else c.past_school_name end pastSchoolName,
+		case when c.new_province_name is null or c.new_province_name='null' then '' else c.new_province_name end newProvinceName,
+		case when c.new_city_name is null or c.new_city_name='null' then '' else c.new_city_name end newCityName,
+		case when c.new_district_name is null or c.new_district_name='null' then '' else c.new_district_name end newDistrictName,
+		case when c.new_school_name is null or c.new_school_name='null' then '' else c.new_school_name end newSchoolName
+		from edu_user a
+		left JOIN
+		edu_teacher_job b
+		on
+		a.id=b.teacher_id and (b.version=#oldVersion# or
+		b.version=#newVersion#)
+		join edu_audit c on a.id=c.teacher_id and c.old_version=#oldVersion# and c.new_version=#newVersion#
+		where a.id=#teacherId#
+		) AS T
+
+		GROUP BY
+		T.realName,T.idNumber,T.sex,T.teacherNo,T.teacherStauts,T.userImageUrl
+	</select>
+
+	<select id="select_audit_by_id" parameterClass="int"
+		resultClass="project.teacher.teacherProject.pojo.EduAudit">
+		select
+		old_version as oldVersion,
+		new_version as newVersion,
+		teacher_id as teacherId
+		from
+		edu_audit
+		where id = #id#
+	</select>
+
+
+
+
+	<update id="update_base_info_by_version" parameterClass="java.util.HashMap">
+		update
+		edu_teacher_basic_info set status = #status# where version = #version#
+		and teacher_id = #teacherId#
+	</update>
+
+	<update id="update_job_info_by_version" parameterClass="java.util.HashMap">
+		update
+		edu_teacher_job set status = #status# where version = #version# and
+		teacher_id = #teacherId#
+	</update>
+
+	<update id="update_edu_info_by_version" parameterClass="java.util.HashMap">
+		update
+		edu_teacher_education set status = #status# where version = #version#
+		and teacher_id = #teacherId#
+	</update>
+
+	<insert id="teacher_base_addversion" parameterClass="java.util.HashMap">
+		INSERT INTO edu_teacher_basic_info (
+		teacher_id, teacher_old_name,
+		teacher_name_spelling,
+		teacher_born_date, teacher_political_status,
+		teacher_native_place, teacher_nation,
+		teacher_phone_num,
+		teacher_call_num, teacher_qq, teacher_email,
+		teacher_family_local,
+		teacher_marital_status, teacher_health_condition, version,
+		teacher_create_by,
+		teacher_update_by, teacher_create_date,
+		teacher_update_date, status,teacher_country
+		)
+		SELECT * FROM(
+		select
+		teacher_id,
+		teacher_old_name, teacher_name_spelling,
+		teacher_born_date,
+		teacher_political_status, teacher_native_place, teacher_nation,
+		teacher_phone_num, teacher_call_num, teacher_qq, teacher_email,
+		teacher_family_local,
+		teacher_marital_status, teacher_health_condition,
+		#newVersion#+1, teacher_create_by,
+		#updateBy# as teacher_update_by,
+		teacher_create_date, now(), 1 as
+		status,teacher_country
+		from edu_teacher_basic_info
+		where teacher_id = #teacherId#
+		and version = #oldVersion#
+
+		) AS tb
+		<selectKey resultClass="Integer" keyProperty="id">
+			SELECT
+			last_insert_id() as id ;    
+        </selectKey>
+	</insert>
+
+	<insert id="teacher_job_addversion" parameterClass="java.util.HashMap">
+		INSERT INTO edu_teacher_job (
+		teacher_id, job_qualification_type,
+		job_certificate_date,
+		job_certificate_num, job_work_time,
+		job_work_date, job_comment_position,
+		job_recruitment_position,
+		job_comment_date, job_recruitment_date,
+		job_school_administration_office, job_former_teaching_section,
+		job_former_teaching_section_type, job_former_teaching_subject,
+		job_former_teaching_subject_type, job_subject_leader,job_subject_leader_name,
+		job_core_teacher_type,job_core_teacher, job_whether_teacher,
+		job_whether_grade_teacher,
+		job_county_rural_teacher, job_private_school_teacher,
+		job_special_teacher, job_create_by, job_update_by, job_create_date,
+		job_update_date, version, status,
+		job_qualification,
+		job_comment_position_type, job_recruitment_position_type,adjust_id,adjust_name,
+		wxyj,gwlb,gwdj,sfzb,contract,salary,jszgz,pthdj,cjqsny,qrzsfzy,jsnpxqk,mfsfs,tgjs,jxjybh,rych,
+		eliteTraining,eliteTrainingType,teachingMaster,teachingMasterType,postGrade,jdfldw,jdflTime,postBack,remark
+		) SELECT *
+		FROM(
+		select
+		teacher_id, job_qualification_type, job_certificate_date,
+		job_certificate_num, job_work_time, job_work_date,
+		job_comment_position,
+		job_recruitment_position, job_comment_date,
+		job_recruitment_date,
+		job_school_administration_office,
+		job_former_teaching_section,
+		job_former_teaching_section_type,
+		job_former_teaching_subject,
+		job_former_teaching_subject_type,
+		job_subject_leader,
+		job_subject_leader_name,
+		job_core_teacher_type,job_core_teacher, job_whether_teacher,
+		job_whether_grade_teacher, job_county_rural_teacher,
+		job_private_school_teacher,
+		job_special_teacher, job_create_by,
+		#updateBy# as job_update_by,
+		job_create_date, now(), #newVersion# + 1 ,
+		1,
+		job_qualification, job_comment_position_type,
+		job_recruitment_position_type,adjust_id,adjust_name,
+		wxyj,gwlb,gwdj,sfzb,contract,salary,jszgz,pthdj,cjqsny,qrzsfzy,jsnpxqk,mfsfs,tgjs,jxjybh,rych,
+		eliteTraining,eliteTrainingType,teachingMaster,teachingMasterType,postGrade,jdfldw,jdflTime,postBack,remark
+		from edu_teacher_job
+		where teacher_id =
+		#teacherId#
+		and version = #oldVersion#
+
+		) AS tb
+		<selectKey resultClass="Integer" keyProperty="id">
+			SELECT
+			last_insert_id() as id ;    
+        </selectKey>
+	</insert>
+	<update id="user_addVersion" parameterClass="java.util.HashMap">
+		update edu_user set
+		version = #version# where id = #userId#
+	</update>
+
+
+	<update id="update_base_info_le_new_version" parameterClass="java.util.HashMap">
+		update edu_teacher_basic_info
+		set status = 0 where #version#>version
+		and teacher_id = #teacherId#
+	</update>
+
+	<update id="update_job_info_le_new_version" parameterClass="java.util.HashMap">
+		update edu_teacher_job
+		set status = 0 where version = #version# and
+		teacher_id = #teacherId#
+	</update>
+
+	<update id="update_edu_info_le_new_version" parameterClass="java.util.HashMap">
+		update edu_teacher_education
+		set status = 0 where #version#>version and
+		teacher_id = #teacherId#
+	</update>
+
+	<!-- 发起调动教师列表 -->
+	<select id="selectCreateMobilizeList" parameterClass="java.util.Map"
+		resultClass="project.teacher.teachermanage.pojo.EduTeacherMobilize">
+		select
+		a.id,
+		a.school_id schoolId,
+		a.user_province_id userProvinceId,
+		a.user_city_id userCityId,
+		a.user_district_id userDistrictId,
+		a.real_name realName,
+		a.id_number idNumber,
+		a.user_province_name
+		userProvinceName,
+		a.user_city_name userCityName,
+		a.user_district_name
+		userDistrictName,
+		c.school_name schoolName,
+		IFNULL(b.job_certificate_num,'') jobCertificateNum,
+		a.user_image_url
+		userImageUrl,
+		IFNULL(b.job_comment_position,'') jobCommentPosition,
+		IFNULL(b.job_recruitment_position,'') jobRecruitmentPosition,
+		IFNULL(b.job_school_administration_office,'')
+		jobSchoolAdministrationOffice,
+		IFNULL(b.job_former_teaching_subject,'') jobFormerTeachingSubject,
+		<!-- (case when b.job_core_teacher=1 THEN '是' else '否' end)jobCoreTeacher, -->
+		b.job_core_teacher_type as jobCoreTeacherType,
+		IFNULL(b.job_core_teacher,'') jobCoreTeacher,
+		(case when b.job_whether_teacher=1 THEN '是' else '否'
+		end)jobWhetherTeacher,
+		(case when b.job_county_rural_teacher=1 THEN '是'
+		else '否'
+		end)jobCountyRuralTeacher,
+		b.job_comment_position_type
+		jobCommentPositionType,
+		b.job_recruitment_position_type
+		jobRecruitmentPositionType,
+		b.job_former_teaching_subject_type
+		jobFormerTeachingSubjectType,
+		b.job_school_administration_office_type
+		jobSchoolAdministrationOfficeType,
+		b.adjust_id adjustId,
+		IFNULL(b.adjust_name,'') adjustName,
+		IFNULL(b.job_former_teaching_section,'') jobFormerTeachingSection,
+		b.job_former_teaching_section_type jobFormerTeachingSectionType,
+		d.dictionary_code as sectionDictionaryCode <!-- 学段字典code -->
+		from edu_user a
+		left join edu_teacher_job b on a.id=b.teacher_id and b.status=1
+		left join edu_school c on a.school_id=c.school_id
+		LEFT JOIN edu_sys_dictionary d ON b.job_former_teaching_section_type=d.dictionary_id and d.dictionary_type = 'stduty_section' <!-- 查询教师学段对应字典code -->
+		where 1 = 1
+		<isEmpty prepend="AND" property="retiress">
+			a.status=8
+		</isEmpty>
+		
+		<isNotEmpty prepend="AND" property="retiress">
+			a.STATUS BETWEEN 30 AND 40 AND a.status !=32 
+		</isNotEmpty>
+		
+		 and a.role_id in (4,5)
+
+		and a.id NOT IN(select teacher_id from edu_audit where teacher_id = a.id
+		and audit_status = 11)
+
+		<isNotEmpty prepend="AND" property="realName">
+			a.real_name like
+			'%$realName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="idNumber">
+			a.id_number=
+			#idNumber#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="provinceId">
+			a.user_province_id =
+			#provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cityId">
+			a.user_city_id =
+			#cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="districtId">
+			a.user_district_id =
+			#districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			a.school_id =
+			#schoolId#
+		</isNotEmpty>
+
+		ORDER BY
+		a.create_date desc
+	</select>
+
+	<update id="user_updateVersionForMobilize" parameterClass="java.util.HashMap">
+		update edu_user set
+		version = #version#,
+		school_id=#schoolId#,
+		school_name=#schoolName#,
+		user_province_id=#userProvinceId#,
+		user_province_name=#userProvinceName#,
+		user_city_id=#userCityId#,
+		user_city_name=#userCityName#,
+		user_district_id=#userDistrictId#,
+		user_district_name=#userDistrictName#,
+		status=#status#,
+		school_name=#userSchoolName#
+		where id = #userId#
+	</update>
+
+	<select id="select_count_change_type" resultClass="int"
+		parameterClass="java.util.HashMap">
+		select
+		count(1)
+		from
+		edu_audit
+		where 1=1
+		<isNotNull prepend="and" property="auditStatus">
+			audit_status =
+			#auditStatus#
+		</isNotNull>
+		<isNotNull prepend="and" property="teacherId">
+			teacher_id = #teacherId#
+		</isNotNull>
+		<isNotNull prepend="and" property="changeType1">
+			change_type >=
+			#changeType1#
+		 </isNotNull>
+		<isNotNull prepend="and" property="changeType2">
+			#changeType2#
+			>=change_type
+		</isNotNull>
+	</select>
+
+	<select id="select_auditInfo_by_id" parameterClass="int"
+		resultClass="project.teacher.teachermanage.pojo.EduTeacherMobilize">
+		select
+		audit_option as auditOption,
+		mobilizeMark,
+		audit_status as auditStatus
+		from
+		edu_audit
+		where id = #id#
+	</select>
+
+	<!-- 已发起编制调整列表 -->
+	<select id="selectAdjustList" parameterClass="java.util.Map"
+		resultClass="project.teacher.teachermanage.pojo.EduTeacherAdjust">
+		select
+		a.old_version oldVersion,
+		a.new_version newVersion,
+		a.id,
+		a.teacher_id teacherId,
+		b.real_name realName,
+		(case when b.gender=1 then
+		'男' else '女' END)sex,
+		b.id_number idNumber,
+		a.audit_create_by
+		auditCreateBy,
+		a.audit_create_date auditCreateDate,
+		a.audit_status
+		auditStatus,
+		c.adjust_id newAdjustId,
+		IFNULL(c.adjust_name,'')
+		newAdjustName,
+		d.adjust_id oldAdjustId,
+		IFNULL(d.adjust_name,'')
+		oldAdjustName,
+		IFNULL(a.mobilizeMark,'')mobilizeMark,
+		IFNULL(a.audit_option,'')auditOption
+		from edu_audit a
+		join
+		edu_user b on
+		a.teacher_id=b.id and a.change_type=50
+		join edu_teacher_job c on
+		c.teacher_id=a.teacher_id and c.version=a.new_version
+		join
+		edu_teacher_job d on d.teacher_id=a.teacher_id and
+		d.version=a.old_version
+
+		where 1=1
+		<isNotEmpty prepend="AND" property="adjustId">
+			d.adjust_id=
+			#adjustId#
+		</isNotEmpty>
+
+		<isNotEmpty prepend="AND" property="realName">
+			b.real_name like
+			'%$realName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="idNumber">
+			b.id_number=
+			#idNumber#
+		</isNotEmpty>
+
+		<isNotEmpty prepend="and" property="provinceId">
+			b.user_province_id =
+			#provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cityId">
+			b.user_city_id =
+			#cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="districtId">
+			b.user_district_id =
+			#districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			b.school_id = #schoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="auditStatusStr">
+			a.audit_status in
+			<iterate property="auditStatusStr" open="(" close=")"
+				conjunction=",">
+				#auditStatusStr[]#
+     		 </iterate>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="roleAuditY">
+			b.role_id >= #roleId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="roleAuditN">
+			b.role_id > #roleId#
+		</isNotEmpty>
+
+		ORDER BY
+		a.audit_create_date desc
+		LIMIT
+		#startIndex#, #endIndex#
+	</select>
+
+	<!-- 已发起编制调整count -->
+	<select id="selectAdjustCount" parameterClass="java.util.Map"
+		resultClass="int">
+		select
+		count(1)counts
+		from edu_audit a
+		join
+		edu_user b on
+		a.teacher_id=b.id and a.change_type=50
+		join edu_teacher_job c on
+		c.teacher_id=a.teacher_id and c.version=a.new_version
+		join
+		edu_teacher_job d on d.teacher_id=a.teacher_id and
+		d.version=a.old_version
+
+		where 1=1
+		<isNotEmpty prepend="AND" property="adjustId">
+			d.adjust_id=
+			#adjustId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="realName">
+			b.real_name like
+			'%$realName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="idNumber">
+			b.id_number=
+			#idNumber#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="provinceId">
+			b.user_province_id =
+			#provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cityId">
+			b.user_city_id =
+			#cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="districtId">
+			b.user_district_id =
+			#districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			b.school_id = #schoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="auditStatusStr">
+			a.audit_status in
+			<iterate property="auditStatusStr" open="(" close=")"
+				conjunction=",">
+				#auditStatusStr[]#
+     		 </iterate>
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="roleAuditY">
+			b.role_id >= #roleId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="roleAuditN">
+			b.role_id > #roleId#
+		</isNotEmpty>
+	</select>
+
+	<!-- 我的调动记录 -->
+	<select id="selectTeacherMobilizeList" parameterClass="java.util.Map"
+		resultClass="project.teacher.teachermanage.pojo.EduTeacherMobilize">
+	select
+	a.old_version oldVersion,
+	a.new_version newVersion,
+	a.id,
+	a.teacher_id teacherId,
+	b.real_name realName,
+	(case when b.gender=1 then
+	'男' else '女' END)sex,
+	b.id_number idNumber,
+	IFNULL(a.past_province_name,'')pastProvinceName,
+	IFNULL(a.past_city_name,'')pastCityName,
+	IFNULL(a.past_district_name,'')pastDistrictName,
+	IFNULL(a.past_school_name,'')pastSchoolName,
+	IFNULL(a.new_province_name,'')newProvinceName,
+	IFNULL(a.new_city_name,'')newCityName,
+	IFNULL(a.new_district_name,'')newDistrictName,
+	IFNULL(a.new_school_name,'')newSchoolName,
+	a.new_province_id
+	newProvinceId,
+	a.new_city_id newCityId,
+	a.new_district_id newDistrictId,
+	a.new_school_id newSchoolId,
+	a.audit_create_by
+	auditCreateBy,
+	a.audit_create_date auditCreateDate,
+	a.audit_status auditStatus
+	from
+	edu_audit a
+	join
+	edu_user b on a.teacher_id=b.id and a.change_type=2
+
+	where a.teacher_id=#teacherId#
+		<isNotEmpty prepend="AND" property="startDate">
+			CAST(a.audit_create_date
+			AS DATE) >= #startDate#
+		</isNotEmpty>
+		<isNotNull prepend="and" property="endDate">
+			#endDate# >= CAST(a.audit_create_date
+			AS DATE)
+		</isNotNull>
+		<isNotEmpty prepend="and" property="auditStautsStr">
+			a.audit_status in
+			<iterate property="auditStautsStr" open="(" close=")"
+				conjunction=",">
+				#auditStautsStr[]#
+     		 </iterate>
+		</isNotEmpty>
+
+		ORDER BY
+		a.audit_create_date desc
+		LIMIT
+		#startIndex#, #endIndex#
+	</select>
+	
+	<!-- 我的调动记录count -->
+	<select id="selectTeacherMobilizeCount" parameterClass="java.util.Map"
+		resultClass="int">
+	select
+	count(1)counts
+	from
+	edu_audit a
+	join
+	edu_user b on a.teacher_id=b.id and a.change_type=2
+
+	where a.teacher_id=#teacherId#
+		<isNotEmpty prepend="AND" property="startDate">
+			CAST(a.audit_create_date
+			AS DATE) >= #startDate#
+		</isNotEmpty>
+		<isNotNull prepend="and" property="endDate">
+			#endDate# >= CAST(a.audit_create_date
+			AS DATE)
+		</isNotNull>
+		<isNotEmpty prepend="and" property="auditStautsStr">
+			a.audit_status in
+			<iterate property="auditStautsStr" open="(" close=")"
+				conjunction=",">
+				#auditStautsStr[]#
+     		 </iterate>
+		</isNotEmpty>
+	</select>
+
+</sqlMap>

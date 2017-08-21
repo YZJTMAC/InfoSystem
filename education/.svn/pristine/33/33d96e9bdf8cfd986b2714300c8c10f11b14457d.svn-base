@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_project">
+	<!-- 教师年度学分查询 -->
+	<select id="selectTeacherAssessList" parameterClass="java.util.Map"
+		resultClass="project.furtheredu.edumanage.pojo.EduTearcherAssess">
+	select 
+			SUM(c.teacher_score) as teacherClassScore,
+			c.`year` as year,
+			u.real_name as realName
+    from edu_statistic_year c
+    	INNER JOIN edu_user u ON c.teacher_id = u.id
+	where 1=1
+     	and u.id = #teacherId#
+     GROUP BY c.`year`, u.id_number
+    order by c.`year`, u.create_date desc
+    
+	</select>
+	
+	<!-- 查询年度考核设置信息 -->
+	<select id="selectTargetAssessList" resultClass="project.furtheredu.edumanage.pojo.EduTearcherAssess"  parameterClass="java.util.HashMap" >
+	  	select 
+		a.year,
+		a.province_id provinceId,
+		a.province_name provinceName,
+		a.city_name cityName,
+		a.district_name districtName,
+		a.school_name schoolName,
+		sum(case when a.class_period>0 THEN a.class_period else 0 end)classPeriod,
+		sum(case when a.class_score>0 then a.class_score else 0 end)classScore
+		from edu_target_by_year a
+		
+		where 1=1
+
+		<isNotNull prepend="and" property="year">
+			a.year = #year#
+		</isNotNull> and 
+		province_id = #provinceId# and city_id is null
+		GROUP by a.year,	a.province_id, a.city_id,a.district_id,a.school_id
+		union
+		select 
+		a.year,
+		a.province_id provinceId,
+		a.province_name provinceName,
+		a.city_name cityName,
+		a.district_name districtName,
+		a.school_name schoolName,
+		sum(case when a.class_period>0 THEN a.class_period else 0 end)classPeriod,
+		sum(case when a.class_score>0 then a.class_score else 0 end)classScore
+		from edu_target_by_year a where 
+		province_id = #provinceId# and city_id = #cityId# or district_id in(
+		select id from edu_sys_area where up_lv_code = #cityId#
+		)
+		GROUP by a.year,	a.province_id, a.city_id,a.district_id,a.school_id
+  </select>
+  
+  <select id="selectTeacherAssessInfo" parameterClass="java.util.Map"
+		resultClass="project.furtheredu.edumanage.pojo.EduTearcherAssess">
+		SELECT
+		a.year,
+		a.project_no projectNo,
+		a.project_name projectName,
+		a.start_date startDate,
+		a.end_date endDate,
+		b.teacher_score_audit_status_name teacherScoreAuditStatusName,
+		b.teacher_score as teacherScore,
+		b.teacher_class_score teacherClassScore
+		from edu_project a
+		JOIN edu_project_comment b on a.id=b.project_id
+		JOIN edu_project_train_target c on a.id=c.project_id
+		
+		where b.teacher_id=#teacherId#
+		
+		<isNotNull prepend="and" property="year">
+			a.year = #year#
+		</isNotNull>
+		
+		GROUP BY a.year order by a.year DESC
+	</select>
+	<!-- 查询培训项目的详情 -->
+<select id="new_selectTeacherAssessInfo" parameterClass="java.util.Map" resultClass="project.furtheredu.edumanage.pojo.EduTearcherAssess">
+		select p.project_no as projectNo,
+		p.project_name as projectName,
+		p.start_date as  startDate,
+		p.end_date as endDate,
+		t.teacher_class_score as teacherClassScore,
+		t.teacher_score_audit_status_name as teacherScoreAuditStatusName,
+		t.teacher_score as teacherScore
+		from edu_project p 
+		left join edu_project_comment t on t.project_id = p.id 
+		where t.teacher_id=#teacherId#
+		<isNotNull prepend="and" property="year">
+			p.year = #year#
+		</isNotNull>
+		
+		order by p.id  
+</select>	
+
+
+<select id="new_selectTeacherAssessInfoNoTrain" parameterClass="java.util.Map" resultClass="project.furtheredu.edumanage.pojo.EduTearcherAssess">
+	select 
+	p.code as projectNo,
+	p.name as projectName,
+	p.begin_date as startDate,
+	p.end_date as endDate,
+	t.teacher_score as teacherScore,
+	t.audit_score as teacherClassScore,
+	t.audit_status_name as teacherScoreAuditStatusName
+	from edu_project_notrain p
+	LEFT JOIN edu_project_notrain_comment t 
+	on p.id = t.project_id
+	 where t.teacher_id=#teacherId#
+		<isNotNull prepend="and" property="year">
+			p.year = #year#
+		</isNotNull>
+		 order by p.id  
+</select>
+</sqlMap>

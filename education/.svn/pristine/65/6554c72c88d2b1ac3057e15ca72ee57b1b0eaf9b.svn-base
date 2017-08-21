@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_sys_dictionary">
+
+	<resultMap id="eduSysDictionaryResult" class="project.system.pojo.SysDictionary">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="dictionary_id" property="dictionaryId"
+			jdbcType="INTEGER" />
+		<result column="dictionary_type" property="dictionaryType"
+			jdbcType="VARCHAR" />
+		<result column="dictionary_type_name" property="dictionaryTypeName"
+			jdbcType="VARCHAR" />
+		<result column="dictionary_name" property="dictionaryName"
+			jdbcType="VARCHAR" />
+		<result column="dictionary_code" property="dictionaryCode"
+			jdbcType="VARCHAR" />
+		<result column="status" property="status"
+			jdbcType="VARCHAR" />
+	</resultMap>
+
+	<select id="selectUsedDictionaryInfo" 	parameterClass="java.util.Map" resultClass="int">
+		select 
+			count(1) counts
+		from 
+		<isNotEmpty  property="tableName">
+  			$tableName$
+  		</isNotEmpty>
+		where 1=1 
+		<isNotEmpty prepend="and" property="whereSql">
+			$whereSql$
+  		</isNotEmpty>
+  </select>
+
+	<insert id="insert_dic" parameterClass="project.system.pojo.SysDictionary">
+		insert into
+		edu_sys_dictionary (id, dictionary_id, dictionary_type,
+		dictionary_type_name,
+		dictionary_name, dictionary_code)
+		values
+		(#id:INTEGER#, #dictionaryId:INTEGER#, #dictionaryType:VARCHAR#,
+		#dictionaryTypeName:VARCHAR#, #dictionaryName:VARCHAR#,
+		#dictionaryCode:VARCHAR#)
+  </insert>
+
+	<!-- 查询指定类型数据字典 -->
+	<select id="queryDicByType" resultMap="eduSysDictionaryResult" parameterClass="java.lang.String">
+		select * from edu_sys_dictionary
+		where dictionary_type =
+		#dicType#
+		and status = 1
+		order by dictionary_id
+ 	 </select>
+  
+  <!-- 通过学段查询学科 -->
+  <select id="select_subject_by_section" parameterClass="java.util.Map" resultMap="eduSysDictionaryResult">
+  	select * from edu_sys_dictionary 
+  	where 
+  	dictionary_type = 'project_subject'
+  	and status = 1
+  	<isNotEmpty prepend="and" property="id">
+  		dictionary_id = #id#
+  	</isNotEmpty>
+  	<!-- <isNotEmpty prepend="and" property="sectionName">
+  	   dictionary_name like '$sectionName$%'
+  	</isNotEmpty> -->
+  	<isNotEmpty prepend="and" property="sectionName">
+  	   dictionary_code like '$sectionName$%'
+  	</isNotEmpty>
+ </select>
+
+	<select id="selectSysDictionaryCount" parameterClass="java.util.Map"
+		resultClass="int">
+		select
+		count(1)counts
+		from edu_sys_dictionary
+		WHERE 1=1
+		<isNotNull prepend="and" property="status">
+			status=#status#
+  		</isNotNull>
+		
+		<isNotNull prepend="and" property="dictionaryTypeId">
+			dictionary_type like
+			'%$dictionaryTypeId$%'
+  	</isNotNull>
+	</select>
+	<!-- 字典表管理列表 -->
+	<select id="selectSysDictionaryList" parameterClass="java.util.HashMap"
+		resultMap="eduSysDictionaryResult">
+		SELECT
+		*
+		FROM
+		edu_sys_dictionary
+		WHERE 1=1
+		<isNotNull prepend="and" property="flag">
+		CASE WHEN((SELECT r.role_type FROM edu_user u LEFT JOIN edu_sys_role r ON r.id = u.role_id WHERE login_account = #loginAccount# and u.status != 0) = '1') THEN 1=1
+			 WHEN((SELECT r.role_type FROM edu_user u LEFT JOIN edu_sys_role r ON r.id = u.role_id WHERE login_account = #loginAccount# and u.status != 0) = '2') THEN dictionary_id NOT IN(1,2) 
+			 WHEN((SELECT r.role_type FROM edu_user u LEFT JOIN edu_sys_role r ON r.id = u.role_id WHERE login_account = #loginAccount# and u.status != 0) = '3') THEN dictionary_id NOT IN(1,2,3) END
+		</isNotNull>
+		<isNotNull prepend="and" property="status">
+			status=#status#
+  		</isNotNull>
+		<isNotNull prepend="and" property="dictionaryTypeId">
+			dictionary_type like
+			'%$dictionaryTypeId$%'
+  	</isNotNull>
+		order by id 
+		limit #startIndex#,#endIndex#
+	</select>
+	<!-- 教师信息模板字典表管理列表 -->
+	<select id="selectSysDictionaryTemList" parameterClass="java.util.HashMap"
+		resultMap="eduSysDictionaryResult">
+		SELECT
+		*
+		FROM
+		edu_sys_dictionary
+		WHERE 1=1
+		<isNotNull prepend="and" property="status">
+			status=#status#
+  		</isNotNull>
+		 <!-- and	dictionary_type in
+			(#stduty_section#,#project_subject#,#political_status#)
+			-->  	
+		order by dictionary_type 
+		
+	</select>
+	<!-- 字典表管理全部列表 -->
+	<select id="selectSysDictionaryListes" parameterClass="java.util.HashMap"
+		resultMap="eduSysDictionaryResult">
+		SELECT
+		*
+		FROM
+		edu_sys_dictionary
+		WHERE 1=1
+		<isNotNull prepend="and" property="status">
+			status=#status#
+  		</isNotNull>
+		
+		<isNotNull prepend="and" property="dictionaryTypeId">
+			dictionary_type like
+			'%$dictionaryTypeId$%'
+  	</isNotNull>
+		order by id 
+	</select>
+
+	<!-- 字典表所有信息 -->
+	<select id="selectSysAllDictionaryList" parameterClass="java.util.HashMap"
+		resultMap="eduSysDictionaryResult">
+		SELECT
+		*
+		FROM
+		edu_sys_dictionary where 1=1
+		<isNotNull prepend="and" property="dictionaryType">
+			dictionary_type=#dictionaryType#
+  		</isNotNull>
+		<isNotNull prepend="and" property="dictionaryId">
+			dictionary_id=#dictionaryId#
+  		</isNotNull>
+  		<isNotNull prepend="and" property="status">
+			status=#status#
+  		</isNotNull>
+	</select>
+	<!-- add BY yinxiaolong 
+  增加数据字典
+  -->
+	<insert id="insertDictionaryInfo" parameterClass="java.util.HashMap">
+		INSERT INTO
+		edu_sys_dictionary (
+		dictionary_id,
+		dictionary_type,
+		dictionary_type_name,
+		dictionary_name,
+		dictionary_code,
+		status
+		)
+		VALUES
+		(
+
+		(select maxid from (SELECT
+		IFNULL(MAX(dictionary_id)+ 1,1) as maxid
+		FROM
+		edu_sys_dictionary tmp
+		WHERE
+		dictionary_type = #dictionaryType#)temp)
+		,
+		#dictionaryType#,
+		#dictionaryTypeName#,
+		#dictionaryName#,
+		#dictionaryCode#,
+		1
+		)
+    </insert>
+
+	<!-- add BY yinxiaolong 
+ 	数据字典修改
+ -->
+	<update id="updateDictionary" parameterClass="java.util.HashMap">
+		UPDATE
+		edu_sys_dictionary
+		SET dictionary_name = #dictionName#,
+		dictionary_code
+		= #dictionCode#
+		WHERE
+		id = #id#
+ </update>
+	<update id="deleteDictionaryInfo" parameterClass="java.util.HashMap">
+		UPDATE
+		edu_sys_dictionary
+		SET status = #status#
+		WHERE
+		id = #id#
+ </update>
+ 
+ <!-- 字典表所有信息 -->
+	<select id="selectSysDictionaryInfo" parameterClass="java.util.HashMap"
+		resultMap="eduSysDictionaryResult">
+		SELECT
+		*
+		FROM
+		edu_sys_dictionary where 1=1
+		<isNotNull prepend="and" property="dictionaryName">
+			dictionary_Name=#dictionaryName#
+  		</isNotNull>  		
+  		<isNotNull prepend="and" property="dictionaryId">
+			dictionary_id=#dictionaryId#
+  		</isNotNull>
+  		<isNotNull prepend="and" property="status">
+			status=#status#
+  		</isNotNull>
+	</select>
+ 
+</sqlMap>

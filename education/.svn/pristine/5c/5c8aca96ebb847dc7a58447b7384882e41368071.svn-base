@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_school">
+	<resultMap id="abatorgenerated_EduSchoolResult" class="project.system.pojo.EduSchool">
+		<result column="school_id" property="schoolId" jdbcType="INTEGER" />
+		<result column="school_name" property="schoolName" jdbcType="VARCHAR" />
+		<result column="school_type_id" property="schoolTypeId"
+			jdbcType="INTEGER" />
+		<result column="school_type_name" property="schoolTypeName"
+			jdbcType="VARCHAR" />
+		<result column="school_province_id" property="schoolProvinceId"
+			jdbcType="INTEGER" />
+		<result column="school_province_name" property="schoolProvinceName"
+			jdbcType="VARCHAR" />
+		<result column="school_city_id" property="schoolCityId"
+			jdbcType="INTEGER" />
+		<result column="school_city_name" property="schoolCityName"
+			jdbcType="VARCHAR" />
+		<result column="school_district_id" property="schoolDistrictId"
+			jdbcType="INTEGER" />
+		<result column="school_district_name" property="schoolDistrictName"
+			jdbcType="VARCHAR" />
+		<result column="school_contacts" property="schoolContacts"
+			jdbcType="VARCHAR" />
+		<result column="school_contacts_type" property="schoolContactsType"
+			jdbcType="VARCHAR" />
+		<result column="school_contacts_address" property="schoolContactsAddress"
+			jdbcType="VARCHAR" />
+		<result column="school_memo" property="schoolMemo" jdbcType="VARCHAR" />
+		<result column="create_by" property="createBy" jdbcType="VARCHAR" />
+		<result column="create_date" property="createDate" jdbcType="DATE" />
+		<result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+		<result column="update_date" property="updateDate" jdbcType="DATE" />
+		<result column="school_nature_id" property="schoolNatureId"
+			jdbcType="INTEGER" />
+		<result column="school_nature_name" property="schoolNatureName"
+			jdbcType="VARCHAR" />
+
+		<result column="area_type_id" property="areaTypeId" jdbcType="INTEGER" />
+		<result column="area_type_name" property="areaTypeName"
+			jdbcType="VARCHAR" />
+			
+		<result column="school_establish_type_id" property="establishTypeId" jdbcType="INTEGER" />
+		<result column="school_establish_type_name" property="establishTypeName"
+			jdbcType="VARCHAR" />
+		<result column="school_code" property="schoolCode" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<insert id="insert_school" parameterClass="project.system.pojo.EduSchool">
+		insert into edu_school
+		(school_name, school_type_id,school_type_name, school_province_id,
+		school_province_name, school_city_id,
+		school_city_name,
+		school_district_id, school_district_name, school_contacts,
+		school_contacts_type, school_contacts_address, school_memo, create_by,
+		create_date, update_by,
+		update_date,status,school_nature_id,school_nature_name,area_type_id,area_type_name,school_code,
+		school_establish_type_id, school_establish_type_name)
+		values
+		(#schoolName:VARCHAR#,
+		#schoolTypeId:INTEGER#,#schoolTypeName:VARCHAR#,
+		#schoolProvinceId:INTEGER#, #schoolProvinceName:VARCHAR#,
+		#schoolCityId:INTEGER#,
+		#schoolCityName:VARCHAR#,
+		#schoolDistrictId:INTEGER#,
+		#schoolDistrictName:VARCHAR#,
+		#schoolContacts:VARCHAR#, #schoolContactsType:VARCHAR#,
+		#schoolContactsAddress:VARCHAR#,
+		#schoolMemo:VARCHAR#,
+		#createBy:VARCHAR#,
+		now(), #updateBy:VARCHAR#,
+		now(),#status:INTEGER#,#schoolNatureId:INTEGER#,#schoolNatureName:VARCHAR#,#areaTypeId:INTEGER#,#areaTypeName:VARCHAR#,
+		#schoolCode:VARCHAR#,
+		#establishTypeId:INTEGER#,
+		#establishTypeName:VARCHAR#)
+	</insert>
+
+	<update id="update_school" parameterClass="project.system.pojo.EduSchool">
+		update edu_school set
+		school_name=#schoolName:VARCHAR#,
+		school_type_id=#schoolTypeId:INTEGER#,school_type_name=#schoolTypeName:VARCHAR#,
+		school_province_id=#schoolProvinceId:INTEGER#,
+		school_province_name=#schoolProvinceName:VARCHAR#,
+		school_city_id=#schoolCityId:INTEGER#,
+		school_city_name=#schoolCityName:VARCHAR#,
+		school_district_id=#schoolDistrictId:INTEGER#,
+		school_district_name=#schoolDistrictName:VARCHAR#,
+		school_contacts=#schoolContacts:VARCHAR#,
+		school_contacts_type=#schoolContactsType:VARCHAR#,
+		school_contacts_address=#schoolContactsAddress:VARCHAR#,
+		school_memo=#schoolMemo:VARCHAR#,
+		update_by=#updateBy:VARCHAR#,
+		update_date=now(),
+		school_nature_id=#schoolNatureId:INTEGER#,school_nature_name=#schoolNatureName:VARCHAR#,
+		area_type_id=#areaTypeId:INTEGER#,area_type_name=#areaTypeName:VARCHAR#,school_code=#schoolCode:VARCHAR#,
+		school_establish_type_id=#establishTypeId:INTEGER#,
+		school_establish_type_name=#establishTypeName:VARCHAR#
+		where school_id=#schoolId#
+	</update>
+
+	<update id="delete_school" parameterClass="project.system.pojo.EduSchool">
+		update edu_school set
+		status=#status#,
+		update_by=#updateBy:VARCHAR#,
+		update_date=now()
+		where
+		school_id=#schoolId#
+	</update>
+
+	<select id="select_school_byCondition" resultMap="abatorgenerated_EduSchoolResult"
+		parameterClass="java.util.HashMap">
+		select school_id, school_name, school_type_id, school_type_name,
+		school_province_id,
+		school_province_name, school_city_id,
+		school_city_name, school_district_id,
+		school_district_name,
+		school_contacts, school_contacts_type,
+		school_contacts_address,
+		school_memo, create_by, create_date, update_by, update_date,
+		school_nature_name,
+		school_nature_id,
+		area_type_id,
+		area_type_name,
+		school_code,
+		school_establish_type_id,
+		school_establish_type_name
+		from
+		edu_school
+		where status = 1
+		<isNotEmpty prepend="and" property="schoolId">
+			school_id = #schoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolName">
+			school_name LIKE
+			'%$schoolName$%'
+    </isNotEmpty>
+		<isNotNull prepend="and" property="schoolTypeId">
+			school_type_id =
+			#schoolTypeId#
+    </isNotNull>
+		<isNotNull prepend="and" property="schoolProvinceId">
+			school_province_id =
+			#schoolProvinceId#
+    </isNotNull>
+		<isNotNull prepend="and" property="schoolCityId">
+			school_city_id =
+			#schoolCityId#
+    </isNotNull>
+		<isNotNull prepend="and" property="schoolDistrictId">
+			school_district_id =
+			#schoolDistrictId#
+    </isNotNull>
+		order by create_date desc
+	</select>
+
+	<!-- 学校管理列表 -->
+	<select id="selectSysSchoolList" parameterClass="java.util.Map"
+		resultClass="project.system.pojo.EduSchool">
+		select
+		a.school_id schoolId,
+		a.school_name schoolName,
+		a.school_type_name schoolTypeName,
+		a.school_code schoolCode,
+		IFNULL(a.school_province_name,'')schoolProvinceName,
+		IFNULL(a.school_city_name,'')schoolCityName,
+		IFNULL(a.school_district_name,'')schoolDistrictName,
+		IFNULL(d.dictionary_name,'') schoolNatureName
+		from edu_school a
+		<!--//如果有两个用户名相同的，就会出现重复数据
+		 left
+		join edu_user b on a.create_by=b.login_account -->
+		left JOIN
+		edu_sys_dictionary d on d.dictionary_type = 'school_nature' and
+		d.dictionary_id = a.school_nature_id
+		where a.status=1
+		<isNotEmpty prepend="AND" property="schoolName">
+			a.school_name like
+			'%$schoolName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="schoolTypeId">
+			a.school_type_id=
+			#schoolTypeId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="schoolCode">
+			a.school_code=
+			#schoolCode#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="schoolNatureId">
+			a.school_nature_id=
+			#schoolNatureId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolProvinceId">
+			a.school_province_id=
+			#schoolProvinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolCityId">
+			a.school_city_id=
+			#schoolCityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolDistrictId">
+			a.school_district_id=
+			#schoolDistrictId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="provinceId">
+			a.school_province_id=
+			#provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cityId">
+			a.school_city_id=
+			#cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="districtId">
+			a.school_district_id=
+			#districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			a.school_id =
+			#schoolId#
+		</isNotEmpty>
+		ORDER BY
+		a.school_id desc
+		<isNotEmpty   property="startIndex">
+			 LIMIT #startIndex#, #endIndex#
+		</isNotEmpty>
+	</select>
+	
+	<!-- 得到学校列表，和上面的类似 -->
+	<!-- <select id="selectSysSchoolListNoPage" parameterClass="java.util.Map"
+		resultClass="project.system.pojo.EduSchool">
+		select
+		a.school_id schoolId,
+		a.school_name schoolName,
+		a.school_type_name schoolTypeName,
+		a.school_code schoolCode,
+		IFNULL(a.school_province_name,'')schoolProvinceName,
+		IFNULL(a.school_city_name,'')schoolCityName,
+		IFNULL(a.school_district_name,'')schoolDistrictName,
+		IFNULL(d.dictionary_name,'') schoolNatureName
+		from edu_school a
+		left
+		join edu_user b on a.create_by=b.login_account
+		left JOIN
+		edu_sys_dictionary d on d.dictionary_type = 'school_nature' and
+		d.dictionary_id = a.school_nature_id
+		where a.status=1
+		<isNotEmpty prepend="AND" property="schoolName">
+			a.school_name like
+			'%$schoolName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="schoolTypeId">
+			a.school_type_id=
+			#schoolTypeId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="schoolCode">
+			a.school_code=
+			#schoolCode#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="schoolNatureId">
+			a.school_nature_id=
+			#schoolNatureId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolProvinceId">
+			a.school_province_id=
+			#schoolProvinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolCityId">
+			a.school_city_id=
+			#schoolCityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolDistrictId">
+			a.school_district_id=
+			#schoolDistrictId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="provinceId">
+			a.school_province_id=
+			#provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cityId">
+			a.school_city_id=
+			#cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="districtId">
+			a.school_district_id=
+			#districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="userSchoolId">
+			a.school_id =
+			#userSchoolId#
+		</isNotEmpty>
+		ORDER BY
+		a.school_id 
+	</select> -->
+	
+	<!-- 学校管理列表count -->
+	<select id="selectSysSchoolCount" parameterClass="java.util.Map"
+		resultClass="int">
+		select
+		count(1)counts
+		from edu_school
+		a
+		<!--//如果有两个用户名相同的，就会出现重复数据
+		left join edu_user b on
+		a.create_by=b.login_account -->
+		where a.status=1
+		<isNotEmpty prepend="AND" property="schoolName">
+			a.school_name like
+			'%$schoolName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="schoolCode">
+			a.school_code=
+			#schoolCode#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="schoolTypeId">
+			a.school_type_id=
+			#schoolTypeId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="schoolNatureId">
+			a.school_nature_id=
+			#schoolNatureId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolProvinceId">
+			a.school_province_id=
+			#schoolProvinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolCityId">
+			a.school_city_id=
+			#schoolCityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolDistrictId">
+			a.school_district_id=
+			#schoolDistrictId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="provinceId">
+			a.school_province_id=
+			#provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cityId">
+			a.school_city_id=
+			#cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="districtId">
+			a.school_district_id=
+			#districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			a.school_id =
+			#schoolId#
+		</isNotEmpty>
+	</select>
+
+	<select id="selectSysSchoolCountForImport" parameterClass="java.util.Map"
+		resultClass="int">
+		select
+		count(1)counts
+		from edu_school a
+		where a.status=1
+		<isNotEmpty prepend="AND" property="schoolName">
+			a.school_name=#schoolName#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolProvinceId">
+			a.school_province_id=
+			#schoolProvinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolCityId">
+			a.school_city_id=
+			#schoolCityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolDistrictId">
+			a.school_district_id=
+			#schoolDistrictId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolCode">
+			a.school_code=
+			#schoolCode#
+		</isNotEmpty>
+	</select>
+
+	<select id="selectSysSchoolInfo" parameterClass="int"
+		resultMap="abatorgenerated_EduSchoolResult">
+		select
+		*
+		from edu_school
+		where school_id=#id#
+	</select>
+
+	<select id="select_school" resultMap="abatorgenerated_EduSchoolResult">
+		select * from edu_school
+		where status = 1
+
+</select>
+
+
+	<select id="selectSysSchoolBelongCount" parameterClass="int"
+		resultClass="int">
+
+		select count(1) from(
+		SELECT school_id from edu_user where status!=0 and school_id=#schoolId#
+		union ALL
+		SELECT school_id from edu_target_by_year where status!=0 and school_id=#schoolId#) t
+
+	</select>
+	
+	<!-- liuyiyou 学校管理员发送通知相关-->
+	<select id="schoolTree" resultClass="project.message.pojo.NoticeTree" parameterClass="java.util.HashMap">
+		select school_id as id, school_district_id as pid ,school_name as name from edu_school 
+		where school_district_id = #districtId# and school_id = #schoolId#
+</select>
+	
+	<select id="select_School_ByName" parameterClass="java.util.HashMap" resultMap="abatorgenerated_EduSchoolResult">
+		select
+		*
+		from edu_school
+		where school_name=#schoolName# and status =1 
+	</select>
+	
+
+</sqlMap>

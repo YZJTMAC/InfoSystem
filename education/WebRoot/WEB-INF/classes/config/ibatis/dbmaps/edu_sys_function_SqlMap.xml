@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_user">
+	<select id="selectSysFunction" parameterClass="int"
+		resultClass="project.system.pojo.SysFunction">
+		SELECT id,func_name funcName,func_type funcType,func_code
+		funcCode FROM edu_sys_function
+		ORDER BY func_code
+  </select>
+
+	<select id="selectSysFunctionRole" parameterClass="int"
+		resultClass="project.system.pojo.SysFunction">
+		select a.id,a.role_name roleName,a.status
+		,a.remark,b.func_id funcId
+		from edu_sys_role a
+		left join edu_relas_func_role b on a.id=b.role_id
+		where a.id=#id# order by func_id
+  </select>
+</sqlMap>

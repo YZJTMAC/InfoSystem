@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_file">
+	<resultMap id="baseFile" class="project.fileupload.pojo.FileUpload">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="url" property="url" jdbcType="VARCHAR" />
+		<result column="type" property="type" jdbcType="VARCHAR" />
+		<result column="project_id" property="projectId" jdbcType="INTEGER" />
+		<result column="project_name" property="projectName" jdbcType="VARCHAR" />
+		<result column="user_id" property="userId" jdbcType="INTEGER" />
+		<result column="user_name" property="userName" jdbcType="VARCHAR" />
+		<result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+		<result column="role_id" property="roleId" jdbcType="INTEGER" />
+	</resultMap>
+
+	<!-- 单条插入 -->
+	<insert id="insertFile" parameterClass="project.fileupload.pojo.FileUpload">
+		INSERT INTO edu_file (
+		<dynamic prepend=" ">
+			<isNotNull property="name" prepend=",">name
+			</isNotNull>
+			<isNotNull property="url" prepend=",">url
+			</isNotNull>
+			<isNotNull property="type" prepend=",">type
+			</isNotNull>
+			<isNotNull property="projectId" prepend=",">project_id
+			</isNotNull>
+			<isNotNull property="projectName" prepend=",">project_name
+			</isNotNull>
+			<isNotNull property="userId" prepend=",">user_id
+			</isNotNull>
+			<isNotNull property="userName" prepend=",">user_name
+			</isNotNull>
+			<isNotNull property="createDate" prepend=",">create_date
+			</isNotNull>
+			<isNotNull property="roleId" prepend=",">role_id
+			</isNotNull>
+		</dynamic>
+		) VALUES (
+		<dynamic prepend=" ">
+			<isNotNull property="name" prepend=",">#name#
+			</isNotNull>
+			<isNotNull property="url" prepend=",">#url#
+			</isNotNull>
+			<isNotNull property="type" prepend=",">#type#
+			</isNotNull>
+			<isNotNull property="projectId" prepend=",">#projectId#
+			</isNotNull>
+			<isNotNull property="projectName" prepend=",">#projectName#
+			</isNotNull>
+			<isNotNull property="userId" prepend=",">#userId#
+			</isNotNull>
+			<isNotNull property="userName" prepend=",">#userName#
+			</isNotNull>
+			<isNotNull property="createDate" prepend=",">#createDate#
+			</isNotNull>
+			<isNotNull property="roleId" prepend=",">#roleId#
+			</isNotNull>
+		</dynamic>
+		)
+		<selectKey resultClass="Integer" keyProperty="id">
+			SELECT
+			last_insert_id() as id ;
+		</selectKey>
+	</insert>
+
+	<select id="select_file_list" parameterClass="java.util.HashMap"
+		resultMap="baseFile">
+		select * from edu_file f
+		WHERE 1= 1
+		<isNotNull prepend="and" property="id">
+			f.id =
+			#id#
+		</isNotNull>
+		<isNotNull prepend="and" property="name">
+			f.name =
+			#name#
+		</isNotNull>
+		<isNotNull prepend="and" property="type">
+			f.type = #type#
+		</isNotNull>
+		<isNotNull prepend="and" property="projectId">
+			f.project_id = #projectId#
+		</isNotNull>
+		<isNotNull prepend="and" property="userId">
+			f.user_id = #userId#
+		</isNotNull>
+		<isNotNull prepend="and" property="userName">
+			f.user_name = #userName#
+		</isNotNull>
+		<isNotNull prepend="and" property="roleId">
+			f.role_id = #roleId#
+		</isNotNull>
+	</select>
+
+
+	<delete id="deleteFileById" parameterClass="java.lang.Integer">
+		DELETE FROM edu_file
+		WHERE edu_file.id = #id#
+	</delete>
+	
+	<delete id="deleteFileByProjectId" parameterClass="java.util.HashMap">
+		DELETE FROM edu_file
+		WHERE 
+		<isNotNull property="projectId">
+			project_id = #projectId#
+		</isNotNull>
+		<isNotNull prepend="and" property="type">
+			type = #type#
+		</isNotNull>
+	</delete>
+
+	<!-- 行政管理员查看实施管理员上传的文件 -->
+	<select id="select_others_file_list" parameterClass="java.util.HashMap"
+		resultMap="baseFile">
+		select * from edu_file f
+		WHERE 1= 1 and f.role_id not in (0,4,5,6)
+		<isNotNull prepend="and" property="id">
+			f.id = #id#
+		</isNotNull>
+		<isNotNull prepend="and" property="type">
+			f.type = #type#
+		</isNotNull>
+		<isNotNull prepend="and" property="projectId">
+			f.project_id = #projectId#
+		</isNotNull>
+		<isNotNull prepend="and" property="userId">
+			f.user_id != #userId#
+		</isNotNull>
+		<isNotNull prepend="and" property="roleId">
+			f.role_id = #roleId#
+		</isNotNull>
+	</select>
+
+</sqlMap>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+   <beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd"
+       default-autowire="byName">
+       
+       
+       <bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:config\resources\memcached.properties</value>
+				<value>classpath:config\resources\activemq.properties</value>
+				<value>classpath:config\resources\redis.properties</value>
+				<value>classpath:config\resources\mongodb.properties</value>
+				<value>classpath:config\edu\edu.properties</value>
+			</list>
+		</property>
+	</bean>
+	<!-- MessageSource，提供对i18n消息的访问 -->
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<!-- 指定资源文件的完整文件路径信息 -->
+		<property name="basenames">
+			<list>
+				<value>config.resources.ApplicationResource</value>
+				<!--<value>config.resources.exception</value>-->
+			</list>
+		</property>
+	</bean>
+	
+	<!-- addBy: zhangxiaoqi  date: 2014-01-07 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"> 
+       
+    </bean> 
+    
+</beans>

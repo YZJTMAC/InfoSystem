@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE abatorConfiguration PUBLIC "-//Apache Software Foundation//DTD Abator for iBATIS Configuration 1.0//EN" "http://ibatis.apache.org/dtd/abator-config_1_0.dtd" >
+<abatorConfiguration >
+  <abatorContext >
+    <jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://127.0.0.121:3306/edu" userId="root" password="mySql" >
+      <classPathEntry location="D:\maven\mysql\mysql-connector-java\5.1.10\mysql-connector-java-5.1.10.jar" />
+    </jdbcConnection>
+    <javaModelGenerator targetPackage="project.edupm.projectmanage.pojo" targetProject="education" />
+    <sqlMapGenerator targetPackage="config.config.ibatis.dbmaps.import_teacher_history_sqlMap" targetProject="education" />
+  	<!--<daoGenerator targetPackage="???" targetProject="???" type="GENERIC-CI" />-->
+    <table schema="edu_teacher_import_history" tableName="edu_teacher_import_history" >
+    </table>
+  </abatorContext>
+</abatorConfiguration>

@@ -1,0 +1,283 @@
+var unset = false;
+$(function(){
+	initSelect();
+	queryList(1);
+	initChecked();
+	initSelectClass();
+});
+function initSelect(){
+	initDictionary("project_nature","scopeId");//项目性质
+	initDictionary("training_from","formId");//培训形式
+	initEduModel();//继教信息模板
+	initDictionary("training_type","propertyId");//培训类型
+}
+
+function queryList(type){
+	unset = false;
+	if(type == 2){
+		unset = true;
+	}
+	var modelId = $("#modelId").val();
+	var formId = $("#formId").val();
+	var scopeId = $("#scopeId").val();
+	var propertyId = $("#propertyId").val();	
+	var projectName = $("#projectName").val();
+	var sizePerPage = $("#sizePerPage").val();
+	var pageIndex = $("#pageIndex").val();
+	var url = pathHeader+ "/edupm/projectmanage/queryProjectByStatus.do";
+	$('#proList').html("");
+	$.ajax({
+		url:url,
+		type:"post",
+		async:true,
+		data:{
+			year:$("#year").val(),
+			startIndex : pageIndex,
+			pageSize:sizePerPage,
+			status:'10,20,22,30,40,50',
+			projectName: projectName,
+			eduModelType:$('#modelId').val(),
+			projectTrainType:formId,//培训形式
+			projectScopeId:scopeId,//培训形式
+			projectPropertyId:propertyId,//培训形式
+			unset:unset,//有未设置兑换规则的
+			flag: "Y"  //此标识表示查询申报人所管理的项目
+			
+		},
+		beforeSend: function(){
+			$('#proList').html("<tr><td align='center' colspan='14'><img src='"+pathHeader+"/images/loding.gif'  alt='加载中'/></td></tr>");
+		},
+		success:function(data){
+			var rows = data.rows;
+			if(rows.length > 0){
+				var gridHtml = "";
+				$.each(rows, function(index,element) {
+					gridHtml += getTdHtml(element);
+				});
+				$('#proList').html(gridHtml);
+				pagination(data, function(){queryList();});
+			}else{
+				$('#proList').html("<tr><td colspan='14'>无查询记录</td></tr>");
+				pagination(data, function(){queryList();});
+			}
+		},
+		error:function(){
+			$('#proList1').html("<tr><td colspan='14'>无查询记录</td></tr>");
+		}
+		
+	});
+
+}
+
+function getTdHtml(obj){
+	var tn = "";
+	var ps = "";
+	if(obj.projectScopeName!="请选择"){
+		ps = obj.projectScopeName;
+	}
+	if(obj.trainTypeName!='请选择'){
+		tn = obj.trainTypeName;
+	}
+	var gridHtml = "<tr>";
+	gridHtml += "<td><input name='chk_list' type='checkbox' value='"+obj.id+"'></td>";
+	gridHtml += "<td><a href='javascript:projectInfo("+obj.id+",\"" + obj.createBy +"\",\"" + obj.applyer+ "\")'>"+obj.projectName+"</a></td>";
+	gridHtml += "<td>"+obj.eduModelName+"</td>";
+	gridHtml += "<td>"+tn+"</td>";
+	gridHtml += "<td>"+ps+"</td>";
+	gridHtml += "<td>"+obj.projectPropertyName+"</td>";
+	gridHtml +="<td>"+obj.classPeriod+"学时"+"</td>";
+	gridHtml +="<td>"+obj.exchangeRule+"</td>";
+	gridHtml +="<td>"+obj.excellentRule+"</td>";
+	gridHtml +="<td><a href=javascript:toSetRole("+ obj.id +"," +"'"+ obj.exchangeRule +"'," +"'"+ obj.excellentRule +"')>设置兑换规则</a></td></tr>";;
+	return gridHtml;
+}
+
+var rowId;
+function toSetRole(id,commonPeriod,excellentPeriod){
+	$("#commonPeriod").val("");
+	$("#excellentPeriod").val("");
+	rowId = id;
+	$(".tip").show();
+}
+
+function showExchangeRule(ruleType){
+	$("#msg").html("");
+	if(ruleType==3){
+		$("#creditRule").hide();
+		$("#periodRule").show();
+	}else if(ruleType==4){
+		$("#periodRule").hide();
+		$("#creditRule").show();
+	}
+}
+function hideMe(){
+	$(".tip").hide();
+}
+function setRole(){
+	var ids = getCheckedIds();
+	 
+	getRadioChecked("exchangeWay");
+
+	var rule = getRadioChecked("rule");
+	var way = getRadioChecked("exchangeWay");
+
+	if(way==1){//学时兑换学分
+		var preiodExchangeRule = $("#preiodExchangeRule").val();
+		if(!(/^\d+(\.\d+)?$/).test(preiodExchangeRule)){
+			$("#msg").html("学分不能为空且必须为数字");
+			return ;
+		}
+		
+	}else{//学分兑换学时
+		var creditExchangeRule = $("#creditExchangeRule").val();
+		if(!(/^\d+(\.\d+)?$/).test(creditExchangeRule)){
+			$("#msg").html("学时不能为空且必须为数字");
+			return ;
+		}
+	}
+
+	hideMe();
+	$('#myModal').modal('show');
+	setTimeout(function() {
+		var url = pathHeader + "/edupm/projectmanage/setExchangeRule.do";
+		$.ajax({
+			url:url,
+			data:{
+				id : rowId,
+				rule : rule,
+				way : way,
+				creditExchangeRule: $("#creditExchangeRule").val(),
+				preiodExchangeRule: $("#preiodExchangeRule").val(),
+				modelId:$("#modelId").val(),
+				scopeId:$("#scopeId").val(),
+				propertyId:$("#propertyId").val(),
+				formId:$("#formId").val(),
+				unset:unset,//有未设置兑换规则的
+				ids:ids
+			},
+			async:true,
+			type:"post",
+			success:function(data){
+				queryList();
+				$('#myModal').modal('hide');
+			},
+			error:function(){
+				jQuery.generalAlert("设置失败！");
+			}
+		});
+	}, 500);
+}
+function getRadioChecked(radioName){
+	var chkObjs = document.getElementsByName(radioName)
+    for(var i=0;i<chkObjs.length;i++){
+        if(chkObjs[i].checked){
+        	return chkObjs[i].value;
+        }
+    }
+	jQuery.generalAlert("请选择");
+}
+function initDictionary(dictionaryType, name){
+	$("#"+name+"").html("");
+	var url = pathHeader + "/org/queryDictionaryByType.do";
+	$.ajax({
+		url:url,
+		data:{
+			dictionaryType:dictionaryType,
+			status:1
+		},
+		type:"post",
+		async:false,
+		success:function(data){
+			if(data.rows.length > 0){
+				$("#"+name+"").append("<option  value='' >请选择</option>");
+				$.each(data.rows, function(key, value) {
+					$("#"+name+"").append(
+							"<option  value=\"" + value.dictionaryId + "\">"
+							+ value.dictionaryName + "</option>");
+				});
+			}
+		},
+		error:function(){
+			
+		}
+	});
+}
+/**
+ * 继教信息板块
+ */
+function initEduModel(){
+	var url = pathHeader + "/edupm/projectmanage/queryEduModelNoPage.do";
+	$.ajax({
+		url:url,
+		type:"post",
+		async:false,
+		success:function(data){
+				if(data.success){
+					var rows = data.rows;
+					var opts = "<option value=''>请选择</option>";
+				for(var i = 0;i<rows.length;i++){
+					var obj = rows[i];
+					opts +="<option value='"+(obj.id)+"'>";
+					opts += obj.name;
+					opts+="</option>";
+				}
+				$("select[name='modelId']").html(opts);
+				}
+		},
+		error:function(){
+			$('#eduModelType').html("<option value=''>无记录</option>");
+		}
+		
+	});
+}
+function initSelectClass(){
+	 $(".select1").uedSelect({
+		width : 345			  
+	});
+	$(".select2").uedSelect({
+		width : 167  
+	});
+	$(".select3").uedSelect({
+		width : 100
+	});
+	$(".select4").uedSelect({
+		width : 100
+	});
+}
+
+function setAllRule(type){
+	if(type == 1){//全部设置
+	}else if(type == 2 && getCheckedIds() == ""){//设置选择项目
+		jQuery.generalAlert("请选择项目");
+		return;
+	}
+	rowId = "";
+	$("#commonPeriod").val("");
+	$("#excellentPeriod").val("");
+	$(".tip").show();
+}
+
+/**
+ * 获得选中ids
+ * @param str
+ */
+function getCheckedIds() {
+	var arrChk = $("input[name='chk_list']:checked");
+	var idStr = "";
+	$(arrChk).each(function() {
+		idStr += this.value + ",";
+	});
+	idStr = idStr.substring(0, idStr.length - 1);
+	return idStr;
+}
+
+function initChecked(){
+	$("#chk_all").click(function() {
+		if($(this).attr("checked")){
+			$("input[name='chk_list']").attr("checked", $(this).attr("checked"));			
+		}
+		else{
+		$("input[name='chk_list']").attr("checked", false);
+		}
+	});
+}

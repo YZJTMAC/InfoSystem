@@ -1,0 +1,244 @@
+package project.master.service.impl;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
+import project.master.dao.IEduMasterReadDAO;
+import project.master.dao.IEduMasterWriteDAO;
+import project.master.pojo.EduComparisonComment;
+import project.master.service.IEduMasterService;
+import project.person.pojo.EduUser;
+import project.system.pojo.EduSchool;
+import project.system.pojo.SysArea;
+import framelib.service.AbsService;
+import framelib.utils.page.PageObject;
+
+public class EduMasterServiceImpl extends AbsService implements IEduMasterService {
+	public static String[] chars = new String[] { "a", "b", "c", "d", "e", "f",  
+        "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s",  
+        "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5",  
+        "6", "7", "8", "9", "A", "B", "C", "D", "E", "F", "G", "H", "I",  
+        "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V",  
+        "W", "X", "Y", "Z" };  
+	
+	@Autowired
+	@Qualifier("eduMasterReadDAO")
+	private IEduMasterReadDAO eduMasterReadDAO;
+	
+	@Autowired
+	@Qualifier("eduMasterWriteDAO")
+	private IEduMasterWriteDAO eduMasterWriteDAO;
+	
+
+	@Override
+	public Integer addComparison(Map<String, Object> condition) {
+		return eduMasterWriteDAO.addComparison(condition);
+	}
+
+	@Override
+	public PageObject queryComparison(Map<String, Object> condition) {
+		return eduMasterReadDAO.queryComparison(condition);
+	}
+
+	@Override
+	public int updateComparison(Map<String, Object> condition) {
+		return eduMasterWriteDAO.updateComparison(condition);
+	}
+
+	@Override
+	public boolean deleteComparison(Map<String, Object> condition) {
+		return eduMasterWriteDAO.deleteComparison(condition);
+	}
+
+	@Override
+	public PageObject queryComparisonTeacher(Map<String, Object> condition) {
+		return eduMasterReadDAO.queryComparisonTeacher(condition);
+	}
+
+	@Override
+	public int signUpComparisonTeacher(Map<String, Object> condition) {
+		return eduMasterWriteDAO.signUpComparisonTeacher(condition);
+	}
+
+	@Override
+	public boolean canelSignUpComparisonTeacher(Map<String, Object> condition) {
+		return eduMasterWriteDAO.canelSignUpComparisonTeacher(condition);
+	}
+
+	@Override
+	public boolean updateComparisonCommentStatus(Map<String, Object> condition) {
+		return eduMasterWriteDAO.updateComparisonCommentStatus(condition);
+	}
+
+	@Override
+	public List<EduComparisonComment> querySignUpComparisonTeacher(
+			Map<String, Object> condition) {
+		return eduMasterReadDAO.querySignUpComparisonTeacher(condition);
+	}
+
+	@Override
+	public boolean signUpComparisonTeacherBatch(Map<String, Object> condition) {
+		return eduMasterWriteDAO.signUpComparisonTeacherBatch(condition);
+	}
+
+	@Override
+	public boolean canelSignUpComparisonTeacherBatch(
+			Map<String, Object> condition) {
+		return eduMasterWriteDAO.canelSignUpComparisonTeacherBatch(condition);
+	}
+
+	@Override
+	public int querySignUpComparisonTeacherCount(Map<String, Object> condition) {
+		// TODO Auto-generated method stub
+		return eduMasterReadDAO.querySignUpComparisonTeacherCount(condition);
+	}
+
+	@Override
+	public boolean createMaster(Map<String, Object> condition) {
+		Integer masterNum = Integer.parseInt((String) condition.get("masterNum"));
+		Object comparisonId = condition.get("comparisonId");
+		for(int i = 0 ; i < masterNum ; i++){
+			condition.put("loginAccount", generateShortUuid());
+			condition.put("password", generateShortUuid());
+			condition.put("status", 8);
+			condition.put("realName", "专家");
+			int masterId = eduMasterWriteDAO.createMaster(condition);
+			condition.put("masterId", masterId);
+			if(comparisonId != null){//根据活动创建专家号时
+				if(!eduMasterWriteDAO.associatedMasterComparison(condition) ){
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+	
+	public static String generateShortUuid() {  
+	    StringBuffer shortBuffer = new StringBuffer();  
+	    String uuid = UUID.randomUUID().toString().replace("-", "");  
+	    for (int i = 0; i < 8; i++) {  
+	        String str = uuid.substring(i * 4, i * 4 + 4);  
+	        int x = Integer.parseInt(str, 16);  
+	        shortBuffer.append(chars[x % 0x3E]);  
+	    }  
+	    return shortBuffer.toString();  
+	}
+
+	@Override
+	public PageObject queryComparisonMaster(Map<String, Object> condition) {
+		return eduMasterReadDAO.queryComparisonMaster(condition);
+	}
+
+	@Override
+	public boolean updateComparisonMasterDisable(Map<String, Object> condition) {
+		return eduMasterWriteDAO.updateComparisonMasterDisable(condition);
+	}
+
+	@Override
+	public boolean saveComparisonToMaster(Map<String, Object> condition) {
+		String comparisonIds[] = ((String)condition.get("comparisonIds")).split(",");
+		for(String comparisonId : comparisonIds){
+			condition.put("comparisonId", comparisonId);
+			if(!eduMasterWriteDAO.associatedMasterComparison(condition)){
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public PageObject queryComparisonCheck(Map<String, Object> condition) {
+		return eduMasterReadDAO.queryComparisonCheck(condition);
+	}
+
+	@Override
+	public boolean deleteComparisonToMaster(Map<String, Object> condition) {
+		return eduMasterWriteDAO.deleteComparisonToMaster(condition);
+	}
+
+	@Override
+	public boolean createMasterOne(Map<String, Object> condition) {
+		Integer i = eduMasterWriteDAO.createMaster(condition);
+		if(i < 0){
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean setMasterStatus(Map<String, Object> condition) {
+		return eduMasterWriteDAO.setMasterStatus(condition);
+	}
+
+	@Override
+	public boolean delComprisonFile(Map<String, Object> condition) {
+		return eduMasterWriteDAO.delComprisonFile(condition);
+	}
+
+	@Override
+	public boolean setComparisonStatus(Map<String, Object> condition) {
+		return eduMasterWriteDAO.setComparisonStatus(condition);
+	}
+
+	@Override
+	public List<SysArea> getArea(Map<String, Object> condition) {
+		return eduMasterReadDAO.getArea(condition);
+	}
+
+	@Override
+	public List<EduSchool> getSchool(Map<String, Object> condition) {
+		return eduMasterReadDAO.getSchool(condition);
+	}
+
+	@Override
+	public int updateSignUpComparisonTeacher(Map<String, Object> condition) {
+		return eduMasterWriteDAO.updateSignUpComparisonTeacher(condition);
+	}
+
+	@Override
+	public List<EduComparisonComment> queryMemo(Map<String, Object> condition) {
+		return eduMasterReadDAO.queryMemo(condition);
+	}
+
+	@Override
+	public PageObject queryComparisonByMaster(Map<String, Object> condition) {
+		return eduMasterReadDAO.queryComparisonByMaster(condition);
+	}
+
+	@Override
+	public boolean judgeScore(Map<String, Object> condition) {
+		return eduMasterWriteDAO.judgeScore(condition);
+	}
+
+	@Override
+	public PageObject queryComparisonTeacherScore(Map<String, Object> condition) {
+		return eduMasterReadDAO.queryComparisonTeacherScore(condition);
+	}
+
+	@Override
+	public PageObject queryTeacherComment(Map<String, Object> condition) {
+		return eduMasterReadDAO.querTeacherComment(condition);
+	}
+
+	@Override
+	public List<EduComparisonComment> queryMasterScore(
+			Map<String, Object> condition) {
+		return eduMasterReadDAO.queryMasterScore(condition);
+	}
+
+	@Override
+	public List<EduUser> queryMaster(Map<String, Object> condition) {
+		return eduMasterReadDAO.queryMaster(condition);
+	}
+
+	@Override
+	public boolean updateMasterOne(Map<String, Object> condition) {
+		return eduMasterWriteDAO.updateMasterOne(condition);
+	}
+
+	
+}

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap>
+	<!-- 系统设置查询功能设置 -->
+	<select id="selectSysPlatformSetup" resultClass="project.system.pojo.SysPlatformSetup">
+		SELECT
+			sys_style AS sysStyle,
+			sys_name AS sysName,
+			sys_logo As sysLogo,
+			login_logo As loginLogo,
+			copyright_notice As copyrightNotice,
+			contact_way As contactWay,
+			create_by as createBy,
+			create_date as createDate,
+			update_by as updateBy,
+			update_date as updateDate
+		FROM
+			edu_sys_platform_setup
+		WHERE
+			id = 1
+	</select>
+	
+	<!-- 系统设置更改功能设置  -->
+	<update id="updatePlatformSetup" parameterClass="project.system.pojo.SysPlatformSetup">
+		UPDATE 
+			edu_sys_platform_setup
+		<dynamic prepend="set" >
+			update_by = #updateBy#,
+        	update_date = NOW(),
+      		<isNotNull prepend="," property="sysStyle">
+        		sys_style = #sysStyle:INTEGER#
+      		</isNotNull>
+      		<isNotNull prepend="," property="sysName">
+        		sys_name = #sysName:VARCHAR#
+      		</isNotNull>
+      		<isNotNull prepend="," property="sysLogo">
+        		sys_logo = #sysLogo:VARCHAR#
+      		</isNotNull>
+      		<isNotNull prepend="," property="loginLogo">
+        		login_logo = #loginLogo:VARCHAR#
+      		</isNotNull>
+      		<isNotNull prepend="," property="copyrightNotice">
+        		copyright_notice = #copyrightNotice:VARCHAR#
+      		</isNotNull>
+      		<isNotNull prepend="," property="contactWay">
+        		contact_way = #contactWay:VARCHAR#
+      		</isNotNull>
+        	WHERE
+        		id = 1
+		</dynamic>
+	</update>
+	<select id="select_init_year" resultClass="int">
+		SELECT
+			SUBSTRING(create_date,1,4) as createDate
+		FROM
+			edu_sys_platform_setup
+		WHERE
+			id = 1
+	</select>
+</sqlMap>

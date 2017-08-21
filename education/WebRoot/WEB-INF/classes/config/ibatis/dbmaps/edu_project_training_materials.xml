@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_project_training_materials">
+	<resultMap id="eduProjectTrainingMaterials"
+		class="project.edupm.projectmanage.pojo.EduProjectTrainingMaterials">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="project_id" property="projectId" jdbcType="INTEGER" />
+		<result column="type" property="type" jdbcType="INTEGER" />
+		<result column="name" property="name" jdbcType="VARCHAR" />
+		<result column="createBy" property="createBy" jdbcType="VARCHAR" />
+		<result column="url" property="url" jdbcType="VARCHAR" />
+		<result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    	<result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+	</resultMap>
+
+	<insert id="insert_edu_project_training_materials">
+		insert into
+		edu_project_trainingmaterials(project_id,type,name,createBy,url,create_date,update_date)
+		values(#projectId#,#type#,#name#,#createBy#,#url#,now(),now())
+		<selectKey resultClass="Integer" keyProperty="id">
+			SELECT
+			last_insert_id() as id ;    
+        </selectKey>
+	</insert>
+	
+	<select id="queryEduProjectTrainingMaterialsByCondition"  resultMap="eduProjectTrainingMaterials" parameterClass="java.util.Map">
+		SELECT id,project_id ,url,type,name,createBy,create_date,update_date FROM edu_project_trainingmaterials  TRAIN
+		WHERE 1=1 
+		<isNotEmpty prepend="AND" property="id">
+			TRAIN.id = #id# 
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="projectId">
+			TRAIN.project_id = #projectId# 
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="type">
+			TRAIN.type = #type# 
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="createBy">
+			TRAIN.createBy = #createBy# 
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="id">
+			TRAIN.id = #id# 
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="url">
+			TRAIN.url = #url# 
+		</isNotEmpty>
+     		 order by create_date desc
+	</select>
+	
+	<delete id="deleteEduProjectTrainingMaterialsByCondition"  parameterClass="java.util.Map">
+		DELETE  FROM edu_project_trainingmaterials  
+		WHERE 1=1 
+		<isNotEmpty prepend="AND" property="id">
+			edu_project_trainingmaterials.id = #id# 
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="projectId">
+			edu_project_trainingmaterials.project_id = #projectId# 
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="type">
+			edu_project_trainingmaterials.type = #type# 
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="name">
+			edu_project_trainingmaterials.name = #name# 
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="createBy">
+			edu_project_trainingmaterials.createBy = #createBy# 
+		</isNotEmpty>
+		<isNotEmpty prepend="url" property="url">
+			edu_project_trainingmaterials.url = #url# 
+		</isNotEmpty>
+	</delete>
+	
+
+</sqlMap>

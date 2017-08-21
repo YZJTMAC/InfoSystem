@@ -1,0 +1,740 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_teacher_train_score" >
+  <resultMap id="teacher_score_resultmap" class="project.system.pojo.EduTeacherScoreInfo" >
+  
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="teacher_id" property="teacherId" jdbcType="INTEGER" />
+    <result column="teacher_name" property="teacherName" jdbcType="VARCHAR" />
+    <result column="school_id" property="schoolId" jdbcType="INTEGER"/>
+    <result column="school_name" property="schoolName" jdbcType="VARCHAR"/>
+    <result column="id_number" property="idNumber" jdbcType="VARCHAR"/>
+    <result column="work_shop_num" property="workShopNum" jdbcType="INTEGER" />
+    <result column="course_work_num" property="courseWorkNum" jdbcType="VARCHAR"/>
+    <result column="train_activit_num" property="trainActivitNum" jdbcType="VARCHAR"/>
+    <result column="train_activit_join_num" property="trainActivitJoinNum" jdbcType="VARCHAR"/>
+    <result column="project_report_num" property="projectReportNum" jdbcType="VARCHAR"/>
+    <result column="push_excellent" property="pushExcellent" jdbcType="VARCHAR" />
+    <result column="push_comment" property="pushComment" jdbcType="TEXT" />
+    <result column="create_date" property="createDate" jdbcType="DATETIME"/>
+    <result column="update_date" property="updateDate" jdbcType="DATETIME"/>
+    <result column="create_by_id" property="createById" jdbcType="VARCHAR"/>
+    <result column="update_by_id" property="updateById" jdbcType="VARCHAR"/>
+    <result column="status" property="status" jdbcType="VARCHAR"/>
+  </resultMap>
+ 
+  	<insert id="insert_teacher_train_score" parameterClass="project.system.pojo.EduTeacherScoreInfo">
+		insert into edu_teacher_train_score
+		(
+		  teacher_id,
+		  teacher_name,
+		  school_id,
+		  school_name,
+		  id_number,
+		  work_shop_num,
+		  course_work_num,
+		  train_activit_num,
+		  train_activit_join_num,
+		  practice_activit_num,
+		  project_report_num,
+		  push_excellent,
+		  push_comment,
+		  create_by_id,
+		  update_by_id,
+		  create_date,
+		  update_date,
+		  status
+		)
+		values 
+		(
+			#teacherId:INTEGER#,
+			#teacherName:VARCHAR#,
+			#schoolId:INTEGER#,
+			#schoolName:VARCHAR#,
+			#idNumber:VARCHAR#,
+			
+			#workShopNum:VARCHAR#,
+			#courseWorkNum:VARCHAR#,
+			#trainActivitNum:VARCHAR#,
+			#trainActivitJoinNum:VARCHAR#,
+			#practiceActivitNum:VARCHAR#,
+			#projectReportNum:VARCHAR#,
+			
+			#pushExcellent:VARCHAR#,
+			#pushComment:TEXT#,
+			
+			#createById:VARCHAR#,
+			#updateById:VARCHAR#,
+			#createDate:DATETIME#,
+			#updateDate:DATETIME#,
+			#status:VARCHAR#
+		<selectKey resultClass="int" keyProperty="id">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		);
+	</insert>
+	<!-- 如果存在就将导入的历史数据状态修改为0 -->
+	  <update id="update_teacher_train_score" parameterClass="java.util.HashMap">
+	  		update edu_teacher_train_score 
+		  		<dynamic prepend="set" >
+			  		<isNotEmpty prepend="," property="status">
+						status = #status# 
+					</isNotEmpty>
+			  		<isNotEmpty prepend="," property="pushComment">
+						push_comment = #pushComment#,push_excellent = 1
+					</isNotEmpty>
+				</dynamic>
+	  		where id_number = #idNumber# 
+	  </update>
+	
+	<select id="select_teacherScoreInfo_by_condition" parameterClass="java.util.HashMap" resultClass="project.system.pojo.EduTeacherScoreInfo">
+		select t.id AS id,
+		t.teacher_id AS teacherId,
+		teacher_name AS teacherName,
+		id_number AS idNumber,
+		school_name as schoolName,
+		work_shop_num as workShopNum,
+		course_work_num as courseWorkNum,
+		train_activit_num as trainActivitNum,
+		train_activit_join_num as trainActivitJoinNum,
+		practice_activit_num as practiceActivitNum,
+		project_report_num as projectReportNum,
+		push_excellent as pushExcellent,
+		push_comment as pushComment,
+		(select SUM(teacher_class_score) from edu_project_comment c where c.teacher_id = #teacherId#) as totalScore,
+		j.job_former_teaching_section AS teacherSection,
+		j.job_former_teaching_subject AS teacherSubject
+		FROM edu_teacher_train_score t
+		LEFT JOIN edu_teacher_job j on j.teacher_id = t.teacher_id and j.status = 1
+		where t.status = 1 and id_number = #idNumber# 
+	</select>
+  
+  	<!-- 教师学分汇总列表 -->
+	<select id="select_teacher_score_pagelist" parameterClass="java.util.Map" resultClass="project.system.pojo.EduTeacherScoreInfo">
+		SELECT
+			t.id AS id,
+			t.teacher_id AS teacherId,
+			t.teacher_name AS teacherName,
+			t.school_name AS schoolName,
+			t.id_number AS idNumber,
+			work_shop_num AS workShopNum,
+			course_work_num AS courseWorkNum,
+			train_activit_num AS trainActivitNum,
+			train_activit_join_num AS trainActivitJoinNum,
+			practice_activit_num AS practiceActivitNum,
+			project_report_num AS projectReportNum,
+			push_excellent AS pushExcellent,
+			push_comment AS pushComment,
+			t.create_date AS createDate,
+			ss.scoreNum AS totalScore,
+			j.job_former_teaching_section AS teacherSection,
+			j.job_former_teaching_subject AS teacherSubject
+		FROM
+			edu_teacher_train_score t
+		LEFT JOIN (
+			SELECT
+				SUM(teacher_class_score) AS scoreNum,c.teacher_id
+				FROM
+					 edu_project_comment c where c.teacher_score_audit_status_id = 13
+				GROUP BY
+					c.teacher_id
+				) ss ON t.teacher_id = ss.teacher_id
+			LEFT JOIN edu_teacher_job j ON j.teacher_id = t.teacher_id and j.status = 1
+			LEFT JOIN edu_user u on u.id = j.teacher_id
+			<!-- 按导入时间查询 -->
+	  	<isEqual compareValue="1" property="flag">
+			LEFT JOIN edu_teacher_train_history h ON h.create_by = t.create_by_id
+		</isEqual>
+	  	where 1=1
+	  	<isEqual  prepend="and" compareValue="1" property="flag">
+			h.id=#id# and h.create_date=t.create_date 
+		</isEqual>
+		<!-- 查询全部学员记录 -->
+		<isNotEqual prepend="and" compareValue="1" property="flag">
+			t.status = 1
+		</isNotEqual>
+	  	<isNotNull prepend="and" property="status">
+			t.status = #status#
+		</isNotNull>
+		<isNotEmpty prepend="and" property="idNumber">
+			t.id_number like '%$idNumber$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="teacherName">
+			t.teacher_name like '%$teacherName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolName">
+			t.school_name like '%$schoolName$%'
+		</isNotEmpty>
+   		<isNotEmpty prepend="and" property="provinceId">
+			u.user_province_id= #provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cityId">
+			u.user_city_id= #cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="districtId">
+			u.user_district_id= #districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			u.school_id = #schoolId#
+		</isNotEmpty>
+		order by t.create_date DESC limit #startIndex#,#endIndex#
+	</select>
+
+
+	<!-- 教师学分汇总count -->
+	<select id="select_teacher_score_count" parameterClass="java.util.Map" resultClass="int">
+		SELECT count(1)
+		FROM
+			edu_teacher_train_score t
+		LEFT JOIN (
+			SELECT
+					SUM(teacher_class_score) AS scoreNum,c.teacher_id
+				FROM
+					edu_project_comment c where c.teacher_score_audit_status_id = 13
+				GROUP BY
+					c.teacher_id
+				) ss ON t.teacher_id = ss.teacher_id
+			LEFT JOIN edu_teacher_job j ON j.teacher_id = t.teacher_id and j.status = 1
+			LEFT JOIN edu_user u on u.id = j.teacher_id
+			<isEqual compareValue="1" property="flag">
+				LEFT JOIN edu_teacher_train_history h ON h.create_by = t.create_by_id
+			</isEqual>
+	  	where 1=1
+	  	<isEqual prepend="and" compareValue="1" property="flag">
+			h.id=#id# and h.create_date=t.create_date 
+		</isEqual>
+		<!-- 查询全部学员记录 -->
+		<isNotEqual prepend="and" compareValue="1" property="flag">
+			t.status = 1
+		</isNotEqual>
+		<isNotEmpty prepend="and" property="idNumber">
+			t.id_number like '%$idNumber$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="teacherName">
+			t.teacher_name like '%$teacherName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolName">
+			t.school_name like '%$schoolName$%'
+		</isNotEmpty>
+   		<isNotEmpty prepend="and" property="provinceId">
+			u.user_province_id= #provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cityId">
+			u.user_city_id= #cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="districtId">
+			u.user_district_id= #districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			u.school_id = #schoolId#
+		</isNotEmpty>
+	</select>
+  
+  	<select id="select_teacher_train_score" parameterClass="java.util.Map" resultClass="project.system.pojo.EduTeacherScoreInfo">
+		SELECT 
+			t.id AS id,
+			t.teacher_id AS teacherId,
+			t.teacher_name AS teacherName,
+			t.school_name AS schoolName,
+			t.id_number AS idNumber,
+			t.work_shop_num AS workShopNum,
+			t.course_work_num AS courseWorkNum,
+			t.train_activit_num AS trainActivitNum,
+			t.train_activit_join_num AS trainActivitJoinNum,
+			t.practice_activit_num AS practiceActivitNum,
+			t.project_report_num AS projectReportNum,
+			t.push_excellent AS pushExcellent,
+			t.push_comment AS pushComment
+		FROM edu_teacher_train_score t
+		WHERE 1=1 and status = 1 
+		<isNotNull prepend="and" property="idNumber">
+			id_number = #idNumber#
+		</isNotNull>
+	</select>
+	
+  	<select id="selectTrainScoreCountByParamMap" parameterClass="java.util.HashMap" resultClass="int">
+  	SELECT 
+		count(DISTINCT(p.id))		
+		from edu_project_comment c
+		left join  edu_project p on c.project_id=p.id 
+		where p.is_score_published=1  and c.teacher_score_audit_status_id = 13 and c.teacher_id=#teacherId#
+	  	ORDER BY p.id desc 
+  </select>
+	
+	<!-- 查询教师参培项目学分信息 -->
+	<select id="selectTrainScoreListByParamMap"  parameterClass="java.util.HashMap" resultClass="project.teacher.teacherProject.pojo.EduProjectActivityPojo">
+	 SELECT 
+	    p.id as id,
+		p.project_name as projectName,
+		p.start_date as startDate,
+		p.end_date as endDate,
+		p.train_type_name as trainTypeName,
+		p.project_property_name as projectPropertyName,
+		c.project_score AS projectScore,
+		c.teacher_score as teacherScore,
+		c.teacher_class_score as classScore,
+		c.teacher_train_status_name as teacherTrainStatusName
+		
+		from edu_project_comment c
+		left join  edu_project p on c.project_id=p.id 
+		where p.is_score_published=1  and c.teacher_score_audit_status_id = 13 and c.teacher_id=#teacherId#
+	  	GROUP BY p.id ORDER BY p.id desc limit #startIndex#,#endIndex#
+	</select>
+	
+  
+  <!-- 导出学员学分汇总详情 -->
+ <select id="select_teacher_score_list" parameterClass="java.util.Map" resultClass="project.system.pojo.EduTeacherScoreInfo">
+		SELECT
+			t.id AS id,
+			t.teacher_id AS teacherId,
+			t.teacher_name AS teacherName,
+			t.school_name AS schoolName,
+			t.id_number AS idNumber,
+			work_shop_num AS workShopNum,
+			course_work_num AS courseWorkNum,
+			train_activit_num AS trainActivitNum,
+			train_activit_join_num AS trainActivitJoinNum,
+			practice_activit_num AS practiceActivitNum,
+			project_report_num AS projectReportNum,
+			push_excellent AS pushExcellent,
+			push_comment AS pushComment,
+			t.create_date AS createDate,
+			ss.scoreNum AS totalScore,
+			j.job_former_teaching_section AS teacherSection,
+			j.job_former_teaching_subject AS teacherSubject
+		FROM
+			edu_teacher_train_score t
+		LEFT JOIN (
+			SELECT
+				SUM(teacher_class_score) AS scoreNum,c.teacher_id
+				FROM
+					 edu_project_comment c where c.teacher_score_audit_status_id = 13
+				GROUP BY
+					c.teacher_id
+				) ss ON t.teacher_id = ss.teacher_id
+			LEFT JOIN edu_teacher_job j ON j.teacher_id = t.teacher_id and j.status = 1
+			LEFT JOIN edu_user u on u.id = j.teacher_id
+		<isEqual compareValue="1" property="flag">	
+			LEFT JOIN edu_teacher_train_history h ON h.create_by = t.create_by_id
+		</isEqual>	
+	  	<!-- where h.id=#id# and h.create_date=t.create_date  -->
+	  	where 1=1
+	  	<isEqual prepend="and" compareValue="1" property="flag">
+			h.id=#id# and h.create_date=t.create_date 
+		</isEqual>
+	  	<isNotEmpty prepend="and" property="status">
+			t.status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="teachers">
+			t.id in ($teachers$)
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="idNumber">
+			t.id_number like '%$idNumber$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="teacherName">
+			t.teacher_name like '%$teacherName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolName">
+			t.school_name like '%$schoolName$%'
+		</isNotEmpty>
+   		<isNotEmpty prepend="and" property="provinceId">
+			u.user_province_id= #provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="cityId">
+			u.user_city_id= #cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="districtId">
+			u.user_district_id= #districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="schoolId">
+			u.school_id = #schoolId#
+		</isNotEmpty>
+		order by t.create_date DESC
+</select>
+
+	
+	<select id="query_teacher_score_count"  parameterClass="java.util.Map" resultClass="int">
+		SELECT
+			count(*)
+		FROM
+			edu_project_comment t1
+		LEFT JOIN edu_project t2 ON t1.project_id = t2.id
+		WHERE
+			1=1
+		<isNotEmpty  prepend="and" property="teacherId">  
+  			t1.teacher_id = #teacherId#
+  		</isNotEmpty>
+  		<isNotEmpty  prepend="and" property="queryYear">  
+  			t2.year= #queryYear#
+  		</isNotEmpty>  
+		AND examine = 1
+		AND teacher_score_audit_status_id =13
+	</select>
+	
+	<select id="query_teacher_score"  parameterClass="java.util.Map" resultClass="project.edupm.projectmanage.pojo.EduProjectComment">
+		SELECT
+			t2.project_name AS projectName,
+			t2.train_type_id as trainFormId,
+			t2.train_type_name as trainFormName,
+			t1.teacher_class_period AS teacherCLassPeriod,
+			t1.teacher_class_score AS teacherClassScore,
+			t1.teacher_score AS teacherScore
+		FROM
+			edu_project_comment t1
+		LEFT JOIN edu_project t2 ON t1.project_id = t2.id
+		WHERE
+			1=1
+		<isNotEmpty  prepend="and" property="teacherId">  
+  			t1.teacher_id = #teacherId#
+  		</isNotEmpty>
+  		<isNotEmpty  prepend="and" property="startYear">  
+  			t1.create_date >= #startYear#
+  		</isNotEmpty> 
+  		<isNotEmpty  prepend="and" property="endYear">  
+  			#endYear# > t1.create_date
+  		</isNotEmpty>  
+		AND examine = 1
+		AND teacher_score_audit_status_id =13
+		order by t2.train_type_id
+	</select>
+	
+	<select id="query_teacher_credit"  parameterClass="java.util.Map" resultClass="int">
+		SELECT
+			IFNULL(
+				sum(t1.teacher_class_score),
+				0
+			) AS totalCredit
+		FROM
+	edu_project_comment t1
+		WHERE
+			1 = 1
+		<isNotEmpty  prepend="and" property="teacherId">  
+  			t1.teacher_id = #teacherId#
+  		</isNotEmpty>
+  		<isNotEmpty  prepend="and" property="startYear">  
+  			t1.create_date >= #startYear#
+  		</isNotEmpty> 
+  		<isNotEmpty  prepend="and" property="endYear">  
+  			#endYear# > t1.create_date
+  		</isNotEmpty>  
+		and examine = 1
+		AND teacher_score_audit_status_id =13
+	</select>
+	
+	<select id="query_teacher_period"  parameterClass="java.util.Map" resultClass="int">
+		SELECT
+			IFNULL(
+				sum(t1.teacher_class_period),
+				0
+			) AS totalPeriod
+		FROM
+			edu_project_comment t1
+		WHERE
+			1 = 1
+		<isNotEmpty  prepend="and" property="teacherId">  
+  			t1.teacher_id = #teacherId#
+  		</isNotEmpty>
+  		<isNotEmpty  prepend="and" property="startYear">  
+  			t1.create_date >= #startYear#
+  		</isNotEmpty> 
+  		<isNotEmpty  prepend="and" property="endYear">  
+  			#endYear# > t1.create_date
+  		</isNotEmpty>  
+		and examine = 1
+		AND teacher_score_audit_status_id =13
+	</select>
+	
+	<update id="repay_lend_credit" parameterClass="java.util.Map">
+		UPDATE
+			edu_lend_credit
+		SET
+		<isNotEmpty property="status">
+			lend_status = #status#,
+		</isNotEmpty>
+		<isNotEmpty property="repayCredit">  
+  			repay_credit = #repayCredit#,  
+  		</isNotEmpty>  
+  			repay_date = now()
+		WHERE
+			id = #id#
+	</update>
+	
+	<select id="query_teacher_total_credit_by_year"  parameterClass="java.util.Map" resultClass="float">
+		SELECT
+			IFNULL(sum(t1.teacher_class_score), 0) AS totalCredit
+		FROM
+			edu_project_comment t1
+		LEFT JOIN edu_project t2 ON t1.project_id = t2.id
+		WHERE
+		1 = 1
+		<isNotEmpty  prepend="and" property="teacherId">  
+			t1.teacher_id = #teacherId#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="startYear">  
+			t1.create_date > #startYear#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="endYear">  
+			#endYear# > t1.create_date  
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="trainForm">  
+			t2.train_type_id =  #trainForm#
+		</isNotEmpty>
+		AND t1.examine = 1
+		AND t1.teacher_score_audit_status_id = 13
+		
+	</select>
+	
+	<select id="query_teacher_lend_credit_by_year"  parameterClass="java.util.Map" resultClass="float">
+		SELECT
+			IFNULL(sum(lend_credit), 0) as lendCredit
+		FROM
+			edu_lend_credit
+		WHERE
+		1=1
+		<isNotEmpty  prepend="and" property="teacherId">  
+			teacher_id = #teacherId#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="lendYear">  
+		 	lend_year = #lendYear#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="trainForm">  
+		 	train_form_id = #trainForm#
+		</isNotEmpty>
+	 	<isNotEmpty  prepend="and" property="lendStatus">  
+		 	lend_status in ($lendStatus$)
+		</isNotEmpty>
+	</select>
+	
+	<select id="query_teacher_repay_credit_by_year"  parameterClass="java.util.Map" resultClass="float">
+		SELECT
+			IFNULL(sum(repay_credit), 0)
+		FROM
+			edu_lend_credit
+		WHERE
+		1=1
+		<isNotEmpty  prepend="and" property="teacherId">  
+			teacher_id = #teacherId#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="lendYear">  
+			lend_year = #lendYear#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="trainForm">  
+		 	train_form_id = #trainForm#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="lendStatus">  
+			lend_status = #lendStatus#
+		</isNotEmpty>
+	</select>
+	
+	<select id="query_teacher_total_period_by_year"  parameterClass="java.util.Map" resultClass="float">
+		SELECT
+			IFNULL(sum(teacher_class_period), 0) AS totalPeriod
+		FROM
+			edu_project_comment
+		WHERE
+		1=1
+		<isNotEmpty  prepend="and" property="teacherId">  
+			teacher_id = #teacherId#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="startYear">  
+			create_date > #startYear#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="endYear">  
+			#endYear# > create_date  
+		</isNotEmpty>
+		and examine = 1
+		AND teacher_score_audit_status_id =13
+	</select>
+	
+	<select id="select_teacher_credit_count"  parameterClass="java.util.Map" resultClass="int">
+		SELECT
+			count(t1.id)
+		FROM
+			edu_user t1
+		WHERE
+			1 = 1
+		<isNotEmpty  prepend="and" property="idNumber">  
+			t1.id_number = #idNumber#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="teacherName">  
+			t1.real_name = #teacherName#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="schoolName">  
+			t1.school_name = #schoolName#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="provinceId">  
+			t1.user_province_id = #provinceId#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="cityId">  
+			t1.user_city_id = #cityId#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="districtId">  
+			t1.user_district_id = #districtId#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="schoolId">  
+			t1.school_id = #schoolId#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="teacherIds">  
+			t1.id in ($teacherIds$)
+		</isNotEmpty>
+		AND t1. STATUS = 8
+		AND role_id = 5
+	</select>
+	
+	
+	<select id="select_teacher_credit_pagelist"  parameterClass="java.util.Map" resultClass="project.system.pojo.EduTeacherScoreInfo">
+		SELECT
+			t1.id AS teacherId,
+			t1.id_number AS idNumber,
+			t1.school_name AS schoolName,
+			t1.real_name AS teacherName,
+			IFNULL(t2.score, '') AS score1,
+			IFNULL(t2.totalScore, 0) AS totalScore,
+			IFNULL(t3.push_excellent, 0)  as pushExcellent,
+			IFNULL(t3.push_comment, '无')  as pushComment
+		FROM
+			(
+				SELECT
+					t1.id,
+					t1.id_number,
+					t1.school_name,
+					t1.real_name
+				FROM
+					edu_user t1
+				WHERE
+					1 = 1
+				<isNotEmpty  prepend="and" property="idNumber">  
+					t1.id_number like '%$idNumber$%'
+				</isNotEmpty>
+				<isNotEmpty  prepend="and" property="teacherName">  
+					t1.real_name like '%$teacherName$%'
+				</isNotEmpty>
+				<isNotEmpty  prepend="and" property="schoolName">  
+					t1.school_name like '%$schoolName$%'
+				</isNotEmpty>
+				<isNotEmpty  prepend="and" property="provinceId">  
+					t1.user_province_id = #provinceId#
+				</isNotEmpty>
+				<isNotEmpty  prepend="and" property="cityId">  
+					t1.user_city_id = #cityId#
+				</isNotEmpty>
+				<isNotEmpty  prepend="and" property="districtId">  
+					t1.user_district_id = #districtId#
+				</isNotEmpty>
+				<isNotEmpty  prepend="and" property="schoolId">  
+					t1.school_id = #schoolId#
+				</isNotEmpty>
+				<isNotEmpty  prepend="and" property="teacherIds">  
+					t1.id in ($teacherIds$)
+				</isNotEmpty>
+				AND t1.`status` = 8
+				AND t1.role_id = 5
+				<isEmpty  property="queryAll"> 
+					limit #startIndex#,#endIndex# 
+				</isEmpty>
+			) t1
+		LEFT JOIN (
+			SELECT
+				t.teacherId,
+				group_concat(t.score SEPARATOR ',') AS score,
+				sum(t.totalScore) AS totalScore
+			FROM
+				(
+					SELECT
+						t1.teacher_id AS teacherId,
+						concat(
+							t2.train_type_name,
+							'=',
+							sum(t1.teacher_class_score)
+						) AS score,
+						sum(t1.teacher_class_score) AS totalScore
+					FROM
+						edu_project_comment t1
+					LEFT JOIN edu_project t2 ON t1.project_id = t2.id
+					WHERE
+						1 = 1
+					AND t1.examine = 1
+					AND teacher_score_audit_status_id = 13
+					<isNotEmpty  prepend="and" property="startYear">  
+						t1.create_date > #startYear#
+					</isNotEmpty>
+					<isNotEmpty  prepend="and" property="endYear">  
+						#endYear# > t1.create_date  
+					</isNotEmpty>
+					GROUP BY
+						t1.teacher_id,
+						t2.train_type_id
+				) t
+			GROUP BY
+				t.teacherId
+		) t2 ON t1.id = t2.teacherId
+		left join edu_teacher_train_score t3 on t1.id = t3.teacher_id
+
+	</select>
+	<select id="select_teacher_remain_credit" parameterClass="java.util.Map" resultClass="project.system.pojo.EduTeacherScoreInfo">
+		SELECT
+			IFNULL(sum(teacher_class_score), 0) + IFNULL(t3.lend_credit, 0) - IFNULL(t4.repay_credit, 0) AS remainCredit,
+			t1.teacher_id as teacherId,
+			t2.train_type_name as trainFormName,
+			t2.train_type_id as trainFormId
+		FROM
+			edu_project_comment t1
+		LEFT JOIN edu_project t2 ON t1.project_id = t2.id
+		LEFT JOIN (
+			SELECT
+				t1.lend_credit,
+				t1.teacher_id,
+				t1.train_form_id
+			FROM
+				edu_lend_credit t1
+			WHERE
+			1 = 1
+			and t1.lend_status in (1,3)
+			<isNotEmpty  prepend="and" property="year">
+				t1.lend_year = #year#
+		 	</isNotEmpty>
+		) t3 ON t3.teacher_id = t1.teacher_id
+		AND t3.train_form_id = t2.train_type_id
+		left join (
+			SELECT
+				t1.repay_credit,
+				t1.teacher_id,
+				t1.train_form_id
+			FROM
+				edu_lend_credit t1
+			WHERE
+			 1 = 1 
+			 and t1.lend_status in (1,3)
+			<isNotEmpty  prepend="and" property="repayYear">
+				t1.lend_year = #repayYear#
+		 	</isNotEmpty>
+		) t4 ON t4.teacher_id = t1.teacher_id
+		AND t4.train_form_id = t2.train_type_id
+		WHERE
+			t1.examine = 1
+		AND t1.teacher_score_audit_status_id = 13
+		<isNotEmpty  prepend="and" property="teacherId">
+		 	t1.teacher_id = #teacherId#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="year">  
+		 	SUBSTRING(t1.create_date, 1, 4) = #year#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="trainFormId">  
+		 	t2.train_type_id = #trainFormId#
+		</isNotEmpty>
+		GROUP BY
+			t1.teacher_id,
+			t2.train_type_id
+	</select>
+	<select id="select_need_remain_credit" parameterClass="java.util.Map" resultClass="string">
+		SELECT
+			need_credit1 AS needCredit
+		FROM
+			edu_diploma
+		WHERE
+			type = 1
+		AND #year# = YEAR 
+	</select>
+	
+</sqlMap>

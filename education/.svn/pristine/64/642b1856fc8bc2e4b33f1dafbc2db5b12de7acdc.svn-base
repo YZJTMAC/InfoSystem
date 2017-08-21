@@ -1,0 +1,589 @@
+package project.message.service.impl;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import javax.servlet.http.HttpServletRequest;
+
+import net.sf.json.util.NewBeanInstanceStrategy;
+
+import org.apache.cxf.common.util.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import com.google.zxing.Result;
+
+import framelib.utils.FileUtils;
+import framelib.utils.page.PageObject;
+import framelib.utils.page.PageParser;
+
+import project.common.Common;
+import project.message.controller.MessageController;
+import project.message.dao.IMessageReadDaoIF;
+import project.message.dao.IMessageWriteDaoIF;
+import project.message.pojo.EduMessage;
+import project.message.pojo.MessageTree;
+import project.message.service.IMessageServiceIF;
+import project.person.dao.IUserReadDAO;
+import project.person.pojo.EduUser;
+import project.person.pojo.EduUserActivty;
+import project.system.dao.ISysReadDAO;
+import project.util.ApplicationProperties;
+
+public class MessageServiceImpl implements IMessageServiceIF {
+
+	private static final Logger log = Logger
+			.getLogger(MessageServiceImpl.class);
+
+	@Autowired
+	@Qualifier("messageWriteDao")
+	IMessageWriteDaoIF messageWriteDao;
+
+	@Autowired
+	@Qualifier("messageReadDao")
+	IMessageReadDaoIF messageReadDao;
+
+	@Autowired
+	@Qualifier("userReadDao")
+	IUserReadDAO userReadDao;
+
+	@Autowired
+	@Qualifier("sysReadDAO")
+	ISysReadDAO sysReadDAO;
+
+
+
+	@Override
+	public List<EduMessage> selectMessageListByReceverId(
+			Map<String, Object> paramMap) throws Exception {
+		return messageReadDao.selectMessageList(paramMap);
+	}
+
+	@Override
+	public int selectMessageCounts(Map<String, Object> paramMap)
+			throws Exception {
+		return messageReadDao.selectMessageCounts(paramMap);
+	}
+
+	@Override
+	public boolean deleteMessage(Map<String, Object> ParamMap) throws Exception {
+		return messageWriteDao.deleteMessageUsers(ParamMap);
+	}
+
+	@Override
+	public boolean deleteMessageCreate(Map<String, Object> paramMap)
+			throws Exception {
+		boolean flag = messageWriteDao.deleteMessage(paramMap);
+		boolean mark = false;
+		if (flag) {
+			mark = messageWriteDao.deleteMessageUsers(paramMap);
+		}
+
+		return flag && mark;
+	}
+
+	@Override
+	public List<EduUser> selectUserList(String receverName) throws Exception {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		paramMap.put("loginAccount", receverName);
+		List<EduUser> userList = messageReadDao.selectUserList(paramMap);
+		return userList;
+	}
+
+	@Override
+	public boolean updateMessageStatus(Map<String, Object> ParamMap)
+			throws Exception {
+		return messageWriteDao.updateReadMessageStatus(ParamMap);
+	}
+
+	@Override
+	public List<EduMessage> selectMessageListShenghe(
+			Map<String, Object> paramMap) throws Exception {
+
+		return messageReadDao.selectMessageListShenghe(paramMap);
+	}
+
+	@Override
+	public int selectMessageShenheCounts(Map<String, Object> paramMap)
+			throws Exception {
+		return messageReadDao.selectMessageShenheCounts(paramMap);
+	}
+
+	public Map<String, Object> fileUpload(HttpServletRequest request,
+			Map<String, Object> resultMap, Map<String, Object> ParamMap,
+			MultipartFile file) throws Exception {
+		String projectPath = request.getSession().getServletContext()
+				.getRealPath("/");
+		String path = ApplicationProperties
+				.getPropertyValue("upload_message_path") + File.separator;
+		if (file.getSize() > 0) {
+			String originalName = file.getOriginalFilename();
+
+			String newFileName = FileUtils.write(file, projectPath + path);
+			// 上传文件类型
+			String fileType = originalName.substring(
+					originalName.lastIndexOf("."), originalName.length());
+
+			path = path.replaceAll("\\\\", "/");
+			resultMap.put("success", true);
+			resultMap.put("fileUrl", path + newFileName + fileType);
+			resultMap.put("fileName", originalName);
+
+		} else {
+			resultMap.put("success", false);
+			resultMap.put("info", "附件不存在");
+		}
+		return resultMap;
+	}
+
+	@Override
+	public EduMessage findMessageById(Integer id) {
+		return messageReadDao.findMessageById(id);
+	}
+
+	/**
+	 * 收到的消息列表
+	 */
+	@Override
+	public PageObject messageList(Map<String, Object> paramMap,
+			int messageType, int pageSize, int startIndex,
+			Map<String, Object> resultMap) throws Exception {
+		// 来自省/市/区/校的未读消息数量
+		Integer info1NoRead = 0;
+		Integer info2NoRead = 0;
+		Integer info3NoRead = 0;
+		Integer info4NoRead = 0;
+
+		List<EduMessage> noReadMessageList = messageReadDao
+				.selectNoReadCountByReceiveUserId(paramMap);
+		for (EduMessage message : noReadMessageList) {
+			if (message.getMessageType().intValue() == 1) {
+				info1NoRead = message.getNum();
+			} else if (message.getMessageType().intValue() == 2) {
+				info2NoRead = message.getNum();
+			} else if (message.getMessageType().intValue() == 3) {
+				info3NoRead = message.getNum();
+			} else if (message.getMessageType().intValue() == 4) {
+				info4NoRead = message.getNum();
+			}
+		}
+
+		resultMap.put("noread1", info1NoRead);
+		resultMap.put("noread2", info2NoRead);
+		resultMap.put("noread3", info3NoRead);
+		resultMap.put("noread4", info4NoRead);
+
+		// 总未读数量
+		int noReadTotal = messageReadDao.selectMessageCounts(paramMap);
+		resultMap.put("noReadTotal", noReadTotal);
+
+		// 来自省/市/区/校的消息列表
+		paramMap.remove("status");
+		paramMap.put("messageType", messageType);
+
+		PageObject po = new PageObject();
+		int count = messageReadDao.selectMessageCountByReceiveUserId(paramMap);
+		po.setCount(count);
+		PageParser
+				.getPageObject(
+						PageParser.getPageInfo(startIndex, pageSize,
+								po.getCount()), po);
+		paramMap.put("startIndex", po.getStartIndex());
+		paramMap.put("endIndex", pageSize);
+		List<EduMessage> list = messageReadDao.selectMessageList(paramMap);
+		po.setObjects(list);
+
+		return po;
+	}
+
+	/**
+	 * 我创建的消息列表
+	 */
+	@Override
+	public PageObject myMessageList(Map<String, Object> paramMap, int pageSize,
+			int startIndex, Map<String, Object> resultMap) throws Exception {
+		PageObject po = new PageObject();
+		int count = messageReadDao.selectCreateMessageCount(paramMap);
+		po.setCount(count);
+		PageParser
+				.getPageObject(
+						PageParser.getPageInfo(startIndex, pageSize,
+								po.getCount()), po);
+		paramMap.put("startIndex", po.getStartIndex());
+		paramMap.put("endIndex", pageSize);
+		List<EduMessage> list = messageReadDao
+				.selectCreateMessageList(paramMap);
+		po.setObjects(list);
+		return po;
+	}
+
+	/**
+	 * 发送消息
+	 */
+	@Override
+	public Map<String, Object> sendMessageByType(String sendType, String title,
+			String content, String createBy, int messageType,
+			String sendUserName, int sendUserId, String receiveUserId,
+			String receiveUserName, Map<String, Object> paramMap,
+			boolean isMultipart, HttpServletRequest request) throws Exception {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		String fileUrl = "", fileName = "";
+
+		if (isMultipart) {
+			MultipartHttpServletRequest mrequest = (MultipartHttpServletRequest) request;
+			MultipartFile files = mrequest.getFile("file");
+			if (FileUtils.isFileExists(files)) {
+				resultMap = fileUpload(request, resultMap, paramMap, files);
+				Object result = resultMap.get("success");
+				if (result != null) {
+					if (Boolean.valueOf(result.toString())) {
+						fileName = resultMap.get("fileName").toString();
+						fileUrl = resultMap.get("fileUrl").toString();
+					} else {
+						return resultMap;
+					}
+				}
+			}
+		}
+
+		if ("byScopeAndRole".equals(sendType)) {
+			resultMap = sendMessageByScopeAndRole(title, content, createBy,
+					messageType, sendUserName, sendUserId, fileName, fileUrl,
+					paramMap, resultMap);
+
+		} else if ("byUser".equals(sendType)) {
+			resultMap = sendMessageByUser(title, content, createBy,
+					messageType, sendUserName, sendUserId, fileName, fileUrl,
+					paramMap, resultMap);
+
+		} else if ("byProject".equals(sendType)) {
+			resultMap = sendMessageByProject(title, content, createBy,
+					messageType, sendUserName, sendUserId, fileName, fileUrl,
+					paramMap, resultMap);
+
+		} else {
+			resultMap = sendMessageToUser(title, content, createBy,
+					messageType, sendUserName, sendUserId, receiveUserId,
+					receiveUserName, resultMap);
+		}
+
+		return resultMap;
+	}
+
+	/**
+	 * 按接收范围和角色发送消息
+	 */
+	private Map<String, Object> sendMessageByScopeAndRole(String title,
+			String content, String createBy, int messageType,
+			String sendUserName, int sendUserId, String fileName,
+			String fileUrl, Map<String, Object> paramMap,
+			Map<String, Object> resultMap) throws Exception {
+		String area = (String) paramMap.get("area");
+
+		paramMap.clear();
+		paramMap.put("title", title);
+		paramMap.put("content", content);
+		paramMap.put("createBy", createBy);
+		paramMap.put("messageType", messageType);
+		paramMap.put("sendUserId", sendUserId);
+		paramMap.put("sendUserName", sendUserName);
+		paramMap.put("fileName", fileName);
+		paramMap.put("fileUrl", fileUrl);
+		Integer messageId = messageWriteDao.insertMessage(paramMap);
+
+		if (messageId == -1) {
+			resultMap.put("success", false);
+			resultMap.put("info", "发送失败");
+			return resultMap;
+		}
+
+		if (!StringUtils.isEmpty(area)) {
+			List<EduMessage> messageList = new ArrayList<EduMessage>();
+
+			String[] users = area.split(",");
+			EduMessage message = null;
+			for (String user : users) {
+				message = new EduMessage();
+
+				message.setId(messageId);
+				message.setStatus(Common.COMMON_MESSAGE_NO_READ);
+				message.setReceiveUserId(Integer.parseInt(user.split("_")[0]));
+				message.setReceiveUserName(user.split("_")[1]);
+
+				messageList.add(message);
+			}
+
+			paramMap.put("messageList", messageList);
+			boolean flag = messageWriteDao.batchMessage(paramMap);
+
+			if (flag) {
+				resultMap.put("success", true);
+				resultMap.put("info", "成功发送");
+			} else {
+				resultMap.put("success", false);
+				resultMap.put("info", "发送失败");
+			}
+
+		} else {
+			resultMap.put("success", false);
+			resultMap.put("info", "发送失败-该地区下无对应用户");
+		}
+
+		return resultMap;
+	}
+
+	/**
+	 * 按用户发送消息
+	 */
+	private Map<String, Object> sendMessageByUser(String title, String content,
+			String createBy, int messageType, String sendUserName,
+			int sendUserId, String fileName, String fileUrl,
+			Map<String, Object> paramMap, Map<String, Object> resultMap)
+			throws Exception {
+
+		List<EduUser> userList = messageReadDao.selectUserList(paramMap);
+		if (userList != null && userList.size() > 0) {
+			paramMap.clear();
+
+			paramMap.put("title", title);
+			paramMap.put("content", content);
+			paramMap.put("createBy", createBy);
+			paramMap.put("messageType", messageType);
+			paramMap.put("sendUserId", sendUserId);
+			paramMap.put("sendUserName", sendUserName);
+			paramMap.put("fileName", fileName);
+			paramMap.put("fileUrl", fileUrl);
+			Integer messageId = messageWriteDao.insertMessage(paramMap);
+
+			if (messageId == -1) {
+				resultMap.put("success", false);
+				resultMap.put("info", "发送失败");
+				return resultMap;
+			}
+
+			List<EduMessage> messageList = new ArrayList<EduMessage>();
+			EduMessage message = null;
+			for (EduUser user : userList) {
+				message = new EduMessage();
+
+				message.setId(messageId);
+				message.setStatus(Common.COMMON_MESSAGE_NO_READ);
+				message.setReceiveUserId(user.getId());
+				message.setReceiveUserName(user.getRealName());
+
+				messageList.add(message);
+			}
+
+			paramMap.put("messageList", messageList);
+			boolean flag = messageWriteDao.batchMessage(paramMap);
+
+			if (flag) {
+				resultMap.put("success", true);
+				resultMap.put("info", "成功发送");
+			} else {
+				resultMap.put("success", false);
+				resultMap.put("info", "发送失败");
+			}
+
+		} else {
+			resultMap.put("success", false);
+			resultMap.put("info", "收信人不存在");
+		}
+
+		return resultMap;
+	}
+
+	/**
+	 * 按项目发送消息
+	 */
+	private Map<String, Object> sendMessageByProject(String title,
+			String content, String createBy, int messageType,
+			String sendUserName, int sendUserId, String fileName,
+			String fileUrl, Map<String, Object> paramMap,
+			Map<String, Object> resultMap) throws Exception {
+
+		List<EduUser> userList = userReadDao.selectUsersByProjectId(paramMap);
+
+		if (userList != null && userList.size() > 0) {
+			paramMap.clear();
+
+			paramMap.put("title", title);
+			paramMap.put("content", content);
+			paramMap.put("createBy", createBy);
+			paramMap.put("messageType", messageType);
+			paramMap.put("sendUserId", sendUserId);
+			paramMap.put("sendUserName", sendUserName);
+			paramMap.put("fileName", fileName);
+			paramMap.put("fileUrl", fileUrl);
+			Integer messageId = messageWriteDao.insertMessage(paramMap);
+
+			if (messageId == -1) {
+				resultMap.put("success", false);
+				resultMap.put("info", "发送失败");
+				return resultMap;
+			}
+
+			List<EduMessage> messageList = new ArrayList<EduMessage>();
+			EduMessage message = null;
+			for (EduUser user : userList) {
+				message = new EduMessage();
+
+				message.setId(messageId);
+				message.setStatus(Common.COMMON_MESSAGE_NO_READ);
+				message.setReceiveUserId(user.getId());
+				message.setReceiveUserName(user.getRealName());
+
+				messageList.add(message);
+			}
+
+			paramMap.put("messageList", messageList);
+			boolean flag = messageWriteDao.batchMessage(paramMap);
+
+			if (flag) {
+				resultMap.put("success", true);
+				resultMap.put("info", "成功发送");
+			} else {
+				resultMap.put("success", false);
+				resultMap.put("info", "发送失败");
+			}
+
+		} else {
+			resultMap.put("success", false);
+			resultMap.put("info", "该项目下不存在对应用户");
+		}
+
+		return resultMap;
+	}
+
+	/**
+	 * 向用户发送短消息
+	 */
+	private Map<String, Object> sendMessageToUser(String title, String content,
+			String createBy, int messageType, String sendUserName,
+			int sendUserId, String receiveUserId, String receiveUserName,
+			Map<String, Object> resultMap) throws Exception {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+
+		paramMap.put("title", title);
+		paramMap.put("content", content);
+		paramMap.put("createBy", createBy);
+		paramMap.put("messageType", messageType);
+		paramMap.put("sendUserId", sendUserId);
+		paramMap.put("sendUserName", sendUserName);
+		Integer messageId = messageWriteDao.insertMessage(paramMap);
+
+		if (messageId == -1) {
+			resultMap.put("success", false);
+			resultMap.put("info", "发送失败");
+			return resultMap;
+		}
+
+		paramMap.clear();
+		paramMap.put("messageId", messageId);
+		paramMap.put("status", Common.COMMON_MESSAGE_NO_READ);
+		paramMap.put("receiveUserId", receiveUserId);
+		paramMap.put("receiveUserName", receiveUserName);
+
+		boolean flag = messageWriteDao.insertMessageUsers(paramMap);
+		if (flag) {
+			resultMap.put("success", true);
+			resultMap.put("info", "成功发送");
+		} else {
+			resultMap.put("success", false);
+			resultMap.put("info", "发送失败");
+		}
+
+		return resultMap;
+	}
+
+	/**
+	 * 获取节点树
+	 */
+	@Override
+	public List<MessageTree> getNodeTree(Map<String, Object> paramMap,
+			int receiveRole) throws Exception {
+
+		List<MessageTree> tree = new ArrayList<MessageTree>();
+
+		if (receiveRole == 1) {// 行政管理员tree
+			tree = sysReadDAO.selectAdministratorNode(paramMap);
+		} else if (receiveRole == 2) {// 实施机构管理员tree
+			tree = sysReadDAO.selectOrgAdministratorNode(paramMap);
+		} else if (receiveRole == 3) {// 校管理员tree
+			tree = sysReadDAO.selectSchoolAdministratorNode(paramMap);
+		} else if (receiveRole == 4) {// 教师tree
+			tree = sysReadDAO.selectSchoolTeacherNode(paramMap);
+		}
+
+		return tree;
+	}
+
+	
+	
+
+
+
+	/**
+	 * 向上级发送审查通知
+	 */
+	@Override
+	public boolean sendMessageToBoss(String content, int messageType,
+			String createBy, int sendUserId, String title, String sendUserName,
+			Integer status, String updateBy) {
+		boolean flag = false;
+		/**
+		 * 事务
+		 */
+		try {
+			Integer messageId = sendMessageToBoss1(content, messageType,
+					createBy, sendUserId, title, sendUserName);
+			int i;
+			i = 1 / 0;
+			if (messageId == -1)
+				i = 1 / 0;// 如果第一次执行sql失败，则抛出异常，回滚事务
+			flag = sendMessageToBoss2(messageId, status, updateBy);
+			if (!flag)
+				i = 1 / 0;// 如果第二次执行sql失败，则抛出异常，回滚事务
+		} catch (Exception e) {
+			log.error("sendMessageToBoss插入数据失败！");
+			e.printStackTrace();
+		}
+		return flag;
+	}
+
+	@Override
+	public Integer sendMessageToReview(Map<String,Object> paramMap) throws Exception {
+		Integer messageId = messageWriteDao.insertMessageToReview(paramMap);
+		return messageId;
+	}
+
+	@Override
+	public Integer sendMessageToBoss1(String content, int messageType,
+			String createBy, int sendUserId, String title, String sendUserName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean sendMessageToBoss2(Integer messageId, Integer status,
+			String updateBy) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public List<EduUserActivty> getReceiveInfo(Map<String, Object> paramMap)
+			throws Exception {
+		return messageReadDao.selectReceiveInfo(paramMap);
+	}
+
+}

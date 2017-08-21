@@ -1,0 +1,261 @@
+var statusMap={};
+$(function(){
+	initDictionary("comparison_signup_status",statusMap);
+	queryTeacher();
+	lastForSure();
+	initSelectClass();
+})
+//
+function initDictionary(dictionaryType, map){
+	var url = pathHeader + "/org/queryDictionaryByType.do";
+	$.ajax({
+		url:url,
+		data:{
+			dictionaryType:dictionaryType,
+			status:1
+		},
+		type:"post",
+		async:false,
+		success:function(data){
+			if(data.rows.length > 0){
+				$.each(data.rows, function(key, value) {
+					map[value.dictionaryId] = value.dictionaryName;
+				});
+			}
+		},
+		error:function(){
+			
+		}
+	});
+}
+
+/**
+ * 评选活动教师报名
+ */
+function queryTeacher(){
+	$("#proList1").html("");
+	var teacherName=$("#teacherName").val();
+	var startIndex = $("#pageIndex").val();
+	var pageSize = $("#sizePerPage").val();
+	var url = pathHeader + "/master/queryComparisonTeacherScore.do";
+	$.ajax({
+		url:url,
+		data:{
+		comparisonId:comparisonId,
+		teacherName:teacherName,
+		startIndex:startIndex,
+		pageSize:pageSize
+		},
+		type:"post",
+		async:true,
+		success:function(data){
+			if(data.success){
+				var rows = data.rows;
+				var gridHtml1 = "";
+				var gridHtml2 = "";
+				if(rows.length > 0){
+					$.each(rows,function(index,element){
+						if(element.expertScore == null){
+							gridHtml1 += getTdHtml(element);
+						}else{
+							gridHtml2 += getTdHtml(element);
+						}
+						
+						
+					});
+					$("#proList1").html(gridHtml1+gridHtml2);
+					pagination(data, function(){queryTeacher();});
+				}else{
+					$('#proList1').html("<tr><td colspan='14'>无查询记录</td></tr>");
+					pagination(data, function(){queryTeacher();});
+				}
+				
+			}
+			
+		},
+		error:function(){
+			
+		}
+	});
+}
+
+function getTdHtml(obj){
+	var gridHtml = "<tr>";
+	if(obj.teacherImg != null && obj.teacherImg != ""){
+		gridHtml += "<td><img id='masterPhoto'  style='height: 99px; width:71px;margin-top:2px' src='"+pathHeader+"/uploadFile/"+obj.teacherImg+"' title='头像' /></td>";
+	}else{
+		gridHtml += "<td><img id='masterPhoto'  style='height: 99px; width:71px;margin-top:2px' src='"+pathHeader+"/static/photo/teacher_default.png' title='头像' /></td>";
+	}
+	gridHtml += "<td>"+obj.teacherName+"</td>";
+	gridHtml += "<td>"+obj.idNumber+"</td>";
+	gridHtml += "<td>"+obj.sectionName+"</td>";
+	gridHtml += "<td>"+obj.subjectName+"</td>";
+	gridHtml += "<td>"+obj.schoolName+"</td>";
+	gridHtml += "<td>"+obj.phone+"</td>";
+	gridHtml += "<td><a class='huibtn_a' onclick='memoBox(\"" + obj.memo + "\",\"" + obj.teacherName + "\");'>备注</a></td>";
+	gridHtml += "<td><a class='huibtn_a' onclick='uploadFile(\"" + obj.id + "\",\"" + obj.createBy + "\");'>附 件</a></td>";
+	gridHtml += "<td>"+(obj.expertScore == null?"未评审":"已评审")+"</td>";
+	gridHtml += "<td>"+optionFormatter(obj)+"</td>";
+	gridHtml +="</tr>";
+	return gridHtml;
+	
+	function optionFormatter(obj){
+		var returnStr = "";
+		if(obj.expertScore == null){
+			returnStr += "<a  class='huibtn_a' onclick='toJudge(\"" + obj.teacherName + "\",\"" + obj.id + "\")'>评审</a>&nbsp;&nbsp;";
+		}else{
+			if(obj.isPass==1){
+				returnStr += "<label>评分："+obj.expertScore+"</label>&nbsp;&nbsp;";
+			}else{
+				returnStr += "<label>未通过</label>&nbsp;&nbsp;";
+			}
+			
+		}
+		return returnStr;
+	}
+}
+function memoBox(memo,teacherName){
+	$('#memoName').html(teacherName);
+	$('#memoBox').html(memo);
+	$('#memoModal').modal('show');
+}
+var tId = "";
+function toJudge(teacherName,id){
+	setPosition("judgeTip");
+	$("#teacherName1").val(teacherName);
+	$("#score").val("");
+	$("#memo").val("");
+	$("#scoreErr").html("");
+	$(".tip").show();
+	tId = id;
+}
+function getRadioChecked(radioName){
+	var chkObjs = document.getElementsByName(radioName)
+    for(var i=0;i<chkObjs.length;i++){
+        if(chkObjs[i].checked){
+        	return chkObjs[i].value;
+        }
+    }
+	jQuery.generalAlert("请选择");
+}
+function judge(){
+	var score = $("#score").val();
+	var memo = $("#memo").val();
+	
+	if(!(/^\d+(\.\d+)?$/).test(score)){
+		$("#scoreErr").html("分数不能为空且必须为数字");
+		return false;
+	}
+	if(score > 100 || score < 0){
+		$("#scoreErr").html("分数在0——100之间");
+		return false;
+	}
+	
+	var url = pathHeader + "/master/judgeScore.do";
+	$.ajax({
+		url:url,
+		data:{
+			comparisonId:comparisonId,
+			teacherId:tId,
+			score:score,
+			isPass:1,
+			memo:memo
+		},
+		type:"post",
+		async:true,
+		success:function(data){
+			if(data.success){
+				queryTeacher();
+				hideMe();
+			}
+			jQuery.generalAlert(data.message);
+		},
+		error:function(){
+			
+		}
+	});
+}
+function hideMe(){
+	$(".tip").hide();
+}
+function isPass(value){
+	if(value == 1){
+		$("#scoreBlock").css("display","block");
+	}else{
+		$("#scoreBlock").css("display","none");
+	}
+}
+///////附件/////////////
+/**
+* 查询附件
+*/
+function uploadFile(isId,teacherId) {
+	$("#addFile").show();
+	var url = pathHeader + "/fileupload/viewFiles.do?time=" + (new Date()).getTime();
+	$(".addMore").html('');
+	$('#projectId').val(isId);
+	$.ajax({
+			cache: false,
+			dataType : 'json',
+			url : url,
+			async:"true",
+			type : 'post',
+			data : {
+				projectId : isId,
+				type:'comparisonSignup',
+				teacherId:teacherId
+			},
+			success : function(data) {
+				var table = "<tr><td width='8%'>序号</td><td width='40%'>文件名</td><td width='12%'>上传人</td><td width='25%'>上传时间</td><td colspan='2' width='15%'>操作</td><tr>";
+				$.each(data.files,function(i, item) {
+					table += "<tr>" +
+							"<td>"+ (i + 1)+ "</td>" +
+							"<td><a href='javascript:void(0)'; onclick='previewFile(\""+item.url+"\");'>"+ item.name+ "</a></td>" +
+							"<td>"+item.userName+"</td>"+ 
+							"<td>"+nullFormatter(item.createDate.replace(".0",""))+"</td>" +
+							"<td>"+ "<a href='#' onclick=downloadFile('"+ item.url+ "') >下载 </a></td>"+ 
+							"</tr>";
+						});
+				$("#hasUpload").html(table);
+				$('#myModal').modal('show');
+				
+			},
+			error : function() {
+				jQuery.generalAlert("查询数据出错！请联系管理员");
+			}
+		});
+}
+/**
+* 下载文件
+* @param filePathName
+*/
+function downloadFile(filePathName) {
+	var url = pathHeader + '/fileupload/downloadFiles.do';
+	var form = $("<form>");// 定义一个form表单
+	form.attr("style", "display:none");
+	form.attr("method", "post");
+	form.attr("action", url);
+	var input = $("<input>");
+	input.attr("type", "hidden");
+	input.attr("name", "filePathName");
+	input.attr("value", filePathName);
+	$("body").append(form);// 将表单放置在web中
+	form.append(input);
+	form.submit();// 表单提交
+}
+function setPosition(tipName){
+	var firstDiv=document.getElementById(tipName);
+	var top = document.documentElement.scrollTop + "px";
+	firstDiv.style.marginTop = top;
+}
+function initSelectClass(){
+	$(".select1").uedSelect({
+		width : 345			  
+	});
+	$(".select2").uedSelect({
+		width : 167  
+	});
+	$(".select3").uedSelect({
+		width : 100
+	});
+}

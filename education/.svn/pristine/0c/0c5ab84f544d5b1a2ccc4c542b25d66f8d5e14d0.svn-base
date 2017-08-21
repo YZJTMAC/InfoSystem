@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_user_forgotpassword">
+	<resultMap id="abatorgenerated_EduUserForgotpasswordResult" class="project.person.pojo.EduUserForgotpassword">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="uid" property="uid"
+			jdbcType="INTEGER" />
+		<result column="code" property="code" jdbcType="VARCHAR" />
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+		<result column="create_ip" property="createIp" jdbcType="VARCHAR" />
+		
+	</resultMap>
+
+ 	<select id="selectByUid" parameterClass="java.lang.Integer" resultMap="abatorgenerated_EduUserForgotpasswordResult">
+		select * 
+		from edu_user_forgotpassword where uid=#uid#
+  	</select>
+  
+   <insert id="insert" parameterClass="project.person.pojo.EduUserForgotpassword">
+		insert into edu_user_forgotpassword
+		(uid,code,create_time,create_ip)
+		values
+		(#uid#,#code#,#createTime#,#createIp#)
+		<selectKey resultClass="Integer" keyProperty="id">
+			SELECT
+			last_insert_id() as id ;    
+        </selectKey>
+  </insert>
+  <delete id="deleteByUid" parameterClass="java.lang.Integer" >
+    delete from edu_user_forgotpassword
+    where uid = #uid:INTEGER#
+  </delete>
+  <update id="update" parameterClass="project.person.pojo.EduUserForgotpassword" >
+    update edu_user_forgotpassword
+    set code=#code#,create_time=#createTime#,create_ip=#createIp#
+    where uid = #uid:INTEGER#
+  </update>
+</sqlMap>

@@ -1,0 +1,869 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap>
+	<!-- 根据projectId查询项目下所有的承培机构承培项目信息	zxq -->
+	<select id="queryOrgByProId" resultClass="project.organization.pojo.OrganizationProject" parameterClass="int">
+		SELECT
+			op.id,
+			op.project_id as projectId,
+			op.organization_id as organizationId,
+			op.organization_name as organizationName,
+			op.plan_num as planNum,
+			op.area_code as areaCode,
+			op.area_name as areaName,
+			op.class_subject_id as classSubjectId,
+			op.class_subject_name as classSubjectName,
+			p.train_scope_id as trainScopeId,
+			p.train_scope_name AS trainScopeName,
+			ptt.subject_id as subjectId,
+			ptt.subject_name as subjectName
+	 	FROM
+	 		edu_organization_project op
+	 		LEFT JOIN edu_project  p ON op.project_id = p.id
+	 		LEFT JOIN edu_project_train_target ptt ON p.id = ptt.project_id
+		WHERE
+			op.project_id = #projectId#
+	</select>
+
+	<!-- selectOrgInfoByCode -->
+	<select id="selectOrgInfoByCode" resultClass="project.organization.pojo.Organization" parameterClass="java.util.Map">
+		SELECT
+			organization_id AS organizationId,
+			organization_name AS organizationName
+		FROM
+			edu_organization
+		WHERE
+			type = 1 
+		AND
+			status = 1
+		<isEqual prepend="AND" property="type" compareValue="0">
+			organization_province_id = #trainScopeId# 
+		AND 
+			organization_city_id IS NULL 
+		AND 
+			organization_district_id IS NULL
+		</isEqual>	
+		<isEqual prepend="AND" property="type" compareValue="1">
+			organization_city_id = #trainScopeId# 
+		AND 
+			organization_district_id IS NULL			
+		</isEqual>	
+		<isEqual prepend="AND" property="type" compareValue="2">
+			organization_district_id = #trainScopeId# 	
+		</isEqual>		
+	</select>
+	
+	<!-- selectOrgIdAndNameByProId -->
+	<select id="selectOrgIdAndNameByProId" resultClass="project.organization.pojo.OrganizationProject" parameterClass="int">
+		SELECT
+			organization_id AS organizationId,
+			organization_name AS organizationName
+		FROM
+			edu_organization_project
+		WHERE
+			project_id = #projectId#
+	</select>
+
+	<!-- 实施机构    >>>	承培机构任务分配列表总数查询 (没查询承培机构)-->
+	<select id="countSelectProjectsByStatus" parameterClass="java.util.Map" resultClass="int">
+		SELECT
+			COUNT(1)
+		FROM
+			edu_project p
+			LEFT JOIN edu_project_audit pa ON p.id = pa.project_id
+			LEFT JOIN edu_user u ON p.create_by = u.login_account
+		WHERE
+		<!-- 
+			u.role_id >= #role#
+		AND
+		 -->
+			p.status = 30
+		AND
+			pa.audit_status = 1
+		<isEqual prepend="AND" property="status" compareValue="1">
+			p.plan_num >
+				(
+					SELECT
+						IFNULL(sum(plan_num),-1)
+					FROM
+						edu_organization_project
+					WHERE
+						project_id = p.id
+				)
+		</isEqual>
+		<isEqual prepend="AND" property="status" compareValue="0">
+			p.plan_num =
+				(
+					SELECT
+						IFNULL(sum(plan_num),-1)
+					FROM
+						edu_organization_project
+					WHERE
+						project_id = p.id
+				)
+		</isEqual>
+		<!-- 
+		<isNotEmpty prepend="AND" property="provinceId">
+			u.user_province_id = #provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="cityId">
+			u.user_city_id = #cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="districtId">
+			u.user_district_id = #districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="schoolId">
+			u.user_school_id = #schoolId#
+		</isNotEmpty>
+		 -->
+		<isNotEmpty prepend="AND" property="projectName">
+			p.project_name LIKE '%$projectName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="year">
+			p.year = #year#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="trainType">
+			p.train_type_id = #trainType#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="startDate">
+			p.year >= #startDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="endDate">
+			#endDate# >= p.year
+		</isNotEmpty>
+		AND 
+		(p.train_scope_id in(
+			select up_lv_code from edu_sys_area where id = (select up_lv_code from edu_sys_area where id = #areaId#)
+			UNION 
+			select up_lv_code from edu_sys_area where id = #areaId#
+			)
+			or 
+			p.train_scope_id in(
+			select id from edu_sys_area where up_lv_code = #areaId#
+			UNION
+			select id from edu_sys_area where up_lv_code in (select id from edu_sys_area where up_lv_code = #areaId# )
+			)
+			or p.train_scope_id = #areaId#)
+	</select>
+
+	<!-- 实施机构     >>>	承培机构任务分配列表查询(没查询承培机构)LEFT JOIN edu_user u ON pa.applicant_id = u.id -->
+	<select id="selectProjectsByStatus" resultClass="project.edupm.projectmanage.pojo.SsOrgProjectAuditActivity" parameterClass="java.util.Map">
+		SELECT
+			p.id AS projectId,
+			p.project_name AS projectName, 
+			p.project_scope_name AS projectScopeName,
+			p.train_scope_id AS trainScopeId,
+			p.train_scope_name AS trainScopeName,
+			p.plan_num AS planNum,
+			p.project_property_name AS projectPropertyName,
+			p.train_type_name AS trainTypeName,
+			u.real_name as createBy,
+			pa.create_date AS createDate,
+			pa.audit_status AS auditStatus,
+			pa.auditor_real_name AS auditorRealName
+		FROM
+			edu_project p
+			LEFT JOIN edu_project_audit pa ON p.id = pa.project_id
+			LEFT JOIN edu_user u ON p.create_by = u.login_account
+		WHERE
+		<!-- 
+			u.role_id >= #role#
+		AND
+		 -->
+			p.status = 30
+		AND
+			pa.audit_status = 1
+		<isEqual prepend="AND" property="status" compareValue="1">
+			p.plan_num >
+				(
+					SELECT
+						IFNULL(sum(plan_num),0)
+					FROM
+						edu_organization_project
+					WHERE
+						project_id = p.id
+				)
+		</isEqual>
+		<isEqual prepend="AND" property="status" compareValue="0">
+			p.plan_num =
+				(
+					SELECT
+						IFNULL(sum(plan_num),0)
+					FROM
+						edu_organization_project
+					WHERE
+						project_id = p.id
+				)
+		</isEqual>
+		<!-- 
+		<isNotEmpty prepend="AND" property="provinceId">
+			u.user_province_id = #provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="cityId">
+			u.user_city_id = #cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="districtId">
+			u.user_district_id = #districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="schoolId">
+			u.user_school_id = #schoolId#
+		</isNotEmpty>
+		 -->
+		<isNotEmpty prepend="AND" property="projectName">
+			p.project_name LIKE '%$projectName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="year">
+			p.year = #year#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="trainType">
+			p.train_type_id = #trainType#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="startDate">
+			p.year >= #startDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="endDate">
+			#endDate# >= p.year
+		</isNotEmpty>
+		AND 
+		(p.train_scope_id in(
+			select up_lv_code from edu_sys_area where id = (select up_lv_code from edu_sys_area where id = #areaId#)
+			UNION 
+			select up_lv_code from edu_sys_area where id = #areaId#
+			)
+			or 
+			p.train_scope_id in(
+			select id from edu_sys_area where up_lv_code = #areaId#
+			UNION
+			select id from edu_sys_area where up_lv_code in (select id from edu_sys_area where up_lv_code = #areaId# )
+			)
+			or p.train_scope_id = #areaId#)
+		ORDER BY
+			p.update_date DESC LIMIT #startIndex#, #endIndex#
+	</select>
+
+	<!-- 根据edu_project_commom表version查询教师报名时的任教学科/学段 -->
+	<select id="queryTeacherByCondition" resultClass="project.teacher.teachermanage.pojo.TeacherExportActivity" parameterClass="java.util.Map">
+		SELECT
+			IFNULL(
+				tj.job_former_teaching_section,
+				""
+			) AS teachingSection,
+			IFNULL(
+				tj.job_former_teaching_subject,
+				""
+			) AS teachingSubject
+		FROM
+			edu_project_comment pc
+		LEFT JOIN edu_teacher_job tj ON pc.teacher_id = tj.teacher_id AND pc.version = tj.version
+		WHERE
+			pc.project_id = #projectId#
+		AND
+			pc.organization_id = #organizationId#
+		AND
+			pc.teacher_id = #teacherId#
+	</select>
+
+	<!-- 机构:导出某一项目某些条件下的参训教师(无分页) -->
+	<select id="queryTeacherActivetyListByConditionNoPage" resultClass="project.teacher.teachermanage.pojo.TeacherExportActivity" parameterClass="java.util.Map">
+		SELECT DISTINCT
+			u.id AS id,
+			u.teacher_no AS teacherNo,
+			real_name AS realName,
+			id_number AS idNumber,
+			u.gender AS gender,
+			mobile AS mobile,
+			mail AS mail,
+			u.user_province_name AS userProvinceName,
+			u.user_city_name AS userCityName,
+			u.user_district_name AS userDistrictName,
+			u.school_name AS schoolName,
+			d.education_experience AS educationExperience,
+			IFNULL(
+				j.job_former_teaching_section,
+				""
+			) AS jobFormerTeachingSection,
+			IFNULL(
+				j.job_former_teaching_subject,
+				""
+			) AS jobFormerTeachingSubject,
+			j.job_comment_position AS jobCommentPosition,
+			j.job_recruitment_position AS jobRecruitmentPosition,
+			j.job_school_administration_office AS jobSchoolAdministrationOffice,
+			j.job_core_teacher AS jobCoreTeacher,
+			j.job_whether_teacher AS jobWhetherTeacher,
+			j.job_county_rural_teacher AS jobCountyRuralTeacher
+		FROM
+			edu_project_comment pc
+		LEFT JOIN edu_user u ON pc.teacher_id = u.id
+		LEFT JOIN edu_teacher_basic_info t ON u.id = t.teacher_id AND t. STATUS = 1
+		LEFT JOIN edu_teacher_job j ON u.id = j.teacher_id AND j. STATUS = 1
+		LEFT JOIN edu_school s ON u.school_id = s.school_id
+		LEFT JOIN edu_teacher_education d ON d.teacher_id = u.id AND d.sort = 1 AND d.`status` = 1
+		WHERE
+			1=1
+		AND 
+			u.status != 0
+		AND 
+			u.role_id = 5
+		AND
+			pc.project_id = #projectId#
+		AND
+			pc.organization_id = #organizationId#
+		<isNotEmpty prepend="AND" property="provinceId">
+			s.school_province_id = #provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="cityId">
+			s.school_city_id = #cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="districtId">
+			s.school_district_id = #districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="schoolId">
+			s.school_id = #schoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="teachingSubject">
+			j.job_former_teaching_subject LIKE '%$teachingSubject$%'
+		</isNotEmpty>
+		ORDER BY
+			u.update_date DESC
+	</select>
+
+	<!--  -->
+	<select id="selectOrgProClassCount" parameterClass="java.util.Map" resultClass="int">
+		SELECT
+			count(1)
+		FROM
+		 	edu_project_class pc
+			LEFT JOIN edu_project_class_category pcc ON pc.id = pcc.class_id
+			LEFT JOIN edu_organization_project op ON op.project_id = pcc.project_id
+		WHERE
+			pcc.project_id = #projectId#
+		AND
+			pc.user_id = #userId#
+		AND
+			op.organization_id = #organizationId#
+		<isNotEmpty prepend="AND" property="classSubjectId">
+			pc.class_subject_id LIKE '%$classSubjectId$%'	
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="className">
+			pc.class_name LIKE '%$className$%'	
+		</isNotEmpty>
+	</select>
+
+	<!-- 查询当前机构的当前项目的可以设置的培训学科 -->
+	<select id="selectOrgProClassScope" parameterClass="java.util.Map" resultClass="project.organization.pojo.OrganizationProject">
+		SELECT
+			class_subject_id as classSubjectId, 
+			class_subject_name as classSubjectName
+		FROM
+			edu_organization_project
+		WHERE
+			organization_id = #organizationId#
+		AND
+			project_id = #projectId#
+	</select>
+
+	<!-- 机构: 查询其某一项目下的所有课程 -->
+	<select id="selectClassByCondition" parameterClass="java.util.Map" resultClass="project.organization.pojo.ProjectClassActivity">
+  		SELECT
+			pc.id as classId, 
+			pc.class_name as className, 
+			pc.class_subject_name as classSubjectName, 
+			class_type as classType
+		FROM
+		 	edu_project_class pc
+			LEFT JOIN edu_project_class_category pcc ON pc.id = pcc.class_id
+			LEFT JOIN edu_organization_project op ON op.project_id = pcc.project_id
+		WHERE
+			pcc.project_id = #projectId#
+		AND
+			pc.user_id = #userId#
+		AND
+			op.organization_id = #organizationId#
+		<isNotEmpty prepend="AND" property="classSubjectId">
+			pc.class_subject_id LIKE '%$classSubjectId$%'	
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="className">
+			pc.class_name LIKE '%$className$%'	
+		</isNotEmpty>
+  	</select>
+
+	<!-- 查询机构下的某一项目是否有设置url -->
+	<select id="selectOrgProUrl" resultClass="project.organization.dto.OrgProjectListDTO" parameterClass="java.util.Map">
+		SELECT
+			training_address as trainingAddress,
+			training_home_address as trainingHomeAddress
+		FROM
+			edu_organization_project
+		WHERE
+			organization_id = #orgId#	
+		AND
+			project_id = #projectId#
+	</select>
+
+	<!-- 更新培训人数 -->
+	<update id="updateOrgProActualNum" parameterClass="java.util.Map">
+		UPDATE 
+			edu_organization_project
+		SET
+			actual_num = #actualNum#
+		WHERE
+			organization_id = #orgId#
+		AND
+			project_id = #projectId#	
+	</update>
+
+	<!-- 查询机构下某一项目报名人数 -->
+	<select id="selectOrgProTeacherCount" parameterClass="java.util.Map" resultClass="int">
+		SELECT
+			COUNT(1)
+		FROM
+			edu_project_comment
+		WHERE
+			project_id = #projectId#
+		AND
+			organization_id = #orgId#
+	</select>
+
+	<!--  -->
+	<select id="selectTeacherIdByIdNumberOrgIdProId" parameterClass="java.util.Map" resultClass="int">
+		SELECT
+			a.id
+		FROM
+			edu_user a
+			LEFT JOIN edu_project_comment b ON a.id = b.teacher_id
+		WHERE
+			b.project_id = #projectId#
+		AND
+			a.id_number = #idNumber#
+		<isNotEmpty prepend="AND" property="orgId">
+			b.organization_id = #orgId#
+		</isNotEmpty>
+	</select>
+	
+	<!-- 机构: 承培项目教师评价记录总数 -->
+	<select id="selectOrgProTeacherScoreCount" parameterClass="java.util.Map" resultClass="int">
+		SELECT 
+			count(1)
+		FROM(
+			SELECT
+				case when  project_score=1 then 1 else 0 end as score_1,
+				case when  project_score=2 then 1 else 0 end as score_2,
+				case when  project_score=3 then 1 else 0 end as score_3,
+				case when  project_score=4 then 1 else 0 end as score_4,
+				case when  project_score=5 then 1 else 0 end as score_5,
+				a.project_id as projectId, a.organization_id as organizationId, a.update_date as updateDate,
+				b.plan_num as planNum, b.organization_name as organizationName,
+				c.year, c.project_name as projectName
+			FROM
+				edu_project_comment a
+				LEFT JOIN edu_organization_project  b ON a.organization_id = b.organization_id AND a.project_id = b.project_id
+				LEFT JOIN edu_project c ON a.project_id = c.id
+			) d
+		WHERE
+			d.organizationId = #organizationId#
+		<isNotEmpty prepend="AND" property="projectName">
+			d.projectName LIKE '%$projectName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="startTime">
+			d.year >= #startTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="endTime">
+			#endTime# >= d.year
+		</isNotEmpty>
+	</select>
+	
+	<!-- 机构: 承培项目教师评价 -->
+	<select id="selectOrgProTeacherScore" parameterClass="java.util.Map" resultClass="project.organization.pojo.OrgProTeacherScoreActivity">
+		SELECT 
+			projectId, 
+			projectName, 
+			organizationId, 
+			organizationName, 
+			planNum, 
+			year, 
+			updateDate,
+			sum(ifnull(score_1,0)) as veryBad,
+			sum(ifnull(score_2,0)) as bad,
+			sum(ifnull(score_3,0)) as general,
+			sum(ifnull(score_4,0)) as good,
+			sum(ifnull(score_5,0)) as veryGood
+		FROM(
+			SELECT
+				case when  project_score=1 then 1 else 0 end as score_1,
+				case when  project_score=2 then 1 else 0 end as score_2,
+				case when  project_score=3 then 1 else 0 end as score_3,
+				case when  project_score=4 then 1 else 0 end as score_4,
+				case when  project_score=5 then 1 else 0 end as score_5,
+				b.project_id as projectId, b.organization_id as organizationId, c.update_date as updateDate,
+				b.plan_num as planNum, b.organization_name as organizationName,
+				c.year, c.project_name as projectName
+			FROM
+				edu_organization_project  b
+				LEFT JOIN edu_project_comment a  ON a.organization_id = b.organization_id AND a.project_id = b.project_id
+				LEFT JOIN edu_project c ON a.project_id = c.id
+			) d
+		WHERE
+			d.organizationId =  #organizationId#
+			
+		<isNotEmpty prepend="AND" property="projectName">
+			d.projectName LIKE '%$projectName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="startTime">
+			d.year >= #startTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="endTime">
+			#endTime# >= d.year
+		</isNotEmpty>
+		GROUP BY  d.projectId ,
+ 		d.organizationId
+		ORDER BY
+			d.updateDate DESC LIMIT #startIndex#, #endIndex#
+	</select>
+
+	<!-- 机构: 某一项目参训教师记录总数  -->
+	<select id="selectOrgProTeachersCount" parameterClass="java.util.Map" resultClass="int">
+		SELECT
+		 	count(1)
+		FROM
+			edu_user a
+			LEFT JOIN edu_project_comment b ON a.id = b.teacher_id
+			LEFT JOIN edu_teacher_job c ON a.id = c.teacher_id AND a.version = c.version
+			LEFT JOIN edu_school d ON a.school_id = d.school_id  AND d.status = 1
+			LEFT JOIN edu_project e ON b.project_id = e.id
+		WHERE
+			b.project_id = #projectId#
+		AND
+			b.organization_id = #organizationId#
+		<isNotEmpty prepend="AND" property="provinceId">
+			d.school_province_id = #provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="cityId">
+			d.school_city_id = #cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="districtId">
+			d.school_district_id = #districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="schoolId">
+			d.school_id = #schoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="teachingSubject">
+			c.job_former_teaching_subject LIKE '%$teachingSubject$%'
+		</isNotEmpty>
+	</select>
+	
+	<!-- 机构: 某一项目参训教师 -->
+	<select id="selectOrgProTeachers"  parameterClass="java.util.Map" resultClass="project.organization.pojo.OrgProTeacherActivity">
+		SELECT
+			a.teacher_no as teacherNo,
+			a.real_name as realName,
+			a.id_number as idNumber,
+			a.mobile,
+			c.job_former_teaching_subject as teachingSubject, 
+			d.school_province_name as schoolProvinceName, 
+			d.school_city_name as schoolCityName,
+			d.school_district_name as schoolDistrictName, 
+			d.school_name as schoolName, 
+			e.project_name as projectName
+		FROM
+			edu_user a
+			LEFT JOIN edu_project_comment b ON a.id = b.teacher_id
+			LEFT JOIN edu_teacher_job c ON a.id = c.teacher_id AND a.version = c.version
+			LEFT JOIN edu_school d ON a.school_id = d.school_id  AND d.status = 1
+			LEFT JOIN edu_project e ON b.project_id = e.id
+		WHERE
+			b.project_id = #projectId#
+		AND
+			b.organization_id = #organizationId#
+		<isNotEmpty prepend="AND" property="provinceId">
+			d.school_province_id = #provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="cityId">
+			d.school_city_id = #cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="districtId">
+			d.school_district_id = #districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="schoolId">
+			d.school_id = #schoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="teachingSubject">
+			c.job_former_teaching_subject LIKE '%$teachingSubject$%'
+		</isNotEmpty>
+		<isNotEmpty property="page" >
+		ORDER BY
+			b.create_date DESC LIMIT #startIndex#, #endIndex#
+		</isNotEmpty>
+	</select>
+
+	<!-- 机构查看项目详情(不包含培训实施机构) -->
+	<select id="selectOrgProjectInfoByProjectId" resultClass="project.organization.pojo.OrgProjectInfoActivity" parameterClass="java.util.Map">
+		SELECT
+			m.model_name AS modelName,
+			a.project_name AS projectName, 
+			a.year, 
+			a.project_no AS projectNo, 
+			a.start_date AS startDate, 
+			a.end_date AS endDate,
+			b.is_free AS isFree,
+			b.charging_standard AS chargingStandard,
+			a.sign_up_way AS signUpWay,
+			a.plan_num AS planNum, 
+			a.project_scope_name  AS projectScopeName, 
+			a.train_scope_name AS trainScopeName,
+			a.project_property_name AS projectPropertyName, 
+			a.train_type_name AS trainTypeName, 
+			b.education_background_name AS educationBackgroundName,
+			b.position_name AS positionName,
+			b.professional_title_name AS professionalTitleName, 
+			b.subject_name AS subjectName,
+			a.class_period AS classPeriod,
+			a.memo,
+			a.project_attchement AS projectAttchement,
+			a.file_names AS fileNames,
+			c.organization_name AS orgName,
+			c.training_home_address AS trainingHomeAddress,
+			c.training_address AS trainingAddress
+		FROM
+			edu_project a
+			LEFT JOIN edu_project_train_target b ON a.id = b.project_id
+			LEFT JOIN edu_organization_project c ON a.id = c.project_id
+			LEFT JOIN edu_model m ON a.edu_model_type = m.id
+		WHERE
+			a.id = #projectId#
+		AND
+			c.organization_id = #orgId#
+	</select>
+	<!--select id="selectOrgProjectInfoByProjectId" parameterClass="java.util.Map" resultClass="project.organization.pojo.OrgProjectInfoActivity">
+		SELECT
+			a.project_no as projectNo, 
+			a.project_name as projectName, 
+			a.year, 
+			a.start_date as startDate, 
+			a.end_date as endDate,
+			a.project_scope_name as projectScopeName, 
+			a.project_property_name as projectPropertyName, 
+			a.train_scope_name as trainScopeName,
+			a.train_type_name as trainTypeName, 
+			a.memo, a.class_period as classPeriod, 
+			a.class_score as classScore, 
+			a.project_attchement as projectAttchement,
+			b.grade_name as gradeName, 
+			b.sex, 
+			b.education_background_name as educationBackgroundName, 
+			b.position_name as positionName, 
+			c.update_date as updateDate,
+		 	b.professional_title_name as professionalTitleName, 
+		 	b.must_audit as mustAudit, 
+		 	b.is_class_charger as isClassCharger, 
+		 	b.subject_name as subjectName,
+		 	b.stduty_section as stdutySection, 
+		 	b.is_free as isFree, 
+		 	b.charging_standard as chargingStandard, 
+		 	c.plan_num as planNum, 
+		 	c.project_status as status,
+		 	c.training_address as trainingAddress, 
+		 	c.organization_name as orgName
+		FROM
+			edu_project a
+			LEFT JOIN edu_project_train_target b ON a.id = b.project_id
+			LEFT JOIN edu_organization_project c ON a.id = c.project_id
+		WHERE
+			a.id = #projectId#
+		AND
+			c.organization_id = #orgId#
+	</select-->
+	
+	
+	
+	<!-- 机构根据条件查询出所有符合的记录总数 add by zhangxiaoqi -->
+	<select id="selectOrgProjectListCount" parameterClass="java.util.Map" resultClass="int">
+		SELECT
+			count(1)
+		FROM
+			edu_project a 
+			LEFT JOIN edu_organization_project b ON a.id = b.project_id
+			<!-- 注释原因：此处sql耦合度较高，将机构承培平台设置单独拿出来另写sql -->
+			<!-- <isNotEmpty prepend="AND" property="ssOrgId">
+				a.organization_id = b.organization_id
+			</isNotEmpty> -->
+			LEFT JOIN edu_organization c 
+			<!-- <isNotEmpty prepend="ON" property="ssOrgId">
+				c.organization_id = a.organization_id
+			</isNotEmpty> -->
+			<isNotEmpty prepend="ON" property="organizationId">
+				 b.organization_id = c.organization_id
+			</isNotEmpty>
+		
+		WHERE 1=1
+		<!-- <isNotEmpty prepend="AND" property="ssOrgId">
+			a.organization_id = #ssOrgId#
+			and a.status >= 30
+		</isNotEmpty> -->
+		<isNotEmpty prepend="AND" property="organizationId">
+			b.organization_id = #organizationId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="projectName">
+			a.project_name LIKE '%$projectName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="startTime">
+			a.year >= #startTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="endTime">
+			#endTime# >= a.year
+		</isNotEmpty>
+	</select> 
+
+	<!-- 机构根据条件查询出所有符合的记录列表   add by zhangxiaoqi -->
+	<select id="selectOrgProjectList" parameterClass="java.util.Map" resultClass="project.organization.pojo.OrganizationProjectActivity">
+		SELECT
+			a.id, 
+			a.project_no as projectNo, 
+			a.project_name as projectName, 
+			a.start_date as startDate, 
+			a.end_date as endDate,
+			a.train_type_id as trainTypeId, 
+			a.train_type_name as trainTypeName,
+			a.project_property_name as projectPropertyName, 
+			a.year, 
+			a.status,
+			b.id as projectId,
+			b.plan_num as planNum, 
+			b.project_status as projectStatus,
+			b.training_address as trainingAddress,
+			b.training_home_address as trainingHomeAddress,
+			b.update_date as updateDate,
+			c.organization_name as orgName
+		FROM
+			edu_project a
+			LEFT JOIN edu_organization_project b ON a.id = b.project_id 
+			<!-- 注释原因：此处sql耦合度较高，将机构承培平台设置单独拿出来另写sql -->
+			<!-- <isNotEmpty prepend="AND" property="ssOrgId">
+				a.organization_id = b.organization_id
+			</isNotEmpty> -->
+			
+			LEFT JOIN edu_organization c 
+			<!-- <isNotEmpty prepend="ON" property="ssOrgId">
+				c.organization_id = a.organization_id
+			</isNotEmpty> -->
+			<isNotEmpty prepend="ON" property="organizationId">
+				 b.organization_id = c.organization_id
+			</isNotEmpty>
+		
+		WHERE 1=1
+		<!-- <isNotEmpty prepend="AND" property="ssOrgId">
+			a.organization_id = #ssOrgId#
+			and a.status >= 30
+		</isNotEmpty> -->
+		<isNotEmpty prepend="AND" property="organizationId">
+			b.organization_id = #organizationId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="projectName">
+			a.project_name LIKE '%$projectName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="startTime">
+			a.year >= #startTime#
+		</isNotEmpty>
+		<!-- <isNotEmpty prepend="AND" property="projectStatus">
+			b.project_status = #projectStatus#
+		</isNotEmpty> -->
+		<isNotEmpty prepend="AND" property="endTime">
+			#endTime# >= a.year
+		</isNotEmpty>
+		<!-- <isNotEmpty prepend="AND" property="organiztionType">
+			#organiztionType# >= c.type
+		</isNotEmpty> -->
+		ORDER BY
+			a.create_date DESC LIMIT #startIndex#, #endIndex#
+	</select> 
+	
+	<!-- 承接平台设置项目列表count -->
+	<select id="selectSsOrgProjectListCount" parameterClass="java.util.Map" resultClass="int">
+		SELECT
+			count(1)
+		FROM
+			edu_project a 
+			LEFT JOIN edu_organization_project b ON a.id = b.project_id AND a.organization_id = b.organization_id
+			LEFT JOIN edu_organization c ON c.organization_id = a.organization_id
+			LEFT JOIN edu_project_audit t on t.id = (SELECT MAX(id)id from edu_project_audit where project_id=a.id )
+		WHERE t.applicant_id = #applyerId# AND a.status >= 30 AND a.status!=60
+		
+		<isNotEmpty prepend="AND" property="projectName">
+			a.project_name LIKE '%$projectName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="startTime">
+			a.year >= #startTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="endTime">
+			#endTime# >= a.year
+		</isNotEmpty>
+	</select> 
+	
+	<!-- 承接平台设置项目列表 -->
+	<select id="selectSsOrgProjectList" parameterClass="java.util.Map" resultClass="project.organization.pojo.OrganizationProjectActivity">
+		SELECT
+			a.id, 
+			a.project_no as projectNo, 
+			a.project_name as projectName, 
+			a.start_date as startDate, 
+			a.end_date as endDate,
+			a.train_type_id as trainTypeId, 
+			a.train_type_name as trainTypeName,
+			a.project_property_name as projectPropertyName, 
+			a.year, 
+			a.status,
+			b.id as projectId,
+			b.plan_num as planNum, 
+			b.project_status as projectStatus,
+			b.training_address as trainingAddress,
+			b.training_home_address as trainingHomeAddress,
+			b.update_date as updateDate,
+			c.organization_name as orgName,
+			a.create_by as createBy,
+			IFNULL(u.login_account,'') as applyer,
+			IFNULL(dd.login_account,'') as auditor
+		FROM
+			edu_project a
+			LEFT JOIN edu_organization_project b ON a.id = b.project_id AND a.organization_id = b.organization_id
+			LEFT JOIN edu_organization c ON c.organization_id = a.organization_id
+			LEFT JOIN edu_project_audit t on t.id = (SELECT MAX(id)id from edu_project_audit where project_id=a.id )
+			LEFT JOIN edu_user u on u.id = t.applicant_id
+			LEFT JOIN edu_user dd on dd.id = t.auditor_id
+			
+		WHERE t.applicant_id = #applyerId# AND a.status >= 30 AND a.status!=60
+		<isNotEmpty prepend="AND" property="projectName">
+			a.project_name LIKE '%$projectName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="startTime">
+			a.year >= #startTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="endTime">
+			#endTime# >= a.year
+		</isNotEmpty>
+		ORDER BY
+			a.create_date DESC LIMIT #startIndex#, #endIndex#
+	</select> 
+	
+	<!-- 根据当前登陆人的userId查找此人的orgId -->
+	<select id="selectOrgIdBuUserId" parameterClass="int" resultClass="int">
+		SELECT
+			organization_id
+		FROM
+			edu_organization
+		WHERE
+			user_id = #userId#			
+	</select>
+	
+	<select id="selectTeacherInfoByOrgIdProId" resultClass="project.teacher.teacherProject.pojo.EduUserPojo" parameterClass="java.util.Map">
+		SELECT
+			a.id, a.id_number as idNumber, a.real_name as realName 
+		FROM
+			edu_user a
+			LEFT JOIN edu_project_comment b ON a.id = b.teacher_id
+		WHERE
+			b.project_id = #projectId#
+		<isNotEmpty prepend="AND" property="orgId">
+			b.organization_id = #orgId#
+		</isNotEmpty>
+	</select>
+</sqlMap>

@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_project_allocate_by_area" >
+  <resultMap id="abatorgenerated_EduProjectAllocateByAreaResult" class="project.edupm.projectmanage.pojo.EduProjectAllocateByArea" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="area_id" property="areaId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="allocate_plan_num" property="allocatePlanNum" jdbcType="INTEGER" />
+    <result column="allocate_fact_num" property="allocateFactNum" jdbcType="INTEGER" />
+    <result column="memo" property="memo" jdbcType="VARCHAR" />
+  </resultMap>
+ 
+  <select id="select_allocate_ByPrimaryKey" resultMap="abatorgenerated_EduProjectAllocateByAreaResult" parameterClass="project.edupm.projectmanage.pojo.EduProjectAllocateByArea" >
+    select id, project_id, area_id, status, allocate_plan_num, allocate_fact_num, memo
+    from edu_project_allocate_by_area
+    where id = #id:INTEGER#
+  </select>
+
+  
+  <delete id="delete_allocate_ByPrimaryKey" parameterClass="project.edupm.projectmanage.pojo.EduProjectAllocateByArea" >
+
+    delete from edu_project_allocate_by_area
+    where id = #id:INTEGER#
+  </delete>
+
+  <insert id="insert_allocate" parameterClass="project.edupm.projectmanage.pojo.EduProjectAllocateByArea" >
+    insert into edu_project_allocate_by_area ( project_id, area_id, status, allocate_plan_num,
+      allocate_fact_num, memo,type)
+    values (#projectId:INTEGER#, #areaId:INTEGER#, #status:INTEGER#,
+      #allocatePlanNum:INTEGER#, #allocateFactNum:INTEGER#, #memo:VARCHAR#,#type#)
+  </insert>
+  
+  <update id="update_allocate_ByPrimaryKey" parameterClass="project.edupm.projectmanage.pojo.EduProjectAllocateByArea" >
+    
+    update edu_project_allocate_by_area
+    set 
+      status = #status:INTEGER#,
+      allocate_plan_num = #allocatePlanNum:INTEGER#,
+      allocate_fact_num = #allocateFactNum:INTEGER#,
+      memo = #memo:VARCHAR#
+    where area_id = #areaId# and project_id = #projectId# and type = #type#
+  </update>
+  
+  <update id="update_allocate_ByPrimaryKeySelective" parameterClass="project.edupm.projectmanage.pojo.EduProjectAllocateByArea" >
+    
+    update edu_project_allocate_by_area
+    <dynamic prepend="set" >
+      <isNotNull prepend="," property="status" >
+        status = #status:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="allocatePlanNum" >
+        allocate_plan_num = #allocatePlanNum:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="allocateFactNum" >
+        allocate_fact_num = #allocateFactNum:INTEGER#
+      </isNotNull>
+    </dynamic>
+    where area_id = #areaId# and project_id = #projectId# and type = #type#
+  </update>
+
+	<select id="select_allocate_info" parameterClass="java.util.HashMap" resultClass="project.edupm.projectmanage.pojo.EduProjectAllocateByArea">
+	select 
+	a.id as areaId,
+	a.name as areaName,
+	IFNULL(p.allocate_plan_num,0) as allocatePlanNum,
+	IFNULL(p.allocate_fact_num,0) as allocateFactNum,
+	p.status as status 
+	from edu_sys_area a 
+		LEFT JOIN 
+		edu_project_allocate_by_area p 
+		on a.id = p.area_id
+		where a.up_lv_code = #areaId# and p.project_id = #projectId#
+	</select>
+
+<!-- 判断是否已经分配了名额 -->
+	<select id="count_by_areaId_projectId" parameterClass="project.edupm.projectmanage.pojo.EduProjectAllocateByArea"  resultClass="int">
+		select count(1) from edu_project_allocate_by_area where area_id = #areaId# and project_id = #projectId# and type=#type#
+	</select>
+	
+	
+	<!-- 学校分配详情 -->
+	<select id="select_school_by_area2" parameterClass="java.util.HashMap"  resultClass="project.edupm.projectmanage.pojo.EduProjectAllocateByArea">
+	SELECT
+	s.school_id as areaId,
+	s.school_name as areaName,
+	p.allocate_plan_num as allocatePlanNum,
+	p.allocate_fact_num as allocateFactNum,
+	p.status as status
+	FROM
+		edu_school s
+	LEFT JOIN edu_project_allocate_by_area p ON p.area_id = s.school_id
+	AND project_id = #projectId#
+	AND p.type = 1
+	WHERE
+		(
+			s.school_province_id = #areaId#
+			OR s.school_city_id = #areaId#
+			OR s.school_district_id = #areaId#
+		)
+	  <isNotNull prepend="or" property="schoolName">
+			s.school_name = #schoolName#
+		</isNotNull>
+	GROUP BY s.school_id
+	</select>
+		
+		<!-- 学校分配详情 -->
+	<select id="select_school_by_area3" parameterClass="java.util.HashMap"  resultClass="project.edupm.projectmanage.pojo.EduProjectAllocateByArea">
+	SELECT
+	s.school_id as areaId,
+	s.school_name as areaName,
+	p.allocate_plan_num as allocatePlanNum,
+	p.allocate_fact_num as allocateFactNum,
+	p.status as status
+	FROM
+		edu_school s
+	LEFT JOIN edu_project_allocate_by_area p ON p.area_id = s.school_id
+	AND project_id = #projectId#
+	AND p.type = 1
+	WHERE
+		
+	  <isNotNull property="schoolId">
+			s.school_id = #schoolId#  
+		</isNotNull>
+	GROUP BY s.school_id
+	</select>
+	
+	<select id="select_school_by_areaes" parameterClass="java.util.HashMap"  resultClass="project.edupm.projectmanage.pojo.EduProjectAllocateByArea">
+	SELECT
+	s.school_id as areaId,
+	s.school_name as areaName,
+	s.school_type_id as schoolTypeId,
+	p.allocate_plan_num as allocatePlanNum,
+	p.allocate_fact_num as allocateFactNum,
+	p.status as status
+	FROM
+		edu_school s
+	LEFT JOIN edu_project_allocate_by_area p ON p.area_id = s.school_id
+	AND project_id = #projectId#
+	AND p.type = 1
+	WHERE
+		(
+			s.school_province_id = #areaId#
+			OR s.school_city_id = #areaId#
+			OR s.school_district_id = #areaId#
+		)
+	  <isNotNull prepend="and" property="schoolName">
+			s.school_name like  '%$schoolName$%'  
+		</isNotNull>
+	  <isNotNull prepend="and" property="schoolTypeId">
+			s.school_type_id=#schoolTypeId#  
+		</isNotNull>
+	GROUP BY s.school_id
+	</select>
+	
+	
+	<select id="select_allocate_by_project_and_area" parameterClass="java.util.HashMap" resultClass="project.edupm.projectmanage.pojo.EduProjectAllocateByArea">
+		select 
+		IFNULL(p.allocate_plan_num,0) as allocatePlanNum,
+		IFNULL(p.allocate_fact_num,0) as allocateFactNum,
+		p.status as status 
+		from edu_project_allocate_by_area p
+		where p.area_id = #areaId# and project_id = #projectId# and type = #type#
+	</select>
+	<!-- 判断是否已经上报 -->
+	<select id="count_by_areaId_projectId_status" parameterClass="java.util.HashMap"  resultClass="int">
+		select count(1) from edu_project_allocate_by_area where area_id = #areaId# and project_id = #projectId# and type=#type# and status = 1
+	</select>
+	<!-- 通过上级地区上报名额 -->
+	<select id="select_allocate_info_by_areaId_and_type" parameterClass="java.util.HashMap" resultClass="project.edupm.projectmanage.pojo.EduProjectAllocateByArea">
+		select SUM(allocate_plan_num) as allocatePlanNum,IFNULL(sum(allocate_fact_num),0) as allocateFactNum from edu_project_allocate_by_area 
+			where area_id in(
+				select id from edu_sys_area where up_lv_code = #areaId#
+			) and type =#type# and project_id = #projectId#
+	</select>
+	
+	
+	<select id="select_sum_school_allocate_by_areaId_and_type" parameterClass="java.util.HashMap" resultClass="project.edupm.projectmanage.pojo.EduProjectAllocateByArea">
+		select IFNULL(SUM(allocate_plan_num),0) as allocatePlanNum,IFNULL(sum(allocate_fact_num),0) as allocateFactNum from edu_project_allocate_by_area 
+	where area_id in(
+		select school_id from edu_school where school_district_id = #areaId#
+	)  and type = 1 and project_id = #projectId#
+	</select>
+	
+	<update id="update_allocate_by_areaIds" parameterClass="java.util.HashMap">
+		update edu_project_allocate_by_area set status = 1 where project_id = #projectId# and type = #type# and area_id in	
+		<iterate open="(" close=")" conjunction="," property="ids">
+		#ids[]#
+		</iterate>
+	</update>
+	
+	<!-- 已经分配的地区 -->
+	<select id="select_area_id_in_ids" parameterClass="java.util.HashMap" resultClass="int">
+		select area_id from edu_project_allocate_by_area where area_id in
+		<iterate open="(" close=")" conjunction="," property="ids">
+			#ids[]#
+		</iterate>
+		and type = #type# and project_id = #projectId#
+	</select>
+	
+	<select id="has_allocate_gt0" parameterClass="java.util.HashMap" resultClass="int">
+		select count(1) from edu_project_allocate_by_area where area_id = #areaId# and project_id = #projectId# and allocate_plan_num >0 and type = #type#
+	</select>
+	
+</sqlMap>

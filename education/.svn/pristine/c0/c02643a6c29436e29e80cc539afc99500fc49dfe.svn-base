@@ -1,0 +1,65 @@
+package project.master.dao;
+
+import java.util.Map;
+
+import framelib.utils.page.PageObject;
+
+public interface IEduMasterWriteDAO {
+
+	/**
+	 * 新增评比活动
+	 * @param condition
+	 * @return
+	 */
+	boolean addComparison(Map<String, Object> condition);
+
+	/**
+	 * 修改评比活动
+	 * @param condition
+	 * @return
+	 */
+	boolean updateComparison(Map<String, Object> condition);
+
+	/**
+	 * 删除评比活动
+	 * @param condition
+	 * @return
+	 */
+	boolean deleteComparison(Map<String, Object> condition);
+
+	/**
+	 * 报名评比活动
+	 * @param condition
+	 * @return
+	 */
+	boolean signUpComparisonTeacher(Map<String, Object> condition);
+
+	/**
+	 * 取消报名评比活动
+	 * @param condition
+	 * @return
+	 */
+	boolean canelSignUpComparisonTeacher(Map<String, Object> condition);
+
+	/**
+	 * 重新报名评比活动
+	 * @param condition
+	 * @return
+	 */
+	boolean resignUpComparisonTeacher(Map<String, Object> condition);
+
+	/**
+	 * 教师报名评比活动（批量）
+	 * @param condition
+	 * @return
+	 */
+	boolean signUpComparisonTeacherBatch(Map<String, Object> condition);
+
+	/**
+	 * 取消教师报名评比活动（批量）
+	 * @param condition
+	 * @return
+	 */
+	boolean canelSignUpComparisonTeacherBatch(Map<String, Object> condition);
+
+}

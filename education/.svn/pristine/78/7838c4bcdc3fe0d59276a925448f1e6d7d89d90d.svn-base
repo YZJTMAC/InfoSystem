@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+	<!--
+		=====================================================================
+	-->
+	<!--
+	-->
+	<!--
+		Log4j Configuration
+	-->
+	<!--
+	-->
+	<!--
+		=====================================================================
+	-->
+
+	<!--
+		| For more configuration infromation and examples see the Jakarta
+		Log4j | owebsite: http://jakarta.apache.org/log4j
+	-->
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/"
+	debug="false">
+
+	<!-- ============================== -->
+	<!-- Append messages to the console -->
+	<!-- ============================== -->
+
+	<!--
+		<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out"/> <layout
+		class="org.apache.log4j.PatternLayout"> The default pattern: Date
+		Priority [Category] Message\n [framework] %d - %-4r [%t] %-5p %c %x -
+		%m%n [start]%d{DATE}[DATE]%n%p[PRIORITY]%n%x[NDC]%n%t[THREAD]
+		n%c[CATEGORY]%n%m[MESSAGE]%n%n [%d{yyy MMM dd HH:mm:ss,SSS} IN %r]
+		[%-5p] [%C$%-12M(%l) in thread $t]: %m%n <param
+		name="ConversionPattern" value="[%d{yyyy年MMMdd日HH:mm:ss,SSS}] [%-5p] :
+		%m%n" /> <param name="ConversionPattern"
+		value="[%d{yyyy年MMMdd日HH:mm:ss,SSS}] [%-5p] [%C.%-12M(%L)]: %m%n" />
+		param name="ConversionPattern" value="%d{ABSOLUTE} %-5p [%c{1}] %m%n"/
+		</layout> </appender> <appender name="activexAppender"
+		class="org.apache.log4j.DailyRollingFileAppender"> <param name="File"
+		value="D:\sharewithme.log" /> <param name="DatePattern"
+		value="'.'yyyy-MM-dd'.log'" /> <param name="Threshold" value="ALL"/>
+		<param name="MaxFileSize" value="5120KB"/> <param
+		name="MaxBackupIndex" value="100"/> <layout
+		class="org.apache.log4j.PatternLayout"> <param
+		name="ConversionPattern" value="[%d{MMdd HH:mm:ss SSS\} %-5p] [%t]
+		%c{3\} - %m%n" /> </layout> </appender> ================ Limit
+		categories ================ <logger additivity="false"
+		name="logger.org.springframework.aop.interceptor"> <level
+		value="TRACE"/> <appender-ref ref="CONSOLE"/> <appender-ref
+		ref="activexAppender"/> </logger> Limit the org.apache category to
+		INFO as its DEBUG is verbose <category name="framelib"> <priority
+		value="INFO"/> </category> <category name="project"> <priority
+		value="INFO"/> </category> Limit the org.apache category to DEBUG as
+		its DEBUG is verbose <category name="com.ibatis"> <priority
+		value="ERROR"/> </category> <category name="org.springframework">
+		<priority value="ERROR"/> </category>
+	-->
+<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%-5p: %c - %m%n" />
+		</layout>
+</appender>
+<!--  log4j ibatis 输出-->
+<appender name="IBatis" class="org.apache.log4j.ConsoleAppender">
+	<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="%-4r [%t] %-5p %c %x - %m%n" />
+	</layout>
+	<filter class="org.apache.log4j.varia.LevelRangeFilter">
+		<param name="LevelMin" value="DEBUG" />
+		<param name="LevelMax" value="DEBUG" />
+	</filter>
+</appender>
+<appender name="FILE" class="org.apache.log4j.DailyRollingFileAppender">
+	<param name="File" value="d:/log/devdemo.log" />
+	<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />   
+       <param name="Threshold" value="ALL"/>  
+    	<param name="MaxFileSize" value="51200KB"/>  
+    	<param name="MaxBackupIndex" value="1000"/>
+	<layout class="org.apache.log4j.PatternLayout">
+		<param name="ConversionPattern" value="[%d{MMdd HH:mm:ss SSS\} %-5p] [%t] %c{3\} - %m%n" />
+	</layout>
+</appender>
+	 <category name="framelib">
+      <priority value="WARN"/>
+   </category>
+    <category name="project">
+      <priority value="WARN"/>
+	</category>
+	   <category name="product">
+      <priority value="WARN"/>
+	</category>
+	<category name="com.ibatis">
+		<priority value="ERROR" />
+	</category>
+	<category name="org.springframework">
+		<priority value="ERROR" />
+	</category>
+	
+
+	<logger name="com.ibatis" additivity="true">
+		<level value="WARN" />
+	</logger>
+
+	<logger name="java.sql.Connection" additivity="true">
+		<level value="WARN" />
+	</logger>
+
+	<logger name="java.sql.Statement" additivity="true">
+		<level value="WARN" />
+	</logger>
+
+	<logger name="java.sql.PreparedStatement" additivity="true">
+		<level value="WARN" />
+		<appender-ref ref="IBatis" />
+	</logger>
+
+	<logger name="java.sql.ResultSet" additivity="true">
+		<level value="WARN" />
+		<appender-ref ref="IBatis" />
+	</logger>
+	<!--  Spring log -->
+	<logger name="org.lxh.mvc.controller">
+		<level value="WARN" />
+	</logger>
+	<logger name="org.springframework.core">
+		<level value="WARN" />
+	</logger>
+
+	<logger name="org.springframework.beans">
+		<level value="WARN" />
+	</logger>
+
+	<logger name="org.springframework.context">
+		<level value="WARN" />
+	</logger>
+
+	<logger name="org.springframework.web">
+		<level value="WARN" />
+	</logger>
+	
+	<!-- ======================= -->
+	<!-- Setup the Root category -->
+	<!-- ======================= -->
+	<root>
+		<priority value="WARN" />
+		<appender-ref ref="CONSOLE" />
+		<!-- 增加日志到文件 -->
+		<appender-ref ref="FILE"/>
+	</root>
+
+</log4j:configuration>

@@ -1,0 +1,500 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_teacher_job">
+	<resultMap id="abatorgenerated_EduTeacherJobResult"
+		class="project.teacher.teachermanage.pojo.EduTeacherJob">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="teacher_id" property="teacherId" jdbcType="INTEGER" />
+		<result column="job_qualification_type" property="jobQualificationType"
+			jdbcType="VARCHAR" />
+		<result column="job_certificate_date" property="jobCertificateDate"
+			jdbcType="DATE" />
+		<result column="job_certificate_num" property="jobCertificateNum"
+			jdbcType="VARCHAR" />
+		<result column="job_work_time" property="jobWorkTime" jdbcType="DATE" />
+		<result column="job_work_date" property="jobWorkDate" jdbcType="DATE" />
+		<result column="job_comment_position" property="jobCommentPosition"
+			jdbcType="VARCHAR" />
+		<result column="job_recruitment_position" property="jobRecruitmentPosition"
+			jdbcType="VARCHAR" />
+		<result column="job_comment_date" property="jobCommentDate"
+			jdbcType="DATE" />
+		<result column="job_recruitment_date" property="jobRecruitmentDate"
+			jdbcType="DATE" />
+		<result column="job_school_administration_office_type" property="jobSchoolAdministrationOfficeType"
+			jdbcType="INTEGER" />
+		<result column="job_school_administration_office" property="jobSchoolAdministrationOffice"
+			jdbcType="VARCHAR" />
+		<result column="job_former_teaching_section" property="jobFormerTeachingSection"
+			jdbcType="VARCHAR" />
+		<result column="job_former_teaching_section_type" property="jobFormerTeachingSectionType"
+			jdbcType="INTEGER" />
+		<result column="job_former_teaching_subject" property="jobFormerTeachingSubject"
+			jdbcType="VARCHAR" />
+		<result column="job_former_teaching_subject_type" property="jobFormerTeachingSubjectType"
+			jdbcType="VARCHAR" />
+		<result column="job_subject_leader" property="jobSubjectLeader"
+			jdbcType="INTEGER" />
+		<result column="job_subject_leader_name" property="jobSubjectLeaderName"
+			jdbcType="VARCHAR" />
+		<result column="job_core_teacher_type" property="jobCoreTeacher" jdbcType="INTEGER" />
+		<result column="job_core_teacher" property="jobCoreTeacher" jdbcType="VARCHAR" />
+		<result column="remark" property="remark" jdbcType="VARCHAR" />
+		<result column="job_whether_teacher" property="jobWhetherTeacher"
+			jdbcType="INTEGER" />
+		<result column="job_whether_grade_teacher" property="jobWhetherGradeTeacher"
+			jdbcType="INTEGER" />
+		<result column="job_county_rural_teacher" property="jobCountyRuralTeacher"
+			jdbcType="INTEGER" />
+		<result column="job_private_school_teacher" property="jobPrivateSchoolTeacher"
+			jdbcType="INTEGER" />
+		<result column="job_special_teacher" property="jobSpecialTeacher"
+			jdbcType="INTEGER" />
+		<result column="job_create_by" property="jobCreateBy" jdbcType="VARCHAR" />
+		<result column="job_update_by" property="jobUpdateBy" jdbcType="VARCHAR" />
+		<result column="job_create_date" property="jobCreateDate"
+			jdbcType="TIMESTAMP" />
+		<result column="job_update_date" property="jobUpdateDate"
+			jdbcType="TIMESTAMP" />
+		<result column="version" property="version" jdbcType="INTEGER" />
+		<result column="status" jdbcType="INTEGER" property="status" />
+	</resultMap>
+
+	<insert id="teacher_job_insert" parameterClass="project.teacher.teachermanage.pojo.EduTeacherJob">
+		insert into edu_teacher_job (id, teacher_id, job_qualification_type,
+		job_certificate_date,
+		job_certificate_num, job_work_time, job_work_date, job_comment_position,
+		job_recruitment_position, job_comment_date, job_recruitment_date,
+		job_school_administration_office_type,
+		job_school_administration_office, job_former_teaching_section,
+		job_former_teaching_section_type, job_former_teaching_subject,
+		job_former_teaching_subject_type, job_subject_leader,job_subject_leader_name,
+		job_core_teacher_type,job_core_teacher, job_whether_teacher,
+		job_whether_grade_teacher, job_county_rural_teacher, job_private_school_teacher,
+		job_special_teacher, job_create_by, job_update_by, job_create_date,
+		job_update_date, version, status,
+		job_qualification, job_comment_position_type, job_recruitment_position_type,adjust_id,adjust_name,
+		wxyj,gwlb,gwdj,sfzb,contract,salary,jszgz,pthdj,cjqsny,qrzsfzy,jsnpxqk,mfsfs,tgjs,jxjybh,rych,teacher_staff,
+		eliteTraining,eliteTrainingType,teachingMaster,teachingMasterType,postGrade,jdfldw,jdflTime,postBack,remark
+		)
+		values (#id:INTEGER#, #teacherId:INTEGER#, #jobQualificationType:VARCHAR#,
+		#jobCertificateDate#, #jobCertificateNum:VARCHAR#,
+		#jobWorkTime#,
+		#jobWorkDate#, #jobCommentPosition:VARCHAR#, #jobRecruitmentPosition:VARCHAR#,
+		#jobCommentDate#, #jobRecruitmentDate#,
+		#jobSchoolAdministrationOfficeType:INTEGER#,
+		#jobSchoolAdministrationOffice:VARCHAR#,
+		#jobFormerTeachingSection:VARCHAR#,
+		#jobFormerTeachingSectionType:INTEGER#,
+		#jobFormerTeachingSubject:VARCHAR#,
+		#jobFormerTeachingSubjectType:VARCHAR#,
+		#jobSubjectLeader:INTEGER#,#jobSubjectLeaderName:VARCHAR#, #jobCoreTeacherType:INTEGER#,#jobCoreTeacher:VARCHAR#, #jobWhetherTeacher:INTEGER#,
+		#jobWhetherGradeTeacher:INTEGER#, #jobCountyRuralTeacher:INTEGER#,
+		#jobPrivateSchoolTeacher:INTEGER#, #jobSpecialTeacher:INTEGER#,
+		#jobCreateBy:VARCHAR#,
+		#jobUpdateBy:VARCHAR#, #jobCreateDate:TIMESTAMP#, #jobUpdateDate:TIMESTAMP#, #version:INTEGER#,
+		#status:INTEGER#,
+		#jobQualification:VARCHAR#, #jobCommentPositionType:INTEGER#,
+		#jobRecruitmentPositionType:INTEGER#,
+		#adjustId:INTEGER#,#adjustName:INTEGER#,
+		#wxyj#,#gwlb#,#gwdj#,#sfzb#,#contract#,#salary#,#jszgz#,#pthdj#,#cjqsny#,#qrzsfzy#,#jsnpxqk#,#mfsfs#,#tgjs#,#jxjybh#,#rych#,#teacherStaff#,
+		#eliteTraining:VARCHAR#,#eliteTrainingType:INTEGER#,#teachingMaster:VARCHAR#,#teachingMasterType:INTEGER#,#postGrade#,
+		#jdfldw#,#jdflTime#,#postBack#,#remark#
+		)
+		<selectKey resultClass="Integer" keyProperty="id">
+			SELECT last_insert_id() as id ;    
+        </selectKey>
+	</insert>
+
+	<insert id="teacher_job_insert_addversion" parameterClass="java.util.HashMap">
+		INSERT INTO edu_teacher_job (
+		teacher_id, job_qualification_type, job_certificate_date,
+		job_certificate_num, job_work_time, job_work_date, job_comment_position,
+		job_recruitment_position, job_comment_date, job_recruitment_date,
+		job_school_administration_office, job_former_teaching_section,
+		job_former_teaching_section_type, job_former_teaching_subject,
+		job_former_teaching_subject_type, job_subject_leader,job_subject_leader_name,
+		job_core_teacher_type,job_core_teacher, job_whether_teacher,
+		job_whether_grade_teacher, job_county_rural_teacher, job_private_school_teacher,
+		job_special_teacher, job_create_by, job_update_by, job_create_date,
+		job_update_date, version, status,
+		job_qualification, job_comment_position_type, job_recruitment_position_type,
+		wxyj,gwlb,gwdj,sfzb,contract,salary,jszgz,pthdj,cjqsny,qrzsfzy,jsnpxqk,mfsfs,tgjs,jxjybh,rych,
+		eliteTraining,eliteTrainingType,teachingMaster,teachingMasterType,postGrade,jdfldw,jdflTime,postBack,remark
+		) SELECT *
+		FROM(
+		select
+		teacher_id, job_qualification_type, job_certificate_date,
+		job_certificate_num, job_work_time, job_work_date, job_comment_position,
+		job_recruitment_position, job_comment_date, job_recruitment_date,
+		job_school_administration_office, job_former_teaching_section,
+		job_former_teaching_section_type, job_former_teaching_subject,
+		job_former_teaching_subject_type, job_subject_leader,job_subject_leader_name,
+		job_core_teacher_type,job_core_teacher, job_whether_teacher,
+		job_whether_grade_teacher, job_county_rural_teacher, job_private_school_teacher,
+		job_special_teacher, job_create_by, #updateBy# as job_update_by,
+		job_create_date, now(), #version# as version , #status# as status,
+		job_qualification, job_comment_position_type,
+		job_recruitment_position_type,
+		wxyj,gwlb,gwdj,sfzb,contract,salary,jszgz,pthdj,cjqsny,qrzsfzy,jsnpxqk,mfsfs,tgjs,jxjybh,rych,
+		eliteTraining,eliteTrainingType,teachingMaster,teachingMasterType,postGrade,jdfldw,jdflTime,postBack,remark
+		from edu_teacher_job
+		where teacher_id = #teacherIdA#
+		and version = (
+		SELECT versionId from (
+		SELECT MAX(version) as versionId FROM edu_teacher_job
+		where teacher_id = #teacherIdB#
+		) a
+		)
+
+		) AS tb
+		<selectKey resultClass="Integer" keyProperty="id">
+			SELECT last_insert_id() as id ;    
+        </selectKey>
+	</insert>
+
+	<update id="update_batch_Job_status" parameterClass="java.util.HashMap">
+		update edu_teacher_job
+		set
+		job_update_by = #updateBy#,
+		job_update_date = now(),
+		status = #status#
+		where teacher_id = #teacherId#
+  </update>
+
+	<!-- add by yinxiaolong
+ 	教师工作信息查询
+   -->
+	<select id="selectTeacherJobInfoByTeacherId" parameterClass="java.util.HashMap" resultClass="project.teacher.teachermanage.pojo.EduTeacherJob">
+		select j.id,
+		j.job_qualification_type as jobQualificationType,
+		j.job_certificate_date as jobCertificateDate,
+		j.job_certificate_num as jobCertificateNum,
+		j.job_work_time as jobWorkTime,
+		j.job_work_date as jobWorkDate,
+		j.job_comment_position as jobCommentPosition,
+		j.job_comment_date as jobCommentDate,
+		j.job_recruitment_position as jobRecruitmentPosition,
+		j.job_recruitment_date as jobRecruitmentDate,
+		j.job_school_administration_office_type as jobSchoolAdministrationOfficeType,
+		j.job_school_administration_office as jobSchoolAdministrationOffice,
+		d.dictionary_code as sectionDictionaryCode,  <!-- 学段字典code -->
+		j.job_former_teaching_section as jobFormerTeachingSection,
+		j.job_former_teaching_section_type as jobFormerTeachingSectionType,
+		j.job_former_teaching_subject as jobFormerTeachingSubject,
+		j.job_former_teaching_subject_type as jobFormerTeachingSubjectType,
+		j.job_subject_leader as jobSubjectLeader,
+		j.job_subject_leader_name as jobSubjectLeaderName,
+		j.job_core_teacher_type as jobCoreTeacherType,
+		j.job_core_teacher as jobCoreTeacher,
+		j.job_whether_teacher as jobWhetherTeacher,
+		j.job_whether_grade_teacher as jobWhetherGradeTeacher,
+		j.job_county_rural_teacher as jobCountyRuralTeacher,
+		j.job_private_school_teacher as jobPrivateSchoolTeacher,
+		j.job_special_teacher as jobSpecialTeacher,
+		j.job_recruitment_position_type as jobRecruitmentPositionType,
+		j.job_comment_position_type as jobCommentPositionType,
+		j.status,
+		j.adjust_id as adjustId,
+		j.adjust_name as adjustName,
+		j.teacher_staff as teacherStaff,
+		j.wxyj,j.gwlb,j.gwdj,j.sfzb,j.contract,j.salary,j.jszgz,j.pthdj,j.cjqsny,j.qrzsfzy,j.jsnpxqk,j.mfsfs,j.tgjs,j.jxjybh,j.rych,
+		j.eliteTraining,j.eliteTrainingType,j.teachingMaster,j.teachingMasterType,j.postGrade,j.jdfldw,j.jdflTime,j.postBack,j.remark
+		from edu_teacher_job j
+		LEFT JOIN edu_sys_dictionary d ON j.job_former_teaching_section_type=d.dictionary_id and d.dictionary_type = 'stduty_section'  <!-- 查询教师学段对应字典code -->
+		where j.teacher_id = #teacherId#
+		<isNotEmpty prepend="and" property="status">
+			j.status = #status#
+		</isNotEmpty>
+		and j.version = (
+		select versionId from (
+		SELECT MAX(version) as versionId FROM edu_teacher_job
+		where teacher_id = #teacherId#
+			<isNotEmpty prepend="and" property="status">
+				status = #status#
+			</isNotEmpty>
+		) a
+		)
+	</select>
+	
+	<select id="selectTeacherJobInfoByTeacherIdAndVersion"
+		parameterClass="java.util.HashMap" resultClass="project.teacher.teachermanage.pojo.EduTeacherJob">
+		select id,
+		job_qualification as jobQualification,
+		job_qualification_type as jobQualificationType,
+		job_certificate_date as jobCertificateDate,
+		job_certificate_num as jobCertificateNum,
+		job_work_time as jobWorkTime,
+		job_work_date as jobWorkDate,
+		job_comment_position as jobCommentPosition,
+		job_comment_date as jobCommentDate,
+		job_recruitment_position as jobRecruitmentPosition,
+		job_recruitment_date as jobRecruitmentDate,
+		job_school_administration_office_type as jobSchoolAdministrationOfficeType,
+		job_school_administration_office as jobSchoolAdministrationOffice,
+		job_former_teaching_section as jobFormerTeachingSection,
+		job_former_teaching_section_type as jobFormerTeachingSectionType,
+		job_former_teaching_subject as jobFormerTeachingSubject,
+		job_former_teaching_subject_type as jobFormerTeachingSubjectType,
+		job_subject_leader as jobSubjectLeader,
+		job_subject_leader_name as jobSubjectLeaderName,
+		job_core_teacher_type as jobCoreTeacherType,
+		job_core_teacher as jobCoreTeacher,
+		job_whether_teacher as jobWhetherTeacher,
+		job_whether_grade_teacher as jobWhetherGradeTeacher,
+		job_county_rural_teacher as jobCountyRuralTeacher,
+		job_private_school_teacher as jobPrivateSchoolTeacher,
+		job_special_teacher as jobSpecialTeacher,
+		job_recruitment_position_type as jobRecruitmentPositionType,
+		job_comment_position_type as jobCommentPositionType,
+		adjust_id as adjustId,
+		adjust_name as adjustName,
+		teacher_staff as teacherStaff,
+		wxyj,gwlb,gwdj,sfzb,contract,salary,jszgz,pthdj,cjqsny,qrzsfzy,jsnpxqk,mfsfs,tgjs,jxjybh,rych,
+		eliteTraining,eliteTrainingType,teachingMaster,teachingMasterType,postGrade,jdfldw,jdflTime,postBack,remark
+		from edu_teacher_job
+		where teacher_id = #teacherId#
+		and version = #version# 
+</select>
+
+    <update id="teacher_job_update" parameterClass="project.teacher.teachermanage.pojo.EduTeacherJob" >
+    update edu_teacher_job
+    set teacher_id = #teacherId:INTEGER#,
+      job_qualification_type = #jobQualificationType:VARCHAR#,  
+      job_certificate_date = #jobCertificateDate#,
+      job_certificate_num = #jobCertificateNum:VARCHAR#,
+      job_work_time = #jobWorkTime#,
+      job_work_date = #jobWorkDate#,
+      job_comment_position = #jobCommentPosition:VARCHAR#,
+      job_recruitment_position = #jobRecruitmentPosition:VARCHAR#,
+      job_comment_date = #jobCommentDate#,
+      job_recruitment_date = #jobRecruitmentDate#,
+      job_school_administration_office_type = #jobSchoolAdministrationOfficeType:INTEGER#,
+      job_school_administration_office = #jobSchoolAdministrationOffice:VARCHAR#,
+      job_former_teaching_section = #jobFormerTeachingSection:VARCHAR#,
+      job_former_teaching_section_type = #jobFormerTeachingSectionType:INTEGER#,
+      job_former_teaching_subject = #jobFormerTeachingSubject:VARCHAR#,
+      job_former_teaching_subject_type = #jobFormerTeachingSubjectType:VARCHAR#,
+      job_subject_leader = #jobSubjectLeader:INTEGER#,
+      job_subject_leader_name = #jobSubjectLeaderName:VARCHAR#,
+      job_core_teacher_type = #jobCoreTeacherType:INTEGER#,
+      job_core_teacher = #jobCoreTeacher:VARCHAR#,
+      job_whether_teacher = #jobWhetherTeacher:INTEGER#,
+      job_whether_grade_teacher = #jobWhetherGradeTeacher:INTEGER#,
+      job_county_rural_teacher = #jobCountyRuralTeacher:INTEGER#,
+      job_private_school_teacher = #jobPrivateSchoolTeacher:INTEGER#,
+      job_special_teacher = #jobSpecialTeacher:INTEGER#,
+      job_create_by = #jobCreateBy:VARCHAR#,
+      job_update_by = #jobUpdateBy:VARCHAR#,
+      job_create_date = #jobCreateDate:DATE#,
+      job_update_date = #jobUpdateDate:DATE#,
+      job_qualification = #jobQualification:VARCHAR#, 
+      job_comment_position_type = #jobCommentPositionType:INTEGER#, 
+      job_recruitment_position_type = #jobRecruitmentPositionType:INTEGER#,
+	  adjust_id = #adjustId:INTEGER#,
+	  adjust_name = #adjustName:INTEGER#,
+	  teacher_staff = #teacherStaff:INTEGER#,
+	  wxyj = #wxyj:VARCHAR#,gwlb = #gwlb#,gwdj=#gwdj#,sfzb=#sfzb#,contract=#contract:INTEGER#,salary=#salary#,jszgz=#jszgz#,pthdj=#pthdj#,
+	  cjqsny=#cjqsny#,qrzsfzy=#qrzsfzy#,jsnpxqk=#jsnpxqk#,mfsfs=#mfsfs#,tgjs=#tgjs#,jxjybh=#jxjybh#,rych=#rych#,
+	  eliteTraining=#eliteTraining#,eliteTrainingType=#eliteTrainingType#,teachingMaster=#teachingMaster#,teachingMasterType=#teachingMasterType#,
+	  postGrade=#postGrade#,jdfldw=#jdfldw#,jdflTime=#jdflTime#,postBack=#postBack#,remark=#remark#
+    where teacher_id = #teacherId:INTEGER#
+    <isNotEmpty prepend="and" property="status">
+    	status = #status:INTEGER#
+    </isNotEmpty>
+		  and version = (
+		  			select versionId from (
+					 SELECT	MAX(version) as versionId FROM edu_teacher_job 
+					 where teacher_id = #teacherId:INTEGER#
+					 <isNotEmpty prepend="and" property="status">
+    					status = #status:INTEGER#
+    				</isNotEmpty>
+					 ) a
+		  		)
+  </update>
+
+
+	<insert id="teacher_job_insert_addversion_mobilize"
+		parameterClass="java.util.HashMap">
+		INSERT INTO edu_teacher_job (
+		teacher_id
+		,job_qualification
+		,job_qualification_type
+		,job_certificate_date
+		,job_certificate_num
+		,job_work_time
+		,job_work_date
+		,job_comment_position_type
+		,job_comment_position
+		,job_recruitment_position_type
+		,job_recruitment_position
+		,job_comment_date
+		,job_recruitment_date
+		,job_school_administration_office
+		,job_school_administration_office_type
+		,job_former_teaching_section
+		,job_former_teaching_section_type
+		,job_former_teaching_subject
+		,job_former_teaching_subject_type
+		,job_subject_leader
+		,job_subject_leader_name
+		,job_core_teacher_type
+		,job_core_teacher
+		,job_whether_teacher
+		,job_whether_grade_teacher
+		,job_county_rural_teacher
+		,job_private_school_teacher
+		,job_special_teacher
+		,job_create_by
+		,job_update_by
+		,job_create_date
+		,job_update_date
+		,version
+		,status,adjust_id,adjust_name,
+		wxyj,gwlb,gwdj,sfzb,contract,salary,jszgz,pthdj,cjqsny,qrzsfzy,jsnpxqk,mfsfs,tgjs,jxjybh,rych,
+		eliteTraining,eliteTrainingType,teachingMaster,teachingMasterType,postGrade,jdfldw,jdflTime,postBack,remark
+		) SELECT * FROM(
+		select
+		teacher_id
+		,job_qualification
+		,job_qualification_type
+		,job_certificate_date
+		,job_certificate_num
+		,job_work_time
+		,job_work_date
+		,#jobCommentPositionType:INTEGER# as job_comment_position_type
+		,#jobCommentPosition:VARCHAR# as job_comment_position
+		,#jobRecruitmentPositionType:INTEGER# as job_recruitment_position_type
+		,#jobRecruitmentPosition:VARCHAR# as job_recruitment_position
+		,job_comment_date
+		,job_recruitment_date
+		,#jobSchoolAdministrationOffice:VARCHAR# as job_school_administration_office
+		,#jobSchoolAdministrationOfficeType:INTEGER# as job_school_administration_office_type
+		,#jobFormerTeachingSection:VARCHAR# as job_former_teaching_section
+		,#jobFormerTeachingSectionType:VARCHAR# as job_former_teaching_section_type
+		,#jobFormerTeachingSubject:VARCHAR# as job_former_teaching_subject
+		,#jobFormerTeachingSubjectType:VARCHAR# as job_former_teaching_subject_type
+		,#jobSubjectLeader:INTEGER# as job_subject_leader
+		,#jobSubjectLeaderName:VARCHAR# as job_subject_leader_name
+		,#jobCoreTeacherType:INTEGER# as job_core_teacher_type
+		,#jobCoreTeacher:VARCHAR# as job_core_teacher
+		,#jobWhetherTeacher:INTEGER# as job_whether_teacher
+		,job_whether_grade_teacher
+		,#jobCountyRuralTeacher:INTEGER# as job_county_rural_teacher
+		,job_private_school_teacher
+		,job_special_teacher
+		,#jobCreateBy:VARCHAR# as job_create_by
+		,#jobCreateBy:VARCHAR# as job_update_by
+		,now() as job_create_date
+		,now() as job_update_date
+		,#version:INTEGER# as version
+		,#status:INTEGER# as status,adjust_id,adjust_name,
+		wxyj,gwlb,gwdj,sfzb,contract,salary,jszgz,pthdj,cjqsny,qrzsfzy,jsnpxqk,mfsfs,tgjs,jxjybh,rych,
+		eliteTraining,eliteTrainingType,teachingMaster,teachingMasterType,postGrade,jdfldw,jdflTime,postBack,remark
+		from edu_teacher_job
+		where teacher_id = #teacherId#
+		and version = (
+		SELECT versionId from (
+		SELECT MAX(version) as versionId FROM edu_teacher_job
+		where teacher_id = #teacherId#
+		) a
+		)
+
+		) AS tb
+		<selectKey resultClass="Integer" keyProperty="id">
+			SELECT last_insert_id() as id ;    
+        </selectKey>
+	</insert>
+	
+	<insert id="teacher_job_insert_addversion_adjust"
+		parameterClass="java.util.HashMap">
+		INSERT INTO edu_teacher_job (
+		teacher_id
+		,job_qualification
+		,job_qualification_type
+		,job_certificate_date
+		,job_certificate_num
+		,job_work_time
+		,job_work_date
+		,job_comment_position_type
+		,job_comment_position
+		,job_recruitment_position_type
+		,job_recruitment_position
+		,job_comment_date
+		,job_recruitment_date
+		,job_school_administration_office
+		,job_school_administration_office_type
+		,job_former_teaching_section
+		,job_former_teaching_section_type
+		,job_former_teaching_subject
+		,job_former_teaching_subject_type
+		,job_subject_leader
+		,job_subject_leader_name
+		,job_core_teacher_type
+		,job_core_teacher
+		,job_whether_teacher
+		,job_whether_grade_teacher
+		,job_county_rural_teacher
+		,job_private_school_teacher
+		,job_special_teacher
+		,job_create_by
+		,job_update_by
+		,job_create_date
+		,job_update_date
+		,version
+		,status,adjust_id,adjust_name,
+		wxyj,gwlb,gwdj,sfzb,contract,salary,jszgz,pthdj,cjqsny,qrzsfzy,jsnpxqk,mfsfs,tgjs,jxjybh,rych,
+		eliteTraining,eliteTrainingType,teachingMaster,teachingMasterType,postGrade,jdfldw,jdflTime,postBack,remark
+		) SELECT * FROM(
+		select
+		teacher_id
+		,job_qualification
+		,job_qualification_type
+		,job_certificate_date
+		,job_certificate_num
+		,job_work_time
+		,job_work_date
+		,job_comment_position_type
+		,job_comment_position
+		,job_recruitment_position_type
+		,job_recruitment_position
+		,job_comment_date
+		,job_recruitment_date
+		,job_school_administration_office
+		,job_school_administration_office_type
+		,job_former_teaching_section
+		,job_former_teaching_section_type
+		,job_former_teaching_subject
+		,job_former_teaching_subject_type
+		,job_subject_leader
+		,job_subject_leader_name
+		,job_core_teacher_type
+		,job_core_teacher
+		,job_whether_teacher
+		,job_whether_grade_teacher
+		,job_county_rural_teacher
+		,job_private_school_teacher
+		,job_special_teacher
+		,#jobCreateBy:VARCHAR# as job_create_by
+		,#jobCreateBy:VARCHAR# as job_update_by
+		,now() as job_create_date
+		,now() as job_update_date
+		,#version:INTEGER# as version
+		,#status:INTEGER# as status,#adjustId:INTEGER# as adjust_id,#adjustName:VARCHAR# as adjust_name,
+		wxyj,gwlb,gwdj,sfzb,contract,salary,jszgz,pthdj,cjqsny,qrzsfzy,jsnpxqk,mfsfs,tgjs,jxjybh,rych,
+		eliteTraining,eliteTrainingType,teachingMaster,teachingMasterType,postGrade,jdfldw,jdflTime,postBack,remark
+		from edu_teacher_job
+		where teacher_id = #teacherId#
+		and version = (
+		SELECT versionId from (
+		SELECT MAX(version) as versionId FROM edu_teacher_job
+		where teacher_id = #teacherId#
+		) a
+		)
+
+		) AS tb
+		<selectKey resultClass="Integer" keyProperty="id">
+			SELECT last_insert_id() as id ;    
+        </selectKey>
+	</insert>
+</sqlMap>

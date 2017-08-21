@@ -1,0 +1,5 @@
+亲爱的用户 ：<p>您好！感谢您使用 ${sysSiteTitle} 提供的服务。<p>
+<a href="${hosturl}/person/login/toUpdatePasswordByMail.htm?id=${id}&uid=${uid}&code=${code}" target="_blank">请点击此链接重置您的密码（链接24小时内有效）。</a><p> 
+如果您不能点击上面的链接请复制下面链接地址到浏览器中访问。<p>
+${hosturl}/person/login/toUpdatePasswordByMail.htm?id=${id}&uid=${uid}&code=${code}
+<p>如果您在使用过程中遇到任何问题，您可以拨打客服专线: 400-010-0910 与我们联系，我们会尽快为您解决。

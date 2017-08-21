@@ -1,0 +1,199 @@
+package project.master.dao.impl;
+
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.orm.ibatis.SqlMapClientCallback;
+
+import com.ibatis.sqlmap.client.SqlMapExecutor;
+
+import project.common.Common;
+import project.master.dao.IEduMasterWriteDAO;
+import framelib.dao.BaseDAOImpl;
+import framelib.utils.page.PageObject;
+
+public class EduMasterWriteDaoImpl extends BaseDAOImpl implements IEduMasterWriteDAO{
+
+	@Override
+	public Integer addComparison(Map<String, Object> condition) {
+		return (Integer)this.getSqlMapClientTemplate().insert("add_comparison",condition);
+	}
+
+	@Override
+	public int updateComparison(Map<String, Object> condition) {
+		return(Integer)this.getSqlMapClientTemplate().update("update_comparison", condition);
+	}
+
+	@Override
+	public boolean deleteComparison(Map<String, Object> condition) {
+		Integer id = (Integer)this.getSqlMapClientTemplate().delete("delete_comparison", condition);
+		if(id <= 0){
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int signUpComparisonTeacher(Map<String, Object> condition) {
+		return (Integer)this.getSqlMapClientTemplate().insert("signup_comparison_teacher", condition);
+	}
+
+	@Override
+	public boolean canelSignUpComparisonTeacher(Map<String, Object> condition) {
+		Integer id = (Integer)this.getSqlMapClientTemplate().update("canel_signup_comparison_teacher", condition);
+		if(id <= 0){
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean updateComparisonCommentStatus(Map<String, Object> condition) {
+		Integer id = (Integer)this.getSqlMapClientTemplate().update("update_comparison_comment_status", condition);
+		if(id <= 0){
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean signUpComparisonTeacherBatch(Map<String, Object> condition) {
+		String teacherIds = (String) condition.get("teacherIds");
+		final String ids[] = teacherIds.split(",");
+		final String comparisonId = (String) condition.get("comparisonId");
+		final String createBy = String.valueOf((Integer) condition.get("createBy"));
+		Object obj = this.getSqlMapClientTemplate().execute(new SqlMapClientCallback<Object>() {
+			@Override
+			public Object doInSqlMapClient(SqlMapExecutor arg0) throws SQLException {
+				arg0.startBatch();
+				for(String id : ids){
+					final Map<String,Object> param = new HashMap<String,Object>();
+					param.put("comparisonId", comparisonId);
+					param.put("createBy", createBy);
+					param.put("teacherId", id);
+					arg0.insert("signup_comparison_teacher", param);
+				}
+				return arg0.executeBatch();
+			}
+			
+		});
+		if(obj != null && (Integer)obj>0){
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean canelSignUpComparisonTeacherBatch(
+			Map<String, Object> condition) {
+		String teacherIds = (String) condition.get("teacherIds");
+		final String ids[] = teacherIds.split(",");
+		final String comparisonId = (String) condition.get("comparisonId");
+		final String updateBy = String.valueOf((Integer) condition.get("updateBy"));
+		Object obj = this.getSqlMapClientTemplate().execute(new SqlMapClientCallback<Object>() {
+			@Override
+			public Object doInSqlMapClient(SqlMapExecutor arg0) throws SQLException {
+				arg0.startBatch();
+				for(String id : ids){
+					final Map<String,Object> param = new HashMap<String,Object>();
+					param.put("comparisonId", comparisonId);
+					param.put("updateBy", updateBy);
+					param.put("teacherId", id);
+					arg0.delete("canel_signup_comparison_teacher", param);
+				}
+				return arg0.executeBatch();
+			}
+			
+		});
+		if(obj != null && (Integer)obj>0){
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public Integer createMaster(Map<String, Object> condition) {
+		Integer id = (Integer)this.getSqlMapClientTemplate().insert("create_master", condition);
+		return id;
+	}
+
+	@Override
+	public boolean associatedMasterComparison(Map<String, Object> condition) {
+		Integer id = (Integer)this.getSqlMapClientTemplate().update("associated_master_comparison", condition);
+		if(id <= 0){
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean updateComparisonMasterDisable(Map<String, Object> condition) {
+		Integer id = (Integer)this.getSqlMapClientTemplate().update("update_comparison_master_disable", condition);
+		if(id < 0){
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean deleteComparisonToMaster(Map<String, Object> condition) {
+		Integer id = (Integer)this.getSqlMapClientTemplate().delete("delete_comparison_to_master", condition);
+		if(id <= 0){
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean setMasterStatus(Map<String, Object> condition) {
+		Integer id = (Integer)this.getSqlMapClientTemplate().update("set_master_status", condition);
+		if(id <= 0){
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean delComprisonFile(Map<String, Object> condition) {
+		Integer id = (Integer)this.getSqlMapClientTemplate().delete("del_comparison_file", condition);
+		if(id <= 0){
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean setComparisonStatus(Map<String, Object> condition) {
+		Integer id = (Integer)this.getSqlMapClientTemplate().update("set_comparison_status", condition);
+		if(id <= 0){
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public int updateSignUpComparisonTeacher(Map<String, Object> condition) {
+		return (Integer)this.getSqlMapClientTemplate().update("update_comparison_comment", condition);
+	}
+
+	@Override
+	public boolean judgeScore(Map<String, Object> condition) {
+		Integer id = (Integer)this.getSqlMapClientTemplate().insert("judge_score", condition);
+		if(id <= 0){
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean updateMasterOne(Map<String, Object> condition) {
+		Integer id = (Integer)this.getSqlMapClientTemplate().update("update_master_one", condition);
+		if(id <= 0){
+			return false;
+		}
+		return true;
+	}
+
+
+}

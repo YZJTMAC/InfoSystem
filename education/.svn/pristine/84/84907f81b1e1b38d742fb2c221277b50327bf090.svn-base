@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_teacher_education" >
+  <resultMap id="abatorgenerated_EduTeacherEducationResult" class="project.teacher.teachermanage.pojo.EduTeacherEducation" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="teacher_id" property="teacherId" jdbcType="INTEGER" />
+    <result column="education_experience" property="educationExperience" jdbcType="VARCHAR" />
+    <result column="education_degree" property="educationDegree" jdbcType="VARCHAR" />
+    <result column="education_graduation_time" property="educationGraduationTime" jdbcType="DATE" />
+    <result column="education_graduation_school" property="educationGraduationSchool" jdbcType="VARCHAR" />
+    <result column="education_graduation_profession" property="educationGraduationProfession" jdbcType="VARCHAR" />
+    <result column="sort" property="sort" jdbcType="INTEGER" />
+    <result column="education_update_by" property="educationUpdateBy" jdbcType="VARCHAR" />
+    <result column="education_create_by" property="educationCreateBy" jdbcType="VARCHAR" />
+    <result column="education_create_date" property="educationCreateDate" jdbcType="TIMESTAMP"  />
+    <result column="education_update_date" property="educationUpdateDate" jdbcType="TIMESTAMP"  />
+    <result column="version" property="version" jdbcType="INTEGER" />
+     <result column="status" jdbcType="INTEGER" property="status" />
+     <result column="education_experience_type" jdbcType="INTEGER" property="educationExperienceType" />
+     <result column="education_degree_type" jdbcType="INTEGER" property="educationDegreeType" />
+  </resultMap>
+   
+  <insert id="teacher_educateion_insert" parameterClass="project.teacher.teachermanage.pojo.EduTeacherEducation" >
+    insert into edu_teacher_education (id, teacher_id, education_experience, education_degree,
+      education_graduation_time, education_graduation_school, education_graduation_profession, sort,
+      education_update_by, education_create_by, education_create_date, education_update_date,
+      version, status, education_experience_type, education_degree_type)
+    values (#id:INTEGER#, #teacherId:INTEGER#, #educationExperience:VARCHAR#,
+      #educationDegree:VARCHAR#, #educationGraduationTime:DATE#,
+      #educationGraduationSchool:VARCHAR#, #educationGraduationProfession:VARCHAR#, #sort:INTEGER#,
+      #educationUpdateBy:VARCHAR#, #educationCreateBy:VARCHAR#, #educationCreateDate:TIMESTAMP#,
+      #educationUpdateDate:TIMESTAMP#, #version:INTEGER#, #status:INTEGER#, #educationExperienceType:INTEGER#, #educationDegreeType:INTEGER#)
+      <selectKey resultClass="Integer"  keyProperty="id" >     
+             SELECT last_insert_id() as id ;    
+        </selectKey> 
+  </insert>
+  
+   <insert id="teacher_edu_insert_addversion" parameterClass="java.util.HashMap" >
+		INSERT INTO edu_teacher_education (
+		   teacher_id, education_experience, education_degree,
+      education_graduation_time, education_graduation_school, education_graduation_profession, sort,
+      education_update_by, education_create_by, education_create_date, education_update_date,
+      version, status, education_experience_type, education_degree_type
+		) SELECT * FROM(
+			select 
+			  teacher_id, education_experience, education_degree,
+		      education_graduation_time, education_graduation_school, education_graduation_profession, sort,
+		      #updateBy# as education_update_by, education_create_by, education_create_date, now(),
+		      #version# as version, #status# as status, education_experience_type, education_degree_type
+			from edu_teacher_education 
+			where id = #eduId# 
+		  		
+		) AS tb
+      <selectKey resultClass="Integer"  keyProperty="id" >     
+             SELECT last_insert_id() as id ;    
+        </selectKey> 
+  </insert>
+  
+  <delete id="teacher_educateion_delete" parameterClass="project.teacher.teachermanage.pojo.EduTeacherEducation" >
+    delete from edu_teacher_education
+    where teacher_id = #teacherId:INTEGER#
+    <isNotEmpty prepend="and" property="status">
+    	status = #status#
+    </isNotEmpty>
+		  and version = (
+		  			select versionId from (
+					 SELECT	MAX(version) as versionId FROM edu_teacher_education 
+					 where teacher_id = #teacherId:INTEGER#
+					 <isNotEmpty prepend="and" property="status">
+				    	status = #status#
+				    </isNotEmpty>
+					 ) a
+		  		)
+  </delete>
+   
+   <update id="update_batch_Edu_status" parameterClass="java.util.HashMap" >
+    update edu_teacher_education
+    set  
+      education_update_by = #updateBy#,
+      education_update_date = now(),
+      status = #status#
+    where teacher_id = #teacherId#
+  </update>
+   
+   <select id="selectTeacherEducationByTeacherId" parameterClass="java.util.HashMap" resultClass="project.teacher.teachermanage.pojo.EduTeacherEducation">
+   SELECT id,
+   education_experience_type as educationExperienceType,
+   education_degree_type as educationDegreeType,
+	education_experience AS educationExperience,
+	education_degree AS educationDegree,
+	education_graduation_time AS educationGraduationTime,
+	education_graduation_school AS educationGraduationSchool,
+	education_graduation_profession AS educationGraduationProfession,
+	sort AS sort,
+	status as status,
+	version as version
+FROM
+	edu_teacher_education
+WHERE
+	teacher_id = #teacherId# 
+	<isNotEmpty prepend="and" property="status">
+		status = #status#
+	</isNotEmpty>
+	and version = (
+		  			select versionId from (
+					 SELECT	MAX(version) as versionId FROM edu_teacher_education 
+					 where teacher_id = #teacherId# 
+					 <isNotEmpty prepend="and" property="status">
+						status = #status#
+					 </isNotEmpty>
+					 ) a
+		  		)
+ORDER BY
+	sort ASC
+	</select>
+	
+	 <select id="selectTeacherEducationByTeacherIdAndVersion" parameterClass="java.util.HashMap" resultClass="project.teacher.teachermanage.pojo.EduTeacherEducation">
+   SELECT id,
+   education_experience_type as educationExperienceType,
+   education_degree_type as educationDegreeType,
+	education_experience AS educationExperience,
+	education_degree AS educationDegree,
+	education_graduation_time AS educationGraduationTime,
+	education_graduation_school AS educationGraduationSchool,
+	education_graduation_profession AS educationGraduationProfession,
+	sort AS sort
+FROM
+	edu_teacher_education
+WHERE
+	teacher_id = #teacherId# 
+	and version = (select max(version) from edu_teacher_education where teacher_id = #teacherId#)
+ORDER BY
+	sort ASC
+	</select>
+	
+	<select id="select_all_info_ByTeacherIdAndVersion" parameterClass="java.util.HashMap" resultMap="abatorgenerated_EduTeacherEducationResult">
+   SELECT *
+FROM
+	edu_teacher_education
+WHERE
+	teacher_id = #teacherId# 
+	and version = #oldVersion# 
+	</select>
+</sqlMap>

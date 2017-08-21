@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:jms="http://www.springframework.org/schema/jms"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+            http://www.springframework.org/schema/context
+            http://www.springframework.org/schema/context/spring-context-2.5.xsd
+            http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-2.5.xsd">
+   
+    <bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate">
+        <property name="environment">
+            <props>
+                <prop key="java.naming.factory.initial">
+                	org.apache.activemq.jndi.ActiveMQInitialContextFactory
+                </prop>
+                <prop key="brokerURL">${brokerurl}</prop> 
+                <prop key="queue.excelQueue">excelQueue</prop>
+                <prop key="connectionFactoryNames">ConnectionFactory</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="connectionFactory" class="org.springframework.jndi.JndiObjectFactoryBean">
+        <property name="jndiName" value="ConnectionFactory" />
+        <property name="jndiTemplate" ref="jndiTemplate" />
+    </bean>
+
+    <bean id="jmsTemplate" class="org.springframework.jms.core.JmsTemplate">
+        <property name="connectionFactory" ref="connectionFactory" />
+        <property name="defaultDestinationName" value="excelQueue" />
+        <property name="pubSubDomain" value="false" />
+        <!-- 消息转换器 -->  
+    <property name="messageConverter" ref="msgConverter"/> 
+    </bean>
+    
+    <bean id="producer" class="framelib.mq.SpringJmsProducer">
+        <property name="jmsTemplate" ref="jmsTemplate" />
+    </bean>
+
+    <bean id="consumer" class="framelib.mq.SpringJmsConsumer">
+        <property name="jmsTemplate" ref="jmsTemplate" />
+    </bean>
+	
+	<bean id="msgListener" class="project.message.messageListener.MqMessageListener"></bean>
+	
+	<!-- 导入excel消息列队监听器 -->
+	<bean id="excelMsgListener" class="project.message.messageListener.ExcelMessageListener">
+		
+	</bean>
+	
+	<!--队列目的地-->  
+    <bean id="queueDestination" class="org.apache.activemq.command.ActiveMQQueue">  
+        <constructor-arg>  
+            <value>myqueue</value>  
+        </constructor-arg>  
+    </bean> 
+	
+	 <bean id="excelDestination" class="org.apache.activemq.command.ActiveMQQueue">  
+        <constructor-arg>  
+            <value>excelQueue</value>  
+        </constructor-arg>  
+    </bean> 
+	
+	<!-- 消息监听容器 -->
+	<bean id="jmsContainer"  class="org.springframework.jms.listener.DefaultMessageListenerContainer">  
+     <property name="connectionFactory" ref="connectionFactory" />
+        <property name="destination" ref="queueDestination" />
+   		<property name="messageListener" ref="msgListener" />  
+	</bean>
+	
+	<!-- 导入EXCEL消息监听器 -->
+	<bean id="excelJmsContainer"  class="org.springframework.jms.listener.DefaultMessageListenerContainer">  
+     <property name="connectionFactory" ref="connectionFactory" />
+        <property name="destination" ref="excelDestination" />
+   		<property name="messageListener" ref="excelMsgListener" />  
+	</bean>
+	
+	<bean id="msgConverter" class="project.message.util.MqMessageConverter"></bean>
+</beans>
+    

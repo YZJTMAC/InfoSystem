@@ -1,0 +1,103 @@
+package project.master.service;
+
+import java.util.List;
+import java.util.Map;
+
+import project.master.pojo.EduComparisonComment;
+
+import framelib.utils.page.PageObject;
+
+
+/**
+ * 评选流程
+ * @author zhudi
+ *
+ */
+public interface IEduMasterService {
+
+	/**
+	 * 新增评比活动
+	 * @param condition
+	 * @return
+	 */
+	boolean addComparison(Map<String, Object> condition);
+
+	/**
+	 * 查询评比活动
+	 * @param condition
+	 * @return
+	 */
+	PageObject queryComparison(Map<String, Object> condition);
+
+	/**
+	 * 修改评比活动
+	 * @param condition
+	 * @return
+	 */
+	boolean updateComparison(Map<String, Object> condition);
+	
+	/**
+	 * 删除评比活动
+	 * @param condition
+	 * @return
+	 */
+	boolean deleteComparison(Map<String, Object> condition);
+
+	/**
+	 * 评比活动教师
+	 * @param condition
+	 * @return
+	 */
+	PageObject queryComparisonTeacher(Map<String, Object> condition);
+
+	/**
+	 * 教师报名评比活动（单个）
+	 * @param condition
+	 * @return
+	 */
+	boolean signUpComparisonTeacher(Map<String, Object> condition);
+	
+	/**
+	 * 教师取消报名评比活动（单个）
+	 * @param condition
+	 * @return
+	 */
+	boolean canelSignUpComparisonTeacher(Map<String, Object> condition);
+
+	/**
+	 * 重新教师报名评比活动（单个）
+	 * @param condition
+	 * @return
+	 */
+	boolean resignUpComparisonTeacher(Map<String, Object> condition);
+
+	/**
+	 * 查询已经报名的教师
+	 * @param condition
+	 * @return
+	 */
+	List<EduComparisonComment> querySignUpComparisonTeacher(Map<String, Object> condition);
+
+	/**
+	 * 教师报名评比活动（批量）
+	 * @param condition
+	 * @return
+	 */
+	boolean signUpComparisonTeacherBatch(Map<String, Object> condition);
+
+	/**
+	 * 取消教师报名评比活动（批量）
+	 * @param condition
+	 * @return
+	 */
+	boolean canelSignUpComparisonTeacherBatch(Map<String, Object> condition);
+
+	/**
+	 * 查询报名活动评比教师数量
+	 * @param condition
+	 * @return
+	 */
+	int querySignUpComparisonTeacherCount(Map<String, Object> condition);
+
+	
+}

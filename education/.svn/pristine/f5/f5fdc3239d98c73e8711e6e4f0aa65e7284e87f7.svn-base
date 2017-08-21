@@ -1,0 +1,8 @@
+#userAvatarUploadPath=/upload/photo/
+userAvatarUploadPath=D:/images/upload/photo/
+#userAvatarSavePathLarge=/upload/photo/avatarLarge
+userAvatarSavePathLarge=D:/images/upload/photo/avatarLarge/
+#userAvatarSavePathMid=/upload/photo/avatarMid
+userAvatarSavePathMid=D:/images/upload/photo/avatarMid/
+#userAvatarSavePathSmall=/upload/photo/avatarSmall
+userAvatarSavePathSmall=D:/images/upload/photo/avatarSmall/

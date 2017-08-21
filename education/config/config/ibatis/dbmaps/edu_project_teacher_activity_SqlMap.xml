@@ -1,0 +1,965 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_project" >
+<!-- 我的自由报名项目列表count -->
+<select id="selectTeacherAddProjectCountByConditions" parameterClass="java.util.HashMap" resultClass="int">
+  		select count(1) counts from(
+select 
+  	 t3.id
+  FROM
+	edu_project t3
+INNER JOIN edu_project_train_target t1 ON t3.id = t1.project_id
+INNER JOIN edu_user t2 ON t2.status in (1,8)
+
+left JOIN edu_project_comment t4 ON t3.id = t4.project_id AND t4.teacher_id = t2.id
+left JOIN edu_organization_project t5 ON t5.project_id = t3.id AND t5.project_status!=60
+WHERE
+	1 = 1
+AND (t3. STATUS = 30 OR t3. STATUS = 40)
+AND t3.pid = #provinceId#
+AND t2.id = #teacherId# 
+AND t3.sign_up_way = 2
+  		<isNotNull prepend="and" property="start">
+  		year >= #start#
+  	</isNotNull>
+  	<isNotNull prepend="and" property="end">
+  		#end#>=year
+  	</isNotNull>
+  	<isNotNull prepend="and" property="projectName">
+  		project_name like '%$projectName$%'
+  	</isNotNull>
+  	GROUP BY t3.id )tt
+  </select>
+  
+  
+  
+  <select id="selectProMustAudit" parameterClass="java.util.HashMap" resultClass="project.teacher.teacherProject.pojo.EduProjectTrainTargetActitity">
+  SELECT
+	must_audit as mustAudit
+FROM
+	edu_project_train_target
+WHERE
+project_id = #projectId#
+  </select>
+  
+  
+  <!-- 我的自由报名项目列表 -->
+  <select id="selectTeacherAddProjectListByConditions" parameterClass="java.util.HashMap" resultClass="project.teacher.teacherProject.pojo.EduProjectTrainTargetActitity">
+ 	SELECT 
+	t1.project_id AS projectId,
+	t1.sex AS sex,
+	t1.education_background_name AS educationBackgroundName,
+	t1.position_name AS positionName,
+	t1.professional_title_name AS professionalTitleName,
+	t1.is_class_charger AS isClassCharger,
+	t1.subject_name AS subjectName,
+	t1.stduty_section AS stdutySection,
+	t3.id,
+	t3.train_scope_id AS trainScopeId,
+	t3.project_name AS projectName,
+	t3. YEAR AS YEAR,
+	t3.start_date AS startDate,
+	t3.end_date AS endDate,
+	t3.train_type_name AS trainTypeName,
+	t3.project_scope_name AS projectScopeName,
+	t3.plan_num AS planNum,
+	t3.class_period AS classPeriod,
+	t3.class_score AS classScore,
+	t3.sign_up_way AS signUpWay,
+	t4. status,
+	t4.organization_id AS organizationId,
+	t5.project_status as projectStatus,
+	t3.has_stop_sign as hasStopSign
+FROM
+	edu_project t3
+INNER JOIN edu_project_train_target t1 ON t3.id = t1.project_id
+INNER JOIN edu_user t2 on t2.status in (1,8)
+
+left JOIN edu_project_comment t4 ON t3.id = t4.project_id AND t4.teacher_id = t2.id
+ left JOIN edu_organization_project t5 ON t5.project_id = t3.id AND t5.project_status!=60
+WHERE
+	1 = 1
+AND (t3. STATUS = 30 OR t3. STATUS = 40)
+AND t3.pid = #provinceId#
+AND t2.id = #teacherId#
+AND t3.sign_up_way = 2
+  		<isNotNull prepend="and" property="start">
+  		t3.year >= #start#
+  	</isNotNull>
+  	<isNotNull prepend="and" property="end">
+  		#end#>=t3.year
+  	</isNotNull>
+  	<isNotNull prepend="and" property="projectName">
+  		t3.project_name like '%$projectName$%'
+  	</isNotNull>
+  	GROUP BY t1.project_id 
+  	order by t3.id DESC limit #startIndex#,#endIndex#
+  </select>
+  
+  <!-- 我的参培项目 -->
+  <select id="teacherMyProject" parameterClass="java.util.HashMap" resultClass="project.teacher.teacherProject.pojo.EduProjectTrainTargetActitity">
+     select 
+ 	t.project_id AS projectId,
+	t.sex AS sex,
+	t.education_background_name AS educationBackgroundName,
+	t.position_name AS positionName,
+	t.professional_title_name AS professionalTitleName,
+	t.is_class_charger AS isClassCharger,
+	t.subject_name AS subjectName,
+	t.stduty_section AS stdutySection,
+  	u.id as uId, 
+	p.id,
+	p.train_scope_id AS trainScopeId,
+	p.project_name AS projectName,
+	p. YEAR AS YEAR,
+	p.start_date AS startDate,
+	p.end_date AS endDate,
+	p.train_type_name AS trainTypeName,
+	p.project_scope_name AS projectScopeName,
+	p.plan_num AS planNum,
+	p.class_period AS classPeriod,
+	p.class_score AS classScore,
+	p.sign_up_way AS signUpWay,
+    c. status,
+	c.organization_id AS organizationId,
+	o.project_status as projectStatus
+	FROM
+	edu_project p 
+	INNER JOIN edu_project_train_target t ON p.id = t.project_id
+	LEFT JOIN edu_project_comment c ON p.id = c.project_id 
+	LEFT JOIN edu_user u on u.id = c.teacher_id
+	LEFT JOIN edu_organization_project o ON o.project_id = p.id  AND o.project_status not in (60) AND (p. STATUS in (30,40)) 
+	where 1=1
+    <isNotNull prepend="and" property="teacherId">
+  		c.teacher_id=#teacherId#
+  	</isNotNull>
+    <isNotNull prepend="and" property="start">
+  		p.year >= #start#
+  	</isNotNull>
+  	<isNotNull prepend="and" property="end">
+  		#end#>=p.year
+  	</isNotNull>
+  	<isNotNull prepend="and" property="projectName">
+  		p.project_name LIKE '%$projectName$%'
+  	</isNotNull>
+     ORDER BY p.id desc limit #startIndex#,#endIndex#
+  </select>
+  
+  <!-- 我的参培项目count -->
+  <select id="selectCountMyProject" parameterClass="java.util.HashMap" resultClass="int">
+    
+      select count(1) from
+   <!-- (select
+    t.project_id AS projectId,
+	t.sex AS sex,
+	t.education_background_name AS educationBackgroundName,
+	t.position_name AS positionName,
+	t.professional_title_name AS professionalTitleName,
+	t.is_class_charger AS isClassCharger,
+	t.subject_name AS subjectName,
+	t.stduty_section AS stdutySection,
+    u.id as uId,
+	p.id,
+	p.train_scope_id AS trainScopeId,
+	p.project_name AS projectName,
+	p. YEAR AS YEAR,
+	p.start_date AS startDate,
+	p.end_date AS endDate,
+	p.train_type_name AS trainTypeName,
+	p.project_scope_name AS projectScopeName,
+	p.plan_num AS planNum,
+	p.class_period AS classPeriod,
+	p.class_score AS classScore,
+	p.sign_up_way AS signUpWay,
+    c. status,
+	c.organization_id AS organizationId,
+	o.project_status as projectStatus
+	FROM -->
+	edu_project p 
+	INNER JOIN edu_project_train_target t ON p.id = t.project_id
+	LEFT JOIN edu_project_comment c ON p.id = c.project_id
+	LEFT JOIN edu_user u on u.id=c.teacher_id
+	LEFT JOIN edu_organization_project o ON o.project_id = p.id  AND o.project_status not in (60) AND (p. STATUS in (30,40)) 
+	where 1=1
+    <isNotNull prepend="and" property="teacherId">
+  		c.teacher_id=#teacherId#
+  	</isNotNull>
+  	<isNotNull prepend="and" property="start">
+	  	p.year >= #start#
+  	</isNotNull>
+  	<isNotNull prepend="and" property="end">
+  		#end#>=p.year
+  	</isNotNull>
+    <isNotNull prepend="and" property="projectName">
+  		p.project_name LIKE '%$projectName$%'
+  	</isNotNull> 
+    <!-- ORDER BY p.id desc
+    ) a -->
+  </select>
+  
+   <!-- 培训项目通用查询 count -->
+  <select id="selectCountTeacherProjectCommon" parameterClass="java.util.HashMap" resultClass="int">
+  SELECT  count(1) 
+	<!-- t.project_id AS projectId,
+	t.sex AS sex,
+	t.education_background_name AS educationBackgroundName,
+	t.position_name AS positionName,
+	t.professional_title_name AS professionalTitleName,
+	t.is_class_charger AS isClassCharger,
+	t.subject_name AS subjectName,
+	t.stduty_section AS stdutySection,
+    u.id as uId,
+	p.id,
+	p.train_scope_id AS trainScopeId,
+	p.project_name AS projectName,
+	p. YEAR AS YEAR,
+	p.start_date AS startDate,
+	p.end_date AS endDate,
+	p.train_type_name AS trainTypeName,
+	p.project_scope_name AS projectScopeName,
+	p.plan_num AS planNum,
+	p.class_period AS classPeriod,
+	p.class_score AS classScore,
+	p.sign_up_way AS signUpWay,
+	c. status,
+	c.organization_id AS organizationId,
+	o.project_status as projectStatus -->
+	FROM
+		edu_project p
+		INNER JOIN edu_project_train_target t ON p.id = t.project_id
+		LEFT JOIN edu_project_comment c ON p.id = c.project_id 
+		LEFT JOIN edu_user u ON c.teacher_id = u.id
+		LEFT JOIN edu_organization_project o ON o.project_id = p.id  AND o.project_status not in (60)
+		WHERE 
+		(p. STATUS in (30,40,50)) AND p.sign_up_way != 2
+		<isNotNull prepend="and" property="projectScopeName">
+	  		p.project_scope_name LIKE  '%$projectScopeName$%'
+	  	</isNotNull>    
+		<isNotNull prepend="and" property="teacherId">
+	  		c.teacher_id=#teacherId#
+	  	</isNotNull>
+	  	<isNotNull prepend="and" property="start">
+	  		p.year >= #start#
+	  	</isNotNull>
+	  	<isNotNull prepend="and" property="end">
+	  		#end# >= p.year
+	  	</isNotNull>
+	  	<isNotNull prepend="and" property="projectName">
+	  		p.project_name LIKE  '%$projectName$%'
+	  	</isNotNull>    
+	  	order by p.id DESC 
+  </select>
+  
+  <!-- 培训项目通用查询 -->
+   <select id="selectTeacherProjectCommon" parameterClass="java.util.HashMap" resultClass="project.teacher.teacherProject.pojo.EduProjectTrainTargetActitity">
+	  SELECT 
+		t.project_id AS projectId,
+		t.sex AS sex,
+		t.education_background_name AS educationBackgroundName,
+		t.position_name AS positionName,
+		t.professional_title_name AS professionalTitleName,
+		t.is_class_charger AS isClassCharger,
+		t.subject_name AS subjectName,
+		t.stduty_section AS stdutySection,
+	    u.id as uId,
+		p.id,
+		p.train_scope_id AS trainScopeId,
+		p.project_name AS projectName,
+		p. YEAR AS YEAR,
+		p.start_date AS startDate,
+		p.end_date AS endDate,
+		p.train_type_name AS trainTypeName,
+		p.project_scope_name AS projectScopeName,
+		p.plan_num AS planNum,
+		p.class_period AS classPeriod,
+		p.class_score AS classScore,
+		p.sign_up_way AS signUpWay,
+		c. status,
+		c.organization_id AS organizationId,
+		o.project_status as projectStatus
+		FROM
+			edu_project p
+			INNER JOIN edu_project_train_target t ON p.id = t.project_id
+			LEFT JOIN edu_project_comment c ON p.id = c.project_id 
+			LEFT JOIN edu_user u ON c.teacher_id = u.id
+			LEFT JOIN edu_organization_project o ON o.project_id = p.id  AND o.project_status not in (60)
+		WHERE 
+			(p. STATUS in (30,40,50)) AND p.sign_up_way != 2
+			<isNotNull prepend="and" property="projectScopeName">
+		  		p.project_scope_name LIKE  '%$projectScopeName$%'
+		  	</isNotNull>    
+			<isNotNull prepend="and" property="teacherId">
+		  		c.teacher_id=#teacherId#
+		  	</isNotNull>
+		  	<isNotNull prepend="and" property="start">
+		  		p.year >= #start#
+		  	</isNotNull>
+		  	<isNotNull prepend="and" property="end">
+		  		#end# >= p.year
+		  	</isNotNull>
+		  	<isNotNull prepend="and" property="projectName">
+		  		p.project_name LIKE  '%$projectName$%'
+		  	</isNotNull> 
+	  	order by p.id DESC limit #startIndex#,#endIndex#
+  </select>
+  
+  <!--国培项目-->
+  <select id="teacherOtherProject" parameterClass="java.util.HashMap" resultClass="project.teacher.teacherProject.pojo.EduProjectTrainTargetActitity">
+	   
+  select * from (
+  SELECT 
+	t.project_id AS projectId,
+	t.sex AS sex,
+	t.education_background_name AS educationBackgroundName,
+	t.position_name AS positionName,
+	t.professional_title_name AS professionalTitleName,
+	t.is_class_charger AS isClassCharger,
+	t.subject_name AS subjectName,
+	t.stduty_section AS stdutySection,
+    u.id as uId,
+	p.id,
+	p.train_scope_id AS trainScopeId,
+	p.project_name AS projectName,
+	p. YEAR AS YEAR,
+	p.start_date AS startDate,
+	p.end_date AS endDate,
+	p.train_type_name AS trainTypeName,
+	p.project_scope_name AS projectScopeName,
+	p.plan_num AS planNum,
+	p.class_period AS classPeriod,
+	p.class_score AS classScore,
+	p.sign_up_way AS signUpWay,
+	c. status,
+	c.organization_id AS organizationId,
+	o.project_status as projectStatus
+	FROM
+		edu_project p
+	INNER JOIN edu_project_train_target t ON p.id = t.project_id
+	INNER JOIN edu_user u on u.status = 8
+	
+	left JOIN edu_project_comment c ON p.id = c.project_id AND c.teacher_id = u.id
+	
+	 left JOIN edu_organization_project o ON o.project_id = p.id  AND o.project_status!=60
+	WHERE
+		1 = 1
+	AND (p. STATUS = 30 OR p. STATUS = 40)
+	AND p.pid = #provinceId#
+	AND u.id = #teacherId#
+  		<isNotNull prepend="and" property="start">
+  		p.year >= #start#
+  	</isNotNull>
+  	<isNotNull prepend="and" property="end">
+  		#end#>=p.year
+  	</isNotNull>
+  	<isNotNull prepend="and" property="projectName">
+  		p.project_name = #projectName#
+  	</isNotNull> 
+  	 	
+  	order by p.id DESC   ) a  where a.projectScopeName  like '%国培%'  limit #startIndex#,#endIndex#
+
+  </select>
+  
+  <!-- 国培count -->
+  <select id="selectCountTeacherOtherProject" parameterClass="java.util.HashMap" resultClass="int">
+    
+    
+   select count(1) from (   
+ select * from (
+  SELECT 
+	t.project_id AS projectId,
+	t.sex AS sex,
+	t.education_background_name AS educationBackgroundName,
+	t.position_name AS positionName,
+	t.professional_title_name AS professionalTitleName,
+	t.is_class_charger AS isClassCharger,
+	t.subject_name AS subjectName,
+	t.stduty_section AS stdutySection,
+    u.id as uId,
+	p.id,
+	p.train_scope_id AS trainScopeId,
+	p.project_name AS projectName,
+	p. YEAR AS YEAR,
+	p.start_date AS startDate,
+	p.end_date AS endDate,
+	p.train_type_name AS trainTypeName,
+	p.project_scope_name AS projectScopeName,
+	p.plan_num AS planNum,
+	p.class_period AS classPeriod,
+	p.class_score AS classScore,
+	p.sign_up_way AS signUpWay,
+	c. status,
+	c.organization_id AS organizationId,
+	o.project_status as projectStatus
+	FROM
+		edu_project p
+	INNER JOIN edu_project_train_target t ON p.id = t.project_id
+	INNER JOIN edu_user u on u.status = 8
+	
+	left JOIN edu_project_comment c ON p.id = c.project_id AND c.teacher_id = u.id
+	
+	 left JOIN edu_organization_project o ON o.project_id = p.id  AND o.project_status!=60
+	WHERE
+		1 = 1
+	AND (p. STATUS = 30 OR p. STATUS = 40)
+	AND p.pid = #provinceId#
+	AND u.id = #teacherId#
+  		<isNotNull prepend="and" property="start">
+  		p.year >= #start#
+  	</isNotNull>
+  	<isNotNull prepend="and" property="end">
+  		#end#>=p.year
+  	</isNotNull>
+  	<isNotNull prepend="and" property="projectName">
+  		p.project_name = #projectName#
+  	</isNotNull>   
+	
+  	order by p.id DESC   ) a  where a.projectScopeName  like '%国培%' ) b
+  </select>
+  
+  <!--省培项目-->
+  <select id="teacherAddProjectGuoPei" parameterClass="java.util.HashMap" resultClass="project.teacher.teacherProject.pojo.EduProjectTrainTargetActitity">
+	
+      select * from (
+  SELECT 
+	t.project_id AS projectId,
+	t.sex AS sex,
+	t.education_background_name AS educationBackgroundName,
+	t.position_name AS positionName,
+	t.professional_title_name AS professionalTitleName,
+	t.is_class_charger AS isClassCharger,
+	t.subject_name AS subjectName,
+	t.stduty_section AS stdutySection,
+    u.id as uId,
+	p.id,
+	p.train_scope_id AS trainScopeId,
+	p.project_name AS projectName,
+	p. YEAR AS YEAR,
+	p.start_date AS startDate,
+	p.end_date AS endDate,
+	p.train_type_name AS trainTypeName,
+	p.project_scope_name AS projectScopeName,
+	p.plan_num AS planNum,
+	p.class_period AS classPeriod,
+	p.class_score AS classScore,
+	p.sign_up_way AS signUpWay,
+	c. status,
+	c.organization_id AS organizationId,
+	o.project_status as projectStatus
+	FROM
+		edu_project p
+	INNER JOIN edu_project_train_target t ON p.id = t.project_id
+	INNER JOIN edu_user u on u.status = 8
+	
+	left JOIN edu_project_comment c ON p.id = c.project_id AND c.teacher_id = u.id
+	
+	 left JOIN edu_organization_project o ON o.project_id = p.id  AND o.project_status!=60
+	WHERE
+		1 = 1
+	AND (p. STATUS = 30 OR p. STATUS = 40)
+	AND p.pid = #provinceId#
+	AND u.id = #teacherId#
+  		<isNotNull prepend="and" property="start">
+  		p.year >= #start#
+  	</isNotNull>
+  	<isNotNull prepend="and" property="end">
+  		#end#>=p.year
+  	</isNotNull>
+  	<isNotNull prepend="and" property="projectName">
+  		p.project_name = #projectName#
+  	</isNotNull> 
+	
+  	order by p.id DESC   ) a  where   a.projectScopeName like '%省培%' limit #startIndex#,#endIndex#
+
+  </select>
+  
+  <!-- 省培项目count -->
+  <select id="selectCountTeacherAddProjectGuoPei" parameterClass="java.util.HashMap" resultClass="int">
+    
+     select count(1) from (   
+ select * from (
+  SELECT 
+	t.project_id AS projectId,
+	t.sex AS sex,
+	t.education_background_name AS educationBackgroundName,
+	t.position_name AS positionName,
+	t.professional_title_name AS professionalTitleName,
+	t.is_class_charger AS isClassCharger,
+	t.subject_name AS subjectName,
+	t.stduty_section AS stdutySection,
+    u.id as uId,
+	p.id,
+	p.train_scope_id AS trainScopeId,
+	p.project_name AS projectName,
+	p. YEAR AS YEAR,
+	p.start_date AS startDate,
+	p.end_date AS endDate,
+	p.train_type_name AS trainTypeName,
+	p.project_scope_name AS projectScopeName,
+	p.plan_num AS planNum,
+	p.class_period AS classPeriod,
+	p.class_score AS classScore,
+	p.sign_up_way AS signUpWay,
+	c. status,
+	c.organization_id AS organizationId,
+	o.project_status as projectStatus
+	FROM
+		edu_project p
+	INNER JOIN edu_project_train_target t ON p.id = t.project_id
+	INNER JOIN edu_user u on u.status = 8
+	
+	left JOIN edu_project_comment c ON p.id = c.project_id AND c.teacher_id = u.id
+	
+	 left JOIN edu_organization_project o ON o.project_id = p.id  AND o.project_status!=60
+	WHERE
+		1 = 1
+	AND (p. STATUS = 30 OR p. STATUS = 40)
+	AND p.pid = #provinceId#
+	AND u.id = #teacherId#
+  		<isNotNull prepend="and" property="start">
+  		p.year >= #start#
+  	</isNotNull>
+  	<isNotNull prepend="and" property="end">
+  		#end#>=p.year
+  	</isNotNull>
+  	<isNotNull prepend="and" property="projectName">
+  		p.project_name = #projectName#
+  	</isNotNull>   
+	 
+  	order by p.id DESC   ) a  where  a.projectScopeName like '%省培%') b
+  </select>
+  
+  
+  
+   <!--校本项目-->
+  <select id="teacherProjectXiaoBen" parameterClass="java.util.HashMap" resultClass="project.teacher.teacherProject.pojo.EduProjectTrainTargetActitity">
+	
+       select * from (
+  SELECT 
+	t.project_id AS projectId,
+	t.sex AS sex,
+	t.education_background_name AS educationBackgroundName,
+	t.position_name AS positionName,
+	t.professional_title_name AS professionalTitleName,
+	t.is_class_charger AS isClassCharger,
+	t.subject_name AS subjectName,
+	t.stduty_section AS stdutySection,
+    u.id as uId,
+	p.id,
+	p.train_scope_id AS trainScopeId,
+	p.project_name AS projectName,
+	p. YEAR AS YEAR,
+	p.start_date AS startDate,
+	p.end_date AS endDate,
+	p.train_type_name AS trainTypeName,
+	p.project_scope_name AS projectScopeName,
+	p.plan_num AS planNum,
+	p.class_period AS classPeriod,
+	p.class_score AS classScore,
+	p.sign_up_way AS signUpWay,
+	c. status,
+	c.organization_id AS organizationId,
+	o.project_status as projectStatus
+	FROM
+		edu_project p
+	INNER JOIN edu_project_train_target t ON p.id = t.project_id
+	INNER JOIN edu_user u on u.status = 8
+	
+	left JOIN edu_project_comment c ON p.id = c.project_id AND c.teacher_id = u.id
+	
+	 left JOIN edu_organization_project o ON o.project_id = p.id  AND o.project_status!=60
+	WHERE
+		1 = 1
+	AND (p. STATUS = 30 OR p. STATUS = 40)
+	AND p.pid = #provinceId#
+	AND u.id = #teacherId#
+  		<isNotNull prepend="and" property="start">
+  		p.year >= #start#
+  	</isNotNull>
+  	<isNotNull prepend="and" property="end">
+  		#end#>=p.year
+  	</isNotNull>
+  	<isNotNull prepend="and" property="projectName">
+  		p.project_name = #projectName#
+  	</isNotNull> 
+	
+  	order by p.id DESC   ) a  where   a.projectScopeName like '%校本%' limit #startIndex#,#endIndex#
+
+  </select>
+  
+  <!-- 校本项目count -->
+  <select id="teacherProjectXiaoBenCount" parameterClass="java.util.HashMap" resultClass="int">
+    
+    select count(1) from (   
+ select * from (
+  SELECT 
+	t.project_id AS projectId,
+	t.sex AS sex,
+	t.education_background_name AS educationBackgroundName,
+	t.position_name AS positionName,
+	t.professional_title_name AS professionalTitleName,
+	t.is_class_charger AS isClassCharger,
+	t.subject_name AS subjectName,
+	t.stduty_section AS stdutySection,
+    u.id as uId,
+	p.id,
+	p.train_scope_id AS trainScopeId,
+	p.project_name AS projectName,
+	p. YEAR AS YEAR,
+	p.start_date AS startDate,
+	p.end_date AS endDate,
+	p.train_type_name AS trainTypeName,
+	p.project_scope_name AS projectScopeName,
+	p.plan_num AS planNum,
+	p.class_period AS classPeriod,
+	p.class_score AS classScore,
+	p.sign_up_way AS signUpWay,
+	c. status,
+	c.organization_id AS organizationId,
+	o.project_status as projectStatus
+	FROM
+		edu_project p
+	INNER JOIN edu_project_train_target t ON p.id = t.project_id
+	INNER JOIN edu_user u on u.status = 8
+	
+	left JOIN edu_project_comment c ON p.id = c.project_id AND c.teacher_id = u.id
+	
+	 left JOIN edu_organization_project o ON o.project_id = p.id  AND o.project_status!=60
+	WHERE
+		1 = 1
+	AND (p. STATUS = 30 OR p. STATUS = 40)
+	AND p.pid = #provinceId#
+	AND u.id = #teacherId#
+  		<isNotNull prepend="and" property="start">
+  		p.year >= #start#
+  	</isNotNull>
+  	<isNotNull prepend="and" property="end">
+  		#end#>=p.year
+  	</isNotNull>
+  	<isNotNull prepend="and" property="projectName">
+  		p.project_name = #projectName#
+  	</isNotNull>   	
+  	order by p.id DESC   ) a  where  a.projectScopeName like '%校本%') b
+  </select>
+  <!--
+  addBy yinxiaolong 
+  教师加入培训项目资格对比教师信息
+  -->
+  <select id="selectTeacherAddProjectTermByTeacherId" parameterClass="java.util.HashMap" resultClass="project.teacher.teachermanage.pojo.EduTeacherJob">
+  select 
+DISTINCT
+t1.job_school_administration_office as jobSchoolAdministrationOffice,
+t1.job_recruitment_position as jobRecruitmentPosition,
+t1.job_whether_teacher as jobWhetherTeacher,
+t1.job_former_teaching_subject as jobFormerTeachingSubject,
+t1.job_former_teaching_section as jobFormerTeachingSection,
+t2.gender as gender,
+t2.user_province_id as userProvinceId,
+t2.user_city_id as userCityId,
+t2.user_district_id as userDistrictId
+from  
+edu_teacher_job t1  
+INNER JOIN edu_user t2 ON t2.id = t1.teacher_id 
+WHERE t1.teacher_id=#teacherId#
+AND t1.`status` = 1
+  </select>
+  <!--
+  addBy yinxiaolong 
+  教师加入培训项目资格对比教师信息学历
+  -->
+  <select id="selectTeacherAddProjectEducationyTeacherId" parameterClass="java.util.HashMap" resultClass="project.teacher.teachermanage.pojo.EduTeacherEducation">
+  select 
+   education_experience as educationExperience
+from edu_teacher_education 
+where teacher_id=#teacherId#
+</select>
+
+	<!-- 管理员: 查询教师成绩详情记录总数 		add by zhangxiaoqi -->
+	<select id="selectTeacherProScoreInfoCount" parameterClass="java.util.Map" resultClass="int">
+		SELECT
+			count(1)
+		FROM
+			edu_user a
+			LEFT JOIN edu_project_comment b ON a.id = b.teacher_id
+			LEFT JOIN edu_teacher_job c ON a.id = c.teacher_id
+			LEFT JOIN edu_school d ON a.school_id = d.school_id
+		WHERE
+			b.project_id = #projectId#
+		<isNotEmpty prepend="AND" property="teacherName">
+			a.real_name LIKE '%$teacherName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="idNumber">
+			a.id_number LIKE '%$idNumber$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="provinceId">
+			d.school_province_id = #provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="cityId">
+			d.school_city_id = #cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="districtId">
+			d.school_district_id = #districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="schoolId">
+			d.school_id = #schoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="teachingSubject">
+			c.job_former_teaching_subject LIKE '%$teachingSubject$%'
+		</isNotEmpty>
+	</select>
+
+	<!-- 管理员: 查询教师成绩详情记录 		add by zhangxiaoqi -->
+	<select id="selectTeacherProScoreInfo"  parameterClass="java.util.Map" resultClass="project.organization.pojo.OrgProTeacherActivity">
+		SELECT
+			a.real_name as realName, a.id_number as idNumber, a.mobile, c.job_former_teaching_subject as teachingSubject, 
+			d.school_province_name as schoolProvinceName, d.school_city_name as schoolCityName, e.project_name as projectName,
+			d.school_district_name as schoolDistrictName, d.school_name as schoolName, b.teacher_score as score
+		FROM
+			edu_user a
+			LEFT JOIN edu_project_comment b ON a.id = b.teacher_id
+			LEFT JOIN edu_teacher_job c ON a.id = c.teacher_id
+			LEFT JOIN edu_school d ON a.school_id = d.school_id
+			LEFT JOIN edu_project e ON b.project_id = e.id
+		WHERE
+			b.project_id = #projectId#
+		<isNotEmpty prepend="AND" property="teacherName">
+			a.real_name LIKE '%$teacherName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="idNumber">
+			a.id_number LIKE '%$idNumber$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="provinceId">
+			d.school_province_id = #provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="cityId">
+			d.school_city_id = #cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="districtId">
+			d.school_district_id = #districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="schoolId">
+			d.school_id = #schoolId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="teachingSubject">
+			c.job_former_teaching_subject LIKE '%$teachingSubject$%'
+		</isNotEmpty>
+		ORDER BY
+			b.update_date DESC LIMIT #startIndex#, #endIndex#
+	</select>
+
+
+	<!-- 培训成绩导入查询项目列表总数/ -->
+	<select id="selectTeacherProScoreListCount" parameterClass="java.util.Map" resultClass="int">
+			
+				select count(1)	from edu_project p
+				LEFT JOIN edu_project_audit t on t.id = (SELECT MAX(id)id from edu_project_audit where project_id=p.id )
+		        where 1=1
+		        <isNotEmpty prepend="AND" property="status">
+					status = #status#
+				</isNotEmpty>
+				<isNotNull prepend="AND" property="createById">
+					create_by_id = #createById#
+				</isNotNull>
+				<isNotEmpty prepend="AND" property="projectName">
+					project_name LIKE '%$projectName$%'
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="start">
+					year >= #start#
+				</isNotEmpty>
+				<isNotEmpty prepend="AND" property="end">
+					#end# >= year
+				</isNotEmpty>
+				<isNotNull prepend="and" property="applyerId">
+  		            t.applicant_id = #applyerId#
+  	            </isNotNull>  				
+			
+	</select> 
+	
+	<!-- 管理员: 查询教师成绩列表记录 	add by zhangxiaoqi -->
+	<select id="selectTeacherProScoreList" parameterClass="java.util.Map" resultClass="project.edupm.teachermanage.pojo.TeacherProScorePOJO">
+		SELECT
+			c.id as projectId, c.projectName, c.startDate, c.endDate, c.trainTypeName, c.planNum, SUM(d.actual_num) as actualNum
+		FROM
+		(
+			SELECT
+				a.id, a.project_name as projectName, a.start_date as startDate, a.end_date as endDate, a.train_type_name as trainTypeName,
+				a.plan_num as planNum, a.update_date
+			FROM
+				edu_project a 
+				LEFT JOIN edu_user b ON a.create_by = b.login_account
+			WHERE
+				b.role_id >= #roleId#
+			AND
+				a.status = 40
+			<isNotEmpty prepend="AND" property="provinceId">
+				b.user_province_id = #provinceId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="cityId">
+				b.user_city_id = #cityId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="districtId">
+				b.user_district_id = #districtId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="schoolId">
+				b.user_school_id = #schoolId#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="projectName">
+				a.project_name LIKE '%$projectName$%'
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="startTime">
+				a.year >= #startTime#
+			</isNotEmpty>
+			<isNotEmpty prepend="AND" property="endTime">
+				#endTime# >= a.year
+			</isNotEmpty>
+		) c LEFT JOIN edu_organization_project d ON c.id = d.project_id
+		GROUP BY d.project_id
+		ORDER BY
+			c.id DESC LIMIT #startIndex#, #endIndex#
+	</select> 
+	
+	<!-- 培训成绩导入查询项目列表/ -->
+	<select id="selectTeacherScoreList" parameterClass="java.util.Map" resultClass="project.edupm.projectmanage.pojo.EduProject">
+		select p.id,p.start_date as startDate,p.end_date as endDate,plan_num as planNum,p.create_by as createBy,p.create_by_area as createByArea,
+		p.project_name as projectName,project_property_name as projectPropertyName,p.train_type_name as trainTypeName,p.status as status,p.has_stop_sign as hasStopSign,
+		(select count(1)from edu_project_comment c where c.project_id=p.id ) as signNum,
+ 		(select count(1)from edu_project_comment c where c.project_id=p.id AND c. STATUS = 13 ) as pass,  
+        (select count(1)from edu_project_comment c where c.project_id=p.id AND c. STATUS = 12 ) as unpass ,
+        year,p.organization_id,p.has_stop_sign as hasStopSign,
+        IFNULL(u.login_account,'') as applyer, IFNULL(dd.login_account,'') as auditor, g.organization_name as organizationName
+		from edu_project p
+			LEFT JOIN edu_project_audit t on t.id = (SELECT MAX(id)id from edu_project_audit where project_id=p.id )
+			LEFT JOIN edu_user u on u.id = t.applicant_id
+			LEFT JOIN edu_user dd on dd.id = t.auditor_id
+			LEFT JOIN edu_organization g on g.organization_id = p.organization_id
+		where 1=1
+		 <isNotNull property="status" prepend="and">
+			p.status = #status#
+		</isNotNull>
+		<isNotNull property="createById" prepend="and">
+			p.create_by_id = #createById#
+		</isNotNull>
+		<isNotNull property="projectName" prepend="and">
+			project_name like '%$projectName$%'
+		</isNotNull>
+		<isNotNull prepend="and" property="start">
+  			year >= #start#
+	  	</isNotNull>
+	  	<isNotNull prepend="and" property="end">
+	  		#end#>=year
+	  	</isNotNull>
+		<isNotNull prepend="and" property="applyerId">
+  			t.applicant_id = #applyerId#
+  	    </isNotNull> 
+		order by id desc
+		limit #startIndex#,#endIndex#
+	</select>
+	
+	<!-- 统计某一项目下的教师参培人数 	add by zxq 	-->
+	<select id="selectTeacherCount" parameterClass="java.util.Map" resultClass="int">
+		SELECT
+			COUNT(1)
+		FROM
+			edu_project_comment
+		WHERE
+			project_id = #projectId#
+	</select>
+	
+	<!-- 管理员: 查询教师成绩详情列表前判断教师是否已有成绩  -->
+	<select id="selectCountTeacherScore" parameterClass="String" resultClass="int">
+		SELECT
+			COUNT(1)
+		FROM
+			edu_project_comment
+		WHERE
+			teacher_score IS NOT NULL
+		AND
+			project_id = #projectId#
+	</select>
+	
+	<!-- 查看项目下导入的各个机构成绩(不包含报名人数, 学习人数) -->
+	<select id="selectInportSoreInfo" resultClass="project.edupm.teachermanage.pojo.TeacherProScorePOJO" parameterClass="int">
+		SELECT
+			op.organization_id AS orgId,
+			op.organization_name AS orgName, 
+			op.plan_num AS planNum
+		FROM
+			edu_organization_project op
+			LEFT JOIN edu_project_comment pc ON op.organization_id = pc.organization_id
+		WHERE
+			op.project_id = #projectId#
+		GROUP BY pc.organization_id
+	</select>
+	
+	<!-- 查看项目下导入的各个机构成绩(报名人数, 学习人数) -->
+	<select id="selectCountApplyAndStudyNum" resultClass="project.edupm.teachermanage.pojo.TeacherProScorePOJO" parameterClass="java.util.Map">
+		SELECT
+			COUNT(teacher_score) AS studyNum, 
+			COUNT(1) AS applyNum
+		FROM
+			edu_project_comment 
+		WHERE
+			project_id = #projectId#
+		<!-- AND
+			organization_id = #orgId# -->
+	</select>
+	
+	<!-- 查看项目下导入的各个机构成绩(各个分数段人数) -->
+	<select id="selectTeacherScores" resultClass="project.edupm.teachermanage.pojo.TeacherProScorePOJO" parameterClass="java.util.Map">
+		SELECT
+			SUM(IFNULL(scoreA,0)) as scoreA,
+			SUM(IFNULL(scoreB,0)) as scoreB,
+			SUM(IFNULL(scoreC,0)) as scoreC,
+			SUM(IFNULL(scoreD,0)) as scoreD,
+			SUM(IFNULL(scoreE,0)) as scoreE
+		FROM(
+			SELECT
+				CASE WHEN teacher_score >= 90 THEN 1 ELSE 0 END AS scoreA,
+				CASE WHEN teacher_score >= 80 AND 90 > teacher_score THEN 1 ELSE 0 END AS scoreB,
+				CASE WHEN teacher_score >= 70 AND 80 > teacher_score THEN 1 ELSE 0 END AS scoreC,
+				CASE WHEN teacher_score >= 60 AND 70 > teacher_score THEN 1 ELSE 0 END AS scoreD,
+				CASE WHEN 60 > teacher_score THEN 1 ELSE 0 END AS scoreE
+			FROM
+				edu_project_comment
+			WHERE
+				project_id = #projectId#
+			<!-- AND
+				organization_id = #orgId# -->
+		) a
+	</select>
+	
+	<!-- 查询培训成绩导入 某一项目下参训教师信息 -->
+	<select id="selectTeacherInfoByProjectId" parameterClass="int" resultClass="java.util.HashMap">
+		<!-- SELECT DISTINCT 
+		a.real_name AS realName, 
+		a.id_number AS idNumber 
+		FROM edu_user a
+		LEFT JOIN edu_project_comment b ON a.id = b.teacher_id 
+		AND b.status = 13
+		AND b.id = ( 
+		SELECT max(id) FROM edu_project_comment WHERE 
+		teacher_id = a.id 
+		AND project_id = #projectId# 
+		) 
+		LEFT JOIN edu_teacher_job c ON a.id = c.teacher_id 
+		LEFT JOIN edu_school d ON a.school_id = d.school_id 
+		LEFT JOIN 
+		edu_project e ON b.project_id = e.id 
+		WHERE 
+		b.project_id = #projectId# 
+		AND c. STATUS = 1 
+		ORDER BY 
+		b.update_date  -->
+		
+		<!-- sql优化，查询主表由edu_user改为edu_project_comment -->
+		SELECT  
+		a.real_name AS realName, 
+		a.id_number AS idNumber 
+		FROM edu_project_comment b
+		LEFT JOIN edu_user a ON a.id = b.teacher_id 
+		LEFT JOIN edu_teacher_job c ON a.id = c.teacher_id 
+		LEFT JOIN edu_school d ON a.school_id = d.school_id 
+		LEFT JOIN edu_project e ON b.project_id = e.id 
+		WHERE b.project_id = #projectId# AND b.status = 13 AND c. STATUS = 1 
+		ORDER BY b.update_date
+	</select>
+</sqlMap>

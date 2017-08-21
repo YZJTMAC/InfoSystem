@@ -1,0 +1,729 @@
+package project.message.controller;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import net.sf.json.JSONObject;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
+
+import project.common.Common;
+import project.message.constant.MessageConstants;
+import project.message.pojo.EduMessage;
+import project.message.pojo.MessageTree;
+import project.message.service.IMessageServiceIF;
+import project.person.pojo.EduUser;
+import project.person.pojo.EduUserActivty;
+import project.person.service.IUserService;
+import project.teacher.teacherProject.controller.TeacherController;
+import project.util.ApplicationProperties;
+import project.util.ResponseUtil;
+import framelib.controller.AbsController;
+import framelib.utils.FileUtils;
+import framelib.utils.page.PageObject;
+
+/**
+ * 消息
+ * @author yinxiaolong
+ * @Create_date:2014-4-19
+ */
+@RequestMapping("/message/messageManagement")
+@Controller
+@Aspect
+public class MessageController extends AbsController{
+	private static final Logger log = Logger.getLogger(TeacherController.class);
+	@Autowired
+	@Qualifier("messageService")
+	IMessageServiceIF messageService;
+	
+	@Autowired
+	@Qualifier("multipartResolver")
+	private CommonsMultipartResolver multipartResolver;
+
+	@Autowired
+	@Qualifier("userService")
+	IUserService userService;
+	
+	/**
+	 * 消息列表页面
+	 * @return
+	 */
+	@RequestMapping(value = "messageList.htm")
+	public String messageListPage() {
+		return "message/messageList";
+	}
+	
+	/**
+	 * 我创建的消息列表页面
+	 * @return
+	 */
+	@RequestMapping(value = "myMessageList.htm")
+	public String myMessageListPage() {
+		return "message/myMessageList";
+	}
+	
+	/**
+	 * 消息详情页面
+	 * @return
+	 */
+	@RequestMapping(value = "messageDetail.htm")
+	public String messageDetail(Integer messageId, Integer messageUserId,  ModelMap modelMap, HttpServletRequest request) {
+		try {
+			EduMessage message = messageService.findMessageById(messageId);
+			modelMap.put("message", message);
+			
+			if(messageUserId!=null){
+				Map<String, Object> paramMap = new HashMap<String, Object>();
+				paramMap.put("id", messageUserId);
+				paramMap.put("updateBy", super.getAccount(request));
+				paramMap.put("status", Common.COMMON_MESSAGE_HAVA_READ);
+				messageService.updateMessageStatus(paramMap);
+			}
+		} catch (Exception e) {
+			log.error("查看消息详情失败--->"+e.getMessage());
+			e.printStackTrace();
+		}
+		
+		return "message/messageDetail";
+	}
+	
+	private ModelMap getMessageType(HttpServletRequest request,  ModelMap map){
+		Integer roleId = super.getRoleId(request).intValue();
+		
+		if(roleId==1 || roleId==7){
+			map.put("messageType", "1");
+			map.put("from", "省级通知");
+		}else if(roleId==2 || roleId==8){
+			map.put("messageType", "2");
+			map.put("from", "市级通知");
+		}else if(roleId==3 || roleId==9){
+			map.put("messageType", "3");
+			map.put("from", "区县通知");
+		}else if(roleId==4 || roleId==10){
+			map.put("messageType", "4");
+			map.put("from", "学校通知");
+		}
+		return map;
+	} 
+	
+	/**
+	 * 根据范围发送消息页面
+	 */
+	@RequestMapping(value = "sendMessageByScope.htm")
+	public String sendMessageByScopePage(HttpServletRequest request, ModelMap map) {
+		getMessageType(request, map);
+		return "message/sendMessageByScope";
+	}
+	
+	
+	/**
+	 * 根据用户发送消息页面
+	 */
+	@RequestMapping(value = "sendMessageByUser.htm")
+	public String sendMessageByUserPage(HttpServletRequest request, ModelMap map) {
+		getMessageType(request, map);
+		return "message/sendMessageByUser";
+	}
+	
+	/**
+	 * 根据项目发送消息页面
+	 */
+	@RequestMapping(value = "sendMessageByProject.htm")
+	public String sendMessageByProjectPage(HttpServletRequest request, ModelMap map) {
+		getMessageType(request, map);
+		return "message/sendMessageByProject";
+	}
+	
+
+	/***
+	 * 获取节点
+	 */
+	@RequestMapping(value = "/getAreaNode.do")
+	public @ResponseBody List<MessageTree> getAdministratorNode(HttpServletRequest request, int receiveRole) throws Exception {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		EduUserActivty obj = getSessionUserInfo(request);
+		int roleId = obj.getRoleId().intValue();
+		
+		String areaId = "";
+		
+		//目前实施机构管理员及行政管理员登录，tree均按加载全部节点处理
+		if(roleId==4){
+			areaId = obj.getSchoolId().toString();
+		}else{
+			areaId = obj.getUserProvinceId();
+		}
+		
+		//和当前登录用户区域关联
+		/*if(roleId==1 || roleId==7){
+			areaId = obj.getUserProvinceId();
+		}else if(roleId==2 || roleId==8){
+			areaId = obj.getUserCityId();
+		}else if(roleId==3 || roleId==9){
+			areaId = obj.getUserDistrictId();
+		}else if(roleId == 4){
+			areaId = obj.getSchoolId().toString();
+		}*/
+		
+		paramMap.put("roleId", roleId);
+		paramMap.put("areaId", areaId);
+		
+		List<MessageTree> tree = messageService.getNodeTree(paramMap, receiveRole);
+		return tree;
+	}
+	
+	
+	/**
+	 * 消息列表
+	 */
+	@RequestMapping("messageList.do")
+	public @ResponseBody Map<String, Object> messageList(HttpServletRequest request, int type, int pageSize, int startIndex, HttpServletResponse response){
+		Map<String,Object> paramMap = new HashMap<String, Object>();
+		Map<String,Object> resultMap = new HashMap<String,Object>();
+		
+		try {
+			paramMap.put("receiveId", this.getAccountId(request));
+			paramMap.put("status", Common.COMMON_MESSAGE_NO_READ);
+			
+			startIndex = (startIndex - 1) * pageSize;
+			PageObject po = messageService.messageList(paramMap, type, pageSize, startIndex, resultMap);
+			
+			resultMap.put("success", true);
+			resultMap.put("total", po.getCount());
+			resultMap.put("rows", po.getObjects());
+			resultMap.put("pageSize", po.getPagesize());
+			resultMap.put("pages", po.getPages());
+			resultMap.put("currentPage", po.getCurrentPage());
+			resultMap.put("pageNumbers", po.getPageNumbers());
+		} catch (Exception e) {
+			log.error("消息列表查询失败："+e.getMessage());
+			e.printStackTrace();
+		}
+		return resultMap;
+	}
+	
+	
+	/**
+	 * 我的消息
+	 */
+	@RequestMapping("myMessageList.do")
+	public @ResponseBody Map<String, Object> myMessageList(HttpServletRequest request, int pageSize, int startIndex, HttpServletResponse response){
+		Map<String,Object> paramMap = new HashMap<String, Object>();
+		Map<String,Object> resultMap = new HashMap<String,Object>();
+		
+		try {
+			paramMap.put("sendUserId", this.getAccountId(request));
+			
+			startIndex = (startIndex - 1) * pageSize;
+			PageObject po = messageService.myMessageList(paramMap, pageSize, startIndex, resultMap);
+			
+			resultMap.put("success", true);
+			resultMap.put("total", po.getCount());
+			resultMap.put("rows", po.getObjects());
+			resultMap.put("pageSize", po.getPagesize());
+			resultMap.put("pages", po.getPages());
+			resultMap.put("currentPage", po.getCurrentPage());
+			resultMap.put("pageNumbers", po.getPageNumbers());
+		} catch (Exception e) {
+			log.error("消息列表查询失败："+e.getMessage());
+			e.printStackTrace();
+		}
+		return resultMap;
+	}
+	
+	
+	/***
+	 * 根据范围和角色发送消息
+	 */
+	@RequestMapping(value = "sendMessageByScope.do")
+	@After(value = "signUpComparisonTeacher()")   
+	public void sendMessageByScope( HttpServletRequest request, HttpServletResponse response, EduMessage message, String area) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		
+		try {
+			EduUserActivty obj = getSessionUserInfo(request);
+			paramMap.put("area", area);
+			resultMap = messageService.sendMessageByType("byScopeAndRole", message.getTitle(), message.getContent(), obj.getLoginAccount(), message.getMessageType(), obj.getRealName(), obj.getUserId(), null, null, paramMap, multipartResolver.isMultipart(request), request);
+		} catch (Exception e) {
+			log.error("插入消息失败：" + e.getMessage());
+			e.printStackTrace();
+			resultMap.put("success", false);
+			resultMap.put("info", "发送失败");
+			ResponseUtil.renderText(response, JSONObject.fromObject(resultMap).toString());
+			return ;
+		}
+		
+		ResponseUtil.renderText(response, JSONObject.fromObject(resultMap).toString());
+		return ;
+	}
+	
+	/***
+	 * 根据用户名发送消息
+	 */
+	@RequestMapping(value = "sendMessageByUser.do")
+	public void sendMessageByUser( HttpServletRequest request, HttpServletResponse response, EduMessage message, String receiveUser) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		
+		try {
+			EduUserActivty obj = getSessionUserInfo(request);
+			
+			paramMap.put("loginAccount", receiveUser);
+			resultMap = messageService.sendMessageByType("byUser", message.getTitle(), message.getContent(), obj.getLoginAccount(), message.getMessageType(), obj.getRealName(), obj.getUserId(), null, null, paramMap, multipartResolver.isMultipart(request), request);
+			
+		} catch (Exception e) {
+			log.error("插入消息失败：" + e.getMessage());
+			e.printStackTrace();
+			resultMap.put("success", false);
+			resultMap.put("info", "发送失败");
+			ResponseUtil.renderText(response, JSONObject.fromObject(resultMap).toString());
+			return ;
+		}
+		
+		ResponseUtil.renderText(response, JSONObject.fromObject(resultMap).toString());
+		return ;
+	}
+	
+	
+	/***
+	 * 根据项目发送消息
+	 */
+	@RequestMapping(value = "sendMessageByProject.do")
+	public void sendMessageByProject(HttpServletRequest request, HttpServletResponse response, EduMessage message, String projectId, String projectApplicant, String joinTeacher) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		
+		try {
+			EduUserActivty obj = getSessionUserInfo(request);
+			
+			if(StringUtils.isNotEmpty(joinTeacher) && StringUtils.isNotEmpty(projectApplicant)){//参训教师及申报人
+				paramMap.put("receiver", "1");
+			} else if(StringUtils.isNotEmpty(joinTeacher)){//参训教师
+				paramMap.put("receiver", "2");
+			} else if(StringUtils.isNotEmpty(projectApplicant)){//申报人
+				paramMap.put("receiver", "3");
+			}
+			paramMap.put("projectId", projectId);
+			
+			resultMap = messageService.sendMessageByType("byProject", message.getTitle(), message.getContent(), obj.getLoginAccount(), message.getMessageType(), obj.getRealName(), obj.getUserId(), null, null, paramMap, multipartResolver.isMultipart(request), request);
+			
+		} catch (Exception e) {
+			log.error("插入消息失败：" + e.getMessage());
+			e.printStackTrace();
+			resultMap.put("success", false);
+			resultMap.put("info", "发送失败");
+			ResponseUtil.renderText(response, JSONObject.fromObject(resultMap).toString());
+			return ;
+		}
+		
+		ResponseUtil.renderText(response, JSONObject.fromObject(resultMap).toString());
+		return ;
+	}
+	
+	
+	/***
+	 * 向用户发送短消息
+	 */
+	@RequestMapping(value = "sendMessageToUser.do")
+	public void sendMessageToUser(HttpServletRequest request, HttpServletResponse response, String title, String content, String receiveUserId, String receiveUserName) {
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		Map<String, Object> resultMap = new HashMap<String, Object>();
+		try {
+			EduUserActivty obj = getSessionUserInfo(request);
+			int roleId = obj.getRoleId().intValue();
+			int messageType = 1;
+			if(roleId==1 || roleId==7){
+				messageType = 1;
+			}else if(roleId==2 || roleId==8){
+				messageType = 2;
+			}else if(roleId==3 || roleId==9){
+				messageType = 3;
+			}else if(roleId==4){
+				messageType = 4;
+			}
+			
+			resultMap = messageService.sendMessageByType(null, title, content, obj.getLoginAccount(), messageType, obj.getRealName(), obj.getUserId(), receiveUserId, receiveUserName, paramMap, false, request);
+			
+		} catch (Exception e) {
+			log.error("发送短消息失败：" + e.getMessage());
+			e.printStackTrace();
+			resultMap.put("success", false);
+			resultMap.put("info", "发送失败");
+			ResponseUtil.renderText(response, JSONObject.fromObject(resultMap).toString());
+			return ;
+		}
+		
+		ResponseUtil.renderText(response, JSONObject.fromObject(resultMap).toString());
+		return ;
+	}
+	
+	/**
+	 * 总未读消息
+	 */
+	@RequestMapping("getMessageCounts.do")
+	public @ResponseBody Map<String, Object> getMessageCounts(HttpServletRequest request,HttpServletResponse response){
+		Map<String,Object> paramMap = new HashMap<String, Object>();
+		Map<String,Object> resultMap = new HashMap<String,Object>();
+		paramMap.put("receiveId", this.getAccountId(request));
+		//消息未读
+		paramMap.put("status", Common.COMMON_MESSAGE_NO_READ);
+			int total;
+			try {
+				total = messageService.selectMessageCounts(paramMap);
+				resultMap.put("success", true);
+				resultMap.put("total", total);
+			} catch (Exception e) {
+				log.error("消息总数查询失败："+e.getMessage());
+				e.printStackTrace();
+			}
+		return resultMap;
+	}
+	
+	/**
+	 * 删除接收的消息
+	 */
+	@RequestMapping("deleteMessage.do")
+	public @ResponseBody Map<String, Object> deleteMessage(Integer id,HttpServletRequest request,HttpServletResponse response){
+		Map<String,Object> paramMap = new HashMap<String, Object>();
+		Map<String,Object> resultMap = new HashMap<String,Object>();
+		
+		try {
+			paramMap.put("id", id);
+			boolean flag = messageService.deleteMessage(paramMap);
+			if(flag){
+				resultMap.put("success", true);
+			}
+		} catch (Exception e) {
+			log.error("消息删除失败："+e.getMessage());
+			e.printStackTrace();
+		}
+		return resultMap;
+	}
+	
+	/**
+	 * 删除我创建的消息
+	 */
+	@RequestMapping("deleteMyMessage.do")
+	public @ResponseBody Map<String, Object> deleteMyMessage(Integer messageId,HttpServletRequest request,HttpServletResponse response){
+		Map<String,Object> paramMap = new HashMap<String, Object>();
+		Map<String,Object> resultMap = new HashMap<String,Object>();
+		
+		try {
+			paramMap.put("messageId", messageId);
+			boolean flag = messageService.deleteMessageCreate(paramMap);
+			if(flag){
+				resultMap.put("success", true);
+			}
+		} catch (Exception e) {
+			log.error("消息删除失败："+e.getMessage());
+			e.printStackTrace();
+		}
+		return resultMap;
+	}
+	
+	
+	/**
+	 * 消息页面跳转
+	 * @return
+	 */
+	/*@RequestMapping(value = "toMessagePage.htm")
+	public String toMessagePag(){
+		return "message/messagePage";
+	}*/
+	
+	
+	/**
+	 * 审核不通过消息
+	 * @return
+	 */
+	/*@RequestMapping(value = "toMessagePageshenghe.htm")
+	public String toMessagePagshenghe(){
+		return "message/messagePageShenghe";
+	}*/
+	
+	/**
+	 * add by 韩龙飞
+	 * 审核不通过消息总数
+	 * @return
+	 */
+	/*@RequestMapping("getMessageShenheCounts.do")
+	public @ResponseBody Map<String, Object> getMessageshenheCounts(HttpServletRequest request,HttpServletResponse response){
+		Map<String,Object> paramMap = new HashMap<String, Object>();
+		Map<String,Object> resultMap = new HashMap<String,Object>();
+		paramMap.put("receiveId", this.getAccountId(request));
+		//审核不通过状态
+		paramMap.put("status", Common.COMMON_AUDIT_UNPASS);
+			int total;
+			try {
+				total = messageService.selectMessageShenheCounts(paramMap);
+				resultMap.put("success", true);
+				resultMap.put("total", total);
+			} catch (Exception e) {
+				log.error("消息总数查询失败："+e.getMessage());
+				e.printStackTrace();
+			}
+		return resultMap;
+	}*/
+	
+	/**
+	 * add by hanlongfei
+	 *韩龙飞添加的报名审核不通过方法2014-10-28
+	 * @return
+	 */
+	/*@RequestMapping("messageListShenghe.do")
+	public @ResponseBody Map<String, Object> messageListShenghe(HttpServletRequest request,HttpServletResponse response){
+		Map<String,Object> paramMap = new HashMap<String, Object>();
+		Map<String,Object> resultMap = new HashMap<String,Object>();
+		paramMap.put("receiveId", this.getAccountId(request));
+		//审核不通过状态
+		paramMap.put("status", Common.COMMON_AUDIT_UNPASS);
+		try {
+			List<EduMessage> info = messageService.selectMessageListShenghe(paramMap);
+			if(info.size()>0){
+				resultMap.put("success", true);
+				resultMap.put("info", info);
+			}
+		} catch (Exception e) {
+			log.error("消息列表查询失败："+e.getMessage());
+			e.printStackTrace();
+		}
+		return resultMap;
+	}*/
+	
+	
+	/**
+	 * add by yinxiaolong
+	 * 消息全部删除
+	 * @return
+	 */
+	/*@RequestMapping("deleteAllMessage.do")
+	public @ResponseBody Map<String, Object> deleteAllMessage(HttpServletRequest request,HttpServletResponse response){
+		Map<String,Object> paramMap = new HashMap<String, Object>();
+		Map<String,Object> resultMap = new HashMap<String,Object>();
+		int userId = this.getAccountId(request);
+		paramMap.put("updateBy", this.getAccount(request));
+		paramMap.put("receiveUserId", userId);
+		paramMap.put("receiveUserName", super.getAccount(request));
+		//消息无效
+		paramMap.put("status", Common.COMMON_MESSAGE_INVALID);
+			try {
+				boolean flag = messageService.deleteMessage(paramMap);
+				if(flag){
+					resultMap.put("success", true);
+				}
+			} catch (Exception e) {
+				log.error("消息删除失败："+e.getMessage());
+				e.printStackTrace();
+			}
+		return resultMap;
+	}*/
+		
+	/**查询所有的用户名
+	 * @author yinxiaolong
+	 * @param receiverName
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping("getAllUserName.do")
+	public @ResponseBody Map<String, Object> getAllUserNameList(String receverName,HttpServletRequest request,HttpServletResponse response){
+		Map<String,Object> resultMap = new HashMap<String,Object>();
+		try {
+			List<EduUser> list = messageService.selectUserList(receverName);
+			resultMap.put("success", true);
+			if(list != null && list.size()> 0){
+				//输入的收信人存在
+				resultMap.put("ok", false);
+				resultMap.put("rows", list);
+			}else{
+				resultMap.put("ok", true);
+			}
+		} catch (Exception e) {
+			log.error("查询失败："+e.getMessage());
+			e.printStackTrace();
+		}
+		return resultMap;
+	}
+		
+		
+	
+	@RequestMapping("downloadMessageFile.do")
+	@ResponseBody
+	public void downloadMessageFile(HttpServletRequest request,String filePathName,HttpServletResponse response) throws IOException{
+		String projectPath = request.getSession().getServletContext().getRealPath("/"); 
+		FileUtils.downloadFile(projectPath+ filePathName, response);
+	}
+	
+	
+	
+	@RequestMapping("fileUpload.do")
+	public @ResponseBody Map<String, Object> uploadFile(HttpServletRequest request)
+			throws Exception {
+		Map<String, Object> result = new HashMap<String, Object>();
+		MultipartHttpServletRequest mrequest = (MultipartHttpServletRequest) request;
+		String path = ApplicationProperties.getPropertyValue("upload_file_path");
+		//file的名称
+		List<String> fileNamesList = new ArrayList<String>();
+		Set<String> fileNameSet = new HashSet<String>();
+		List<MultipartFile> files = mrequest.getFiles("file");
+		if(files == null){
+			result.put("success", false);
+			result.put("info", "文件不存在");
+			return result;
+		}else{
+			if (files.size() > 0) {
+				for (MultipartFile file : files){
+					fileNamesList.add(file.getOriginalFilename());
+					fileNameSet.add(file.getOriginalFilename());
+					if(fileNamesList.size()!= fileNameSet.size()){
+						result.put("success", false);
+						result.put("info", "不能有重复文件");
+					}else{
+						if(file.isEmpty()){
+							result.put("success", false);
+							result.put("info", "文件中有空文件");
+							return result;
+						}
+						File dir = new File(path);
+						if (!dir.exists()) {
+							dir.mkdir();
+						}
+						
+						
+						if (file.getSize() > 0) {
+							
+							file.getOriginalFilename();
+							
+								// names += file.getOriginalFilename()+",";
+								//String name = FileUtils.write(file, path);
+								// 后缀名
+//								String type = file.getOriginalFilename().substring(
+//										file.getOriginalFilename().lastIndexOf("."),
+//										file.getOriginalFilename().length());
+								result.put("success", true);
+								result.put("info", "上传文件成功");
+								result.put("name", "nametype");
+							
+						} else {
+							result.put("success", false);
+							result.put("info", "内部错误");
+						}
+					}
+					
+					
+				}
+			}
+		}
+		return result;
+	}
+	
+//	@RequestMapping(value="sendMessageToBoss.do")
+//	public void sendMessageToBoss(HttpServletRequest request, ModelMap map,EduMessage message){ 
+//		String content = "您有新的审查内容！";
+//		ModelMap messageTypeMap = getMessageType(request,map);
+//		Integer messageType = Integer.parseInt((String) messageTypeMap.get("messageType"));
+//		EduUserActivty user =  getSessionUserInfo(request);
+//		String createBy = user.getLoginAccount();
+//		Integer sendUserId = user.getUserId();
+//		String title = "您有新的审查！";
+//		String sendUserName = user.getRealName();
+//		Integer messageId = message.getId();
+//			messageService.sendMessageToBoss(content, messageType, createBy, sendUserId, title, sendUserName, 0, user.getRealName());
+//	}
+	/**
+	 * 发送审核消息
+	 * by TMACJ
+	 * @throws Exception 
+	 */
+	@RequestMapping(value="sendMessageToReview.do")
+	public void sendMessageToReview(HttpServletRequest request,HttpServletResponse response,      ModelMap map) throws Exception{
+//		Map<String, Object> paramMap = new HashMap<String, Object>();
+		/*EduUserActivty user = getSessionUserInfo(request);
+		Integer roleId = user.getRoleId().intValue();
+		if(roleId==1 || roleId==7){
+			paramMap.put("messageType", "1");
+		}else if(roleId==2 || roleId==8){
+			paramMap.put("messageType", "2");
+		}else if(roleId==3 || roleId==9){
+			paramMap.put("messageType", "3");
+		}else if(roleId==4 || roleId==10){
+			paramMap.put("messageType", "4");
+		}*/
+/*		paramMap.put("content", MessageConstants.REVIEW_INFO_CONTENT);
+		paramMap.put("createBy", user.getLoginAccount());
+		paramMap.put("sendUserId", user.getUserId());
+		paramMap.put("title", MessageConstants.REVIEW_INFO_TITLE);
+		paramMap.put("sendUserName", user.getRealName());
+		try {
+			 Integer result = messageService.sendMessageToReview(paramMap);
+			 if(result!=-1){
+				map.put("success", true);
+				map.put("info", "发送成功！");
+			 }
+			 else{
+				 map.put("success", false);
+				 map.put("info", "发送失败！");
+			 }
+		} catch (Exception e) {
+			log.error("插入消息失败：" + e.getMessage());
+			e.printStackTrace();
+			map.put("success", false);
+			map.put("info", "发送失败");
+			ResponseUtil.renderText(response, JSONObject.fromObject(map).toString());
+			return ;
+		}
+		ResponseUtil.renderText(response, JSONObject.fromObject(map).toString());*/
+		Map<String, Object> receiveInfo = getReceiveInfo(request);
+		EduMessage message = new EduMessage();
+		message.setContent(MessageConstants.REVIEW_INFO_CONTENT);
+		message.setTitle(MessageConstants.REVIEW_INFO_TITLE);
+		ModelMap modelMap = getMessageType(request, map);
+		message.setMessageType(Integer.valueOf((String)modelMap.get("messageType")));
+		sendMessageByUser(request, response, message, (String)receiveInfo.get("loginAccount"));
+	}
+	
+	public Map<String, Object> getReceiveInfo(HttpServletRequest request) throws Exception{
+		Map<String, Object> paramMap = new HashMap<String, Object>();
+		Map<String, Object> resultMap = new HashMap<String,Object>();
+		EduUserActivty obj = getSessionUserInfo(request);
+		int roleId = obj.getRoleId().intValue();
+		paramMap.put("roleId", roleId-1);
+		if(roleId==1 || roleId==7){
+			//目前省级以上不做处理
+		}else if(roleId==2 || roleId==8){
+			paramMap.put("userProvinceId", obj.getUserProvinceId());
+		}else if(roleId==3 || roleId==9){
+			paramMap.put("userCityId", obj.getUserCityId());
+		}else if(roleId==4){
+			paramMap.put("userDistrictId", obj.getUserDistrictId());
+		}
+		List<EduUserActivty> receiveInfoList= messageService.getReceiveInfo(paramMap);
+		for(EduUserActivty receiveInfo:receiveInfoList){
+			resultMap.put("loginAccount", receiveInfo.getLoginAccount());
+		}
+		return resultMap;
+	}
+	
+}

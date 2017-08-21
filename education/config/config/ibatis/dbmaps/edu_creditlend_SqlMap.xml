@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_creditlend">
+	<select id="query_teacher_lend_credit_count" parameterClass="java.util.Map" resultClass="int">
+	SELECT
+		count(*)
+	FROM
+		edu_lend_credit
+	WHERE
+	1 = 1
+	<isNotEmpty prepend="and" property="teacherId">
+		teacher_id = #teacherId#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="lendYear">
+		lend_year = #lendYear#
+	</isNotEmpty>
+	<isNotEmpty prepend="and" property="id">  
+  		id = #id#  
+  	</isNotEmpty> 
+  	<isNotEmpty prepend="and" property="lendStatus">  
+  		lend_status = #lendStatus#  
+  	</isNotEmpty>  
+</select>
+
+  <select id="query_teacher_lend_credit" parameterClass="java.util.Map" resultClass="project.system.pojo.EduCreditLend">  
+  	SELECT  
+  		id as id,  
+  		lend_year as lendYear,  
+  		lend_date as lendDate,  
+  		lend_reason as lendReason,  
+  		lend_credit as lendCredit,  
+  		lend_period as lendPeriod,
+  		lend_status as lendStatus,  
+  		lend_command as lendCommand,  
+  		teacher_id as teacherId,
+  		repay_date as repayDate,
+  		repay_credit as repayCredit,
+  		train_form_id as trainFormId,
+  		train_form_name as trainFormName
+  	FROM  
+  		edu_lend_credit  
+  	WHERE  
+  	1 = 1  
+  	<isNotEmpty prepend="and" property="teacherId">  
+  		teacher_id = #teacherId#  
+  	</isNotEmpty>  
+  	<isNotEmpty prepend="and" property="lendYear">  
+  		lend_year = #lendYear#  
+  	</isNotEmpty> 
+  	<isNotEmpty prepend="and" property="allLendYear">  
+  		#allLendYear# > lend_year
+  	</isNotEmpty>  
+  	<isNotEmpty prepend="and" property="id">  
+  		id = #id#  
+  	</isNotEmpty>  
+  	<isNotEmpty prepend="and" property="lastYear">  
+  		lend_year >= #lastYear#
+  	</isNotEmpty>  
+  	<isNotEmpty prepend="and" property="lendStatus">  
+  		lend_status in ($lendStatus$)
+  	</isNotEmpty>   
+  	<isNotEmpty prepend="and" property="repayStartYear">  
+  		repay_date > #repayStartYear#
+  	</isNotEmpty>   
+  	<isNotEmpty prepend="and" property="repayEndYear">  
+  		#repayEndYear# > repay_date 
+  	</isNotEmpty>  
+  	<isNotEmpty prepend="and" property="trainFormId">  
+  		train_form_id = #trainFormId# 
+  	</isNotEmpty>  
+  </select>  
+  
+  
+  <insert id="insert_teacher_lend_credit" parameterClass="java.util.Map">
+  	insert into edu_lend_credit
+		(
+		  lend_year,
+		  lend_date,
+		  lend_reason,
+		  lend_credit,
+		  lend_period,
+		  lend_command,
+		  teacher_id,
+		  train_form_id,
+		  train_form_name
+		  <isNotEmpty prepend="," property="lendStatus">  
+		  lend_status
+		  </isNotEmpty>
+		)
+		values 
+		(
+			#lendYear#,
+			now(),
+			#lendReason#,
+			#lendCredit#,
+			#lendPeriod#,
+			#lendCommand#,
+			#teacherId#,
+			#trainFormId#,
+			#trainFormName#
+			<isNotEmpty prepend="," property="lendStatus">  
+		  		#lendStatus#
+		  	</isNotEmpty>
+		<selectKey resultClass="int" keyProperty="id">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		);
+  </insert>
+  
+  <update id="update_teacher_lend_credit" parameterClass="java.util.Map">
+  		update edu_lend_credit 
+		  		<dynamic prepend="set" >
+			  		<isNotEmpty prepend="," property="lendYear">
+						lend_year = #lendYear# 
+					</isNotEmpty>
+			  		<isNotEmpty prepend="," property="lendReason">
+						lend_reason = #lendReason#
+					</isNotEmpty>
+					<isNotEmpty prepend="," property="lendCredit">
+						lend_credit = #lendCredit#
+					</isNotEmpty>
+					<isNotEmpty prepend="," property="lendPeriod">
+						lend_period = #lendPeriod#
+					</isNotEmpty>
+					<isNotEmpty prepend="," property="trainFormId">
+						train_form_id = #trainFormId#
+					</isNotEmpty>
+					<isNotEmpty prepend="," property="trainFormName">
+						train_form_name = #trainFormName#
+					</isNotEmpty>
+				</dynamic>
+	  		where id = #id#
+  </update>
+  
+  <select id="select_credit_lend_for_audit" parameterClass="java.util.Map" resultClass="project.system.pojo.EduCreditLend">  
+  	SELECT
+		t1.id as id,
+		t1.lend_year as lendYear,
+		t1.lend_date as lendDate,
+		t1.lend_reason as lendReason,
+		t1.lend_credit as lendCredit,
+		t1.lend_status as lendStatus,
+		t2.real_name as teacherName,
+		t1.teacher_id as teacherId,
+		t1.train_form_name as trainFormName,
+		t2.school_name as schoolName,
+		t2.id_number as idNumber
+	FROM
+		edu_lend_credit t1
+	LEFT JOIN edu_user t2 ON t1.teacher_id = t2.id
+	WHERE
+	1 = 1
+	 <isNotEmpty prepend="and" property="teacherName">  
+  		t2.real_name like '%$teacherName$%'
+  	</isNotEmpty>  
+  	 <isNotEmpty prepend="and" property="schoolId">  
+  		t2.school_id = #schoolId#  
+  	</isNotEmpty>  
+  	<isNotEmpty prepend="and" property="provinceId">  
+  		t2.user_province_id = #provinceId#  
+  	</isNotEmpty>  
+  	<isNotEmpty prepend="and" property="cityId">  
+  		t2.user_city_id = #cityId#  
+  	</isNotEmpty>  
+  	<isNotEmpty prepend="and" property="districtId">  
+  		t2.user_district_id = #districtId#  
+  	</isNotEmpty>  
+  	<isNotEmpty prepend="and" property="status">  
+  		t1.lend_status in ($status$) 
+  	</isNotEmpty>  
+  
+  </select>
+  
+  <select id="count_credit_lend_for_audit" parameterClass="java.util.Map" resultClass="int">  
+  	SELECT
+		count(*)
+	FROM
+		edu_lend_credit t1
+	LEFT JOIN edu_user t2 ON t1.teacher_id = t2.id
+	WHERE
+	1 = 1
+	 <isNotEmpty prepend="and" property="teacherName">  
+  		t2.real_name like '%$teacherName$%'
+  	</isNotEmpty>  
+  	 <isNotEmpty prepend="and" property="schoolId">  
+  		t2.school_id = #schoolId#  
+  	</isNotEmpty>  
+  	<isNotEmpty prepend="and" property="provinceId">  
+  		t2.user_province_id = #provinceId#  
+  	</isNotEmpty>  
+  	<isNotEmpty prepend="and" property="cityId">  
+  		t2.user_city_id = #cityId#  
+  	</isNotEmpty>  
+  	<isNotEmpty prepend="and" property="districtId">  
+  		t2.user_district_id = #districtId#  
+  	</isNotEmpty>  
+  	<isNotEmpty prepend="and" property="status">  
+  		t1.lend_status in ($status$) 
+  	</isNotEmpty>  
+  	
+  </select>
+	<update id="update_credit_lend_status" parameterClass="java.util.Map">
+		UPDATE
+			edu_lend_credit
+		SET
+			lend_status = #status#,
+		<isNotEmpty property="auditId">  
+  			audit_id = #auditId#,  
+  		</isNotEmpty>  
+  		<isNotEmpty  property="auditName">  
+  			audit_name = #auditName#,  
+  		</isNotEmpty> 
+  		<isNotEmpty  property="command">  
+  			lend_command = #command#,  
+  		</isNotEmpty>  
+  			audit_date = now()
+		WHERE
+			id = #id#
+	</update>
+	
+	<select id="query_teacher_credit_lend_by_area" parameterClass="java.util.Map" resultClass="project.system.pojo.EduCreditLend">
+		SELECT
+			t1.id as id,  
+	  		t1.lend_year as lendYear,  
+	  		t1.lend_date as lendDate,  
+	  		t1.lend_reason as lendReason,  
+	  		t1.lend_credit as lendCredit,  
+	  		t1.lend_period as lendPeriod,
+	  		t1.lend_status as lendStatus,  
+	  		t1.lend_command as lendCommand,  
+	  		t1.teacher_id as teacherId,
+	  		t1.repay_date as repayDate,
+	  		t1.repay_credit as repayCredit,
+	  		t1.train_form_id as trainFormId,
+	  		t1.train_form_name as trainFormName,
+	  		t2.real_name as teacherName,
+	  		t2.id_number as teacherIdNumber
+		FROM
+			edu_lend_credit t1
+		LEFT JOIN edu_user t2 ON t1.teacher_id = t2.id
+		WHERE
+		1 = 1 
+		<isNotEmpty prepend="and" property="lendYear">  
+  			t1.lend_year = #lendYear# 
+  		</isNotEmpty>  
+		<isNotEmpty prepend="and" property="provinceId">  
+  			t2.user_province_id = #provinceId#
+  		</isNotEmpty>  
+		<isNotEmpty prepend="and" property="cityId">  
+  			t2.user_city_id = #cityId#
+  		</isNotEmpty>  
+		<isNotEmpty prepend="and" property="districtId">  
+  			t2.user_district_id = #districtId#
+  		</isNotEmpty>  
+		<isNotEmpty prepend="and" property="schoolId">  
+  			t2.school_id= #schoolId#
+  		</isNotEmpty>  
+		<isNotEmpty prepend="and" property="userId">  
+  			t2.id = #userId#
+  		</isNotEmpty>  
+	</select>
+	
+	<insert id="insert_teacher_indept_study" parameterClass="java.util.Map">
+  	insert into edu_indept_study
+		(
+		  is_credit,
+		  train_form_id,
+		  train_form_name,
+		  is_annotation,
+		  is_year,
+		  is_study_type_id,
+		  is_study_type_name,
+		  teacher_id,
+		  teacher_name,
+		  create_date,
+		  status
+		)
+		values 
+		(
+			#isCredit#,
+			#trainFormId#,
+			#trainFormName#,
+			#isAnnotation#,
+			#isYear#,
+			#isStudyTypeId#,
+			#isStudyTypeName#,
+			#teacherId#,
+			#teacherName#,
+			#createDate#,
+			#status#
+		<selectKey resultClass="int" keyProperty="id">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		);
+  </insert>
+  
+  <delete id="delete_teacher_indept_study" parameterClass="java.util.Map">
+  	DELETE
+	FROM
+		edu_indept_study
+	WHERE
+		id = #id#
+  </delete>
+  
+  <select id="query_teacher_indept_study_list" parameterClass="java.util.Map" resultClass="project.teacher.teacherProject.pojo.EduIndependentStudy">
+	  SELECT
+		t1.id AS id,
+		t1.is_credit AS isCredit,
+		t1.train_form_id AS trainFormId,
+		t1.train_form_name AS trainFormName,
+		t1.is_annotation AS isAnnotation,
+		t1.is_year AS isYear,
+		t1.is_study_type_id AS isStudyTypeId,
+		t1.is_study_type_name AS isStudyTypeName,
+		t1.teacher_id AS teacherId,
+		t1.teacher_name AS teacherName,
+		t1.create_date AS createDate,
+		t1.update_id AS updateId,
+		t1.update_name AS updateName,
+		t1.update_date AS updateDate,
+		t1.`comment` AS `comment`,
+		t1.`status` AS `status`,
+		t2.school_name as schoolName,
+		t2.id_number as idNumber,
+		t2.id as teacherId
+	FROM
+		`edu_indept_study` t1
+	left join edu_user t2 on t1.teacher_id = t2.id
+	where
+		1 = 1
+		<isNotEmpty prepend="and" property="queryYear">  
+  			t1.is_year = #queryYear#
+  		</isNotEmpty>  
+		<isNotEmpty prepend="and" property="provinceId">  
+  			t2.user_province_id = #provinceId#
+  		</isNotEmpty>  
+		<isNotEmpty prepend="and" property="cityId">  
+  			t2.user_city_id = #cityId#
+  		</isNotEmpty>  
+		<isNotEmpty prepend="and" property="districtId">  
+  			t2.user_district_id = #districtId#
+  		</isNotEmpty>  
+		<isNotEmpty prepend="and" property="schoolId">  
+  			t2.school_id = #schoolId#
+  		</isNotEmpty>  
+		<isNotEmpty prepend="and" property="teacherId">  
+  			t2.id = #teacherId#
+  		</isNotEmpty>  
+  		<isNotEmpty prepend="and" property="id">  
+  			t1.id = #id#
+  		</isNotEmpty>  
+  		<isNotEmpty prepend="and" property="status">  
+  			t1.status = #status#
+  		</isNotEmpty>  
+  		<isNotEmpty prepend="and" property="teacherName">  
+  			t2.real_name like '%$teacherName$%'
+  		</isNotEmpty>  
+  </select>
+  
+  <update id="update_indept_study" parameterClass="java.util.Map">
+  	update edu_indept_study set
+  		<isNotEmpty  property="auditId">  
+  			update_id = #auditId#,
+  		</isNotEmpty> 
+  		<isNotEmpty  property="auditName">  
+  			update_name = #auditName#,
+  		</isNotEmpty> 
+  		<isNotEmpty  property="auditDate">  
+  			update_date = #auditDate#,
+  		</isNotEmpty> 
+  		<isNotEmpty  property="command">  
+  			comment = #command#,
+  		</isNotEmpty> 
+  		<isNotEmpty  property="status">  
+  			status = #status#,
+  		</isNotEmpty>  
+  			id = #id#
+  	where id = #id#
+  </update>
+  <select id="query_teacher_indept_study_credit" parameterClass="java.util.Map" resultClass="float">
+  	SELECT
+		IFNULL(sum(is_credit),0) AS isCredit
+	FROM
+		`edu_indept_study`
+	WHERE
+		teacher_id =  #teacherId#
+	AND  #year# = is_year 
+	and status = 2
+  </select>
+  <select id="select_teacher_is_remain_credit" parameterClass="java.util.Map" resultClass="project.system.pojo.EduTeacherScoreInfo">
+		SELECT
+			IFNULL(sum(is_credit), 0) + IFNULL(t3.lend_credit, 0) - IFNULL(t4.repay_credit, 0) AS remainCredit,
+			t1.teacher_id as teacherId,
+			t1.train_form_name as trainFormName,
+			t1.train_form_id as trainFormId
+		FROM
+			edu_indept_study t1
+		LEFT JOIN (
+			SELECT
+				t1.lend_credit,
+				t1.teacher_id,
+				t1.train_form_id
+			FROM
+				edu_lend_credit t1
+			WHERE
+			1 = 1
+			and t1.lend_status in (1,3)
+			<isNotEmpty  prepend="and" property="year">
+				t1.lend_year = #year# 
+		 	</isNotEmpty>
+		) t3 ON t3.teacher_id = t1.teacher_id
+		AND t3.train_form_id = t1.train_form_id
+		left join (
+			SELECT
+				t1.repay_credit,
+				t1.teacher_id,
+				t1.train_form_id
+			FROM
+				edu_lend_credit t1
+			WHERE
+			 1 = 1 
+			 and t1.lend_status in (1,3)
+			<isNotEmpty  prepend="and" property="repayYear">
+				t1.lend_year = #repayYear# 
+		 	</isNotEmpty>
+		) t4 ON t4.teacher_id = t1.teacher_id
+		AND t4.train_form_id = t1.train_form_id
+		WHERE
+			status = 2
+		<isNotEmpty  prepend="and" property="teacherId">
+		 	t1.teacher_id = #teacherId#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="year">  
+		 	t1.is_year = #year#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="trainFormId">  
+		 	t1.train_form_id = #trainFormId#
+		</isNotEmpty>
+		GROUP BY
+			t1.teacher_id,
+			t1.train_form_id
+	</select>
+	<select id="query_teacher_special_case_list" parameterClass="java.util.Map" resultClass="project.edupm.projectmanage.pojo.EduProjectComment">
+		SELECT
+			t1.id as id,
+			SUBSTRING(t1.create_date,1,4) AS year,
+			t2.project_name as projectName,
+			t2.train_type_name as trainFormName,
+			t1.teacher_class_score as teacherClassScore,
+			t1.examine as examine,
+			t3.real_name as teacherName,
+			t3.school_name as schoolName,
+			t3.id_number as idNumber,
+			t1.teacher_id  as teacherId,
+			t1.create_date as createDate1,
+			t1.audit_memo as auditMemo
+		FROM
+			edu_project_comment t1
+		LEFT JOIN edu_project t2 ON t1.project_id = t2.id
+		left join edu_user t3 on t1.teacher_id = t3.id
+		WHERE
+			t2.project_type = 1
+		<isNotEmpty  prepend="and" property="status">  
+		 	t1.examine = #status#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="queryYear">  
+		 	SUBSTRING(t1.create_date,1,4) = #queryYear#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="provinceId">  
+		 	t3.user_province_id = #provinceId#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="cityId">  
+		 	t3.user_city_id = #cityId#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="districtId">  
+		 	t3.user_district_id = #districtId#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="schoolId">  
+		 	t3.school_id = #schoolId#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="teacherId">  
+		 	t1.teacher_id = #teacherId#
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="teacherName">  
+		 	t3.real_name like '%$teacherName$%'
+		</isNotEmpty>
+		<isNotEmpty  prepend="and" property="id">  
+		 	t1.id = #id#
+		</isNotEmpty>
+	</select>
+	
+	<delete id="delete_teacher_special_case" parameterClass="java.util.Map">
+  	DELETE
+	FROM
+		edu_project_comment
+	WHERE
+		id = #id#
+  </delete>
+  <update id="update_special_case" parameterClass="java.util.Map">
+  	update edu_project_comment set
+  		<isNotEmpty  property="updateName">  
+  			update_by = #updateName#,
+  		</isNotEmpty> 
+  		<isNotEmpty  property="updateDate">  
+  			update_date = #updateDate#,
+  		</isNotEmpty> 
+  		<isNotEmpty  property="auditMemo">  
+  			audit_memo = #auditMemo#,
+  		</isNotEmpty> 
+  		<isNotEmpty  property="examine">  
+  			examine = #examine#,
+  		</isNotEmpty>  
+  			id = #id#
+  	where id = #id#
+  </update>
+</sqlMap>

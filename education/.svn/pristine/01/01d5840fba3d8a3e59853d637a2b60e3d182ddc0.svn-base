@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_question_options">
+	<resultMap id="EduQuestionOptionsResultMap"
+		class="project.edupm.projectmanage.pojo.EduQuestionOptions">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="create_date" property="createDate" jdbcType="DATE" />
+		<result column="username" property="username" jdbcType="VARCHAR" />
+		<result column="content" property="content" jdbcType="VARCHAR" />
+		<result column="rank" property="rank" jdbcType="INTEGER" />
+		<result column="question_id" property="questionId" jdbcType="INTEGER" />
+	</resultMap>
+	<select id="eduQuestionOptions_selectByPrimaryKey" resultMap="EduQuestionOptionsResultMap"
+		parameterClass="int">
+		select
+		id,
+		create_date,
+		username,
+		content,
+		rank,
+		question_id
+		from edu_question_options
+		where id =
+		#id:INTEGER#
+	</select>
+	<insert id="eduQuestionOptions_insert" parameterClass="project.edupm.projectmanage.pojo.EduQuestionOptions">
+		insert into edu_question_options
+		(create_date,
+		username,
+		content,
+		rank,
+		question_id)
+		values(
+		#createDate:DATE#,
+		#username:VARCHAR#,
+		#content:VARCHAR#,
+		#rank:INTEGER#,
+		#questionId:INTEGER#
+		)
+		<selectKey resultClass="int" keyProperty="id">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+
+
+
+
+	<update id="eduQuestionOptions_updateByPrimaryKeySelective"
+		parameterClass="project.edupm.projectmanage.pojo.EduQuestionOptions">
+		update edu_question_options
+		<dynamic prepend="set">
+			<isNotNull prepend="," property="createDate">
+				create_date
+				=#createDate:DATE#
+			</isNotNull>
+			<isNotNull prepend="," property="username">
+				username
+				=#username:VARCHAR#
+			</isNotNull>
+			<isNotNull prepend="," property="content">
+				content =#content:VARCHAR#
+			</isNotNull>
+			<isNotNull prepend="," property="rank">
+				rank = #rank:INTEGER#
+			</isNotNull>
+			<isNotNull prepend="," property="questionId">
+				question_id
+				=#questionId:INTEGER#
+			</isNotNull>
+		</dynamic>
+		where id = #id:INTEGER#
+	</update>
+
+
+
+	<select id="mgr_selectQuestionOptionsListByQid" parameterClass="java.util.Map"
+		resultClass="project.edupm.projectmanage.pojo.EduQuestionOptions">
+		SELECT
+		id,
+		create_date as createDate,
+		username,
+		content,
+		rank,
+		question_id as questionId
+		FROM
+		edu_question_options
+		WHERE 1=1
+		<isNotNull prepend="and" property="questionId">
+			question_id = #questionId#
+		</isNotNull>
+		order by create_date DESC limit #startIndex#,#endIndex#
+	</select>
+
+
+
+	<select id="count_mgr_selectQuestionOptionsListByQid"
+		parameterClass="java.util.Map" resultClass="int">
+		SELECT
+		count(1)
+		FROM
+		edu_question_options
+		WHERE 1=1
+		<isNotNull prepend="and" property="qid">
+			question_id = #questionId#
+		</isNotNull>
+	</select>
+</sqlMap>

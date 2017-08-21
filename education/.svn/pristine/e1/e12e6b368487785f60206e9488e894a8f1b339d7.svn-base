@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:mvc="http://www.springframework.org/schema/mvc" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+    http://www.springframework.org/schema/beans 
+    http://www.springframework.org/schema/beans/spring-beans-2.5.xsd 
+    http://www.springframework.org/schema/util 
+    http://www.springframework.org/schema/util/spring-util-2.0.xsd 
+    http://www.springframework.org/schema/context 
+    http://www.springframework.org/schema/context/spring-context-2.5.xsd
+    http://www.springframework.org/schema/tx 
+    http://www.springframework.org/schema/tx/spring-tx.xsd
+    http://www.springframework.org/schema/mvc 
+    http://www.springframework.org/schema/mvc/spring-mvc.xsd    
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop-2.5.xsd ">
+	
+	<mvc:annotation-driven />
+	<context:annotation-config />
+	<!-- 把标记了@Controller注解的类转换为bean -->
+	<context:component-scan base-package="project">
+		<context:include-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+		<context:exclude-filter type="annotation"
+			expression="org.springframework.stereotype.Service" />
+	</context:component-scan>
+	<!-- 自定义拦截器，启动Spring MVC的注解功能，完成请求和注解POJO的映射 -->
+	<mvc:interceptors>          
+        <bean class="project.util.MonitorInterceptor" />  
+		<bean class="framelib.common.SessionOptionInterceptor" />  
+        <bean class="framelib.common.AuthInterceptor" />  
+    </mvc:interceptors> 
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver" p:viewClass="org.springframework.web.servlet.view.JstlView"
+		p:prefix="/WEB-INF/jsps/" p:suffix=".jsp" p:contentType="text/html;charset=UTF-8">
+	</bean>
+	<!--
+		对模型视图名称的解析，即在模型视图名称添加前后缀 <tx:advice id="txAdvice"
+		transaction-manager="transactionManager"> <tx:attributes> <tx:method
+		name="get*" propagation="REQUIRED"/> </tx:attributes> </tx:advice>
+	-->
+	<!--
+		配置有那些类中的方法拥有事务的传播性 <aop:config> <aop:pointcut id="pointcut"
+		expression="execution(* com.mmp.user.service.impl.*.*(..))"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="pointcut"/>
+		</aop:config>
+	-->
+	<!-- 处理注解 -->
+	<bean
+		class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor" />
+	<!-- 异常拦截器 -->
+	<bean class="project.util.ExceptionHandler" />  
+	<!-- 文件上传大小限制-->
+	<bean id="multipartResolver" class="project.util.CommonsMultipartResolverExt">
+		<property name="maxUploadSize" value="31457280"/>
+	</bean>
+	
+	
+</beans>

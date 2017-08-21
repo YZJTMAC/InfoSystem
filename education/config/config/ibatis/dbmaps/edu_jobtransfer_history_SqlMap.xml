@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_jobtransfer_history" >
+  <resultMap id="abatorgenerated_EduJobtransferHistoryResult" class="project.teacher.teachermanage.pojo.EduJobtransferHistory" >
+     <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="teacher_id" property="teacherId" jdbcType="INTEGER" />
+    <result column="past_province_id" property="pastProvinceId" jdbcType="INTEGER" />
+    <result column="past_province_name" property="pastProvinceName" jdbcType="VARCHAR" />
+    <result column="past_city_id" property="pastCityId" jdbcType="INTEGER" />
+    <result column="past_city_name" property="pastCityName" jdbcType="VARCHAR" />
+    <result column="past_district_name" property="pastDistrictName" jdbcType="VARCHAR" />
+    <result column="past_district_id" property="pastDistrictId" jdbcType="INTEGER" />
+    <result column="past_school_id" property="pastSchoolId" jdbcType="INTEGER" />
+    <result column="past_school_name" property="pastSchoolName" jdbcType="VARCHAR" />
+    <result column="new_proivnce_name" property="newProivnceName" jdbcType="VARCHAR" />
+    <result column="new_province_id" property="newProvinceId" jdbcType="INTEGER" />
+    <result column="new_city_id" property="newCityId" jdbcType="INTEGER" />
+    <result column="new_city_name" property="newCityName" jdbcType="VARCHAR" />
+    <result column="new_district_id" property="newDistrictId" jdbcType="INTEGER" />
+    <result column="new_district_name" property="newDistrictName" jdbcType="VARCHAR" />
+    <result column="new_school_name" property="newSchoolName" jdbcType="VARCHAR" />
+    <result column="new_school_id" property="newSchoolId" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="old_version" property="oldVersion" jdbcType="INTEGER" />
+    <result column="new_version" property="newVersion" jdbcType="INTEGER" />
+  </resultMap>
+ 
+  <select id="selectJobTranHistoryById"  parameterClass="java.util.HashMap" 
+  	resultClass="project.teacher.teachermanage.pojo.EduTeacherMobilize">
+		select
+		a.old_version oldVersion,
+		a.new_version newVersion,
+		a.id,
+		a.teacher_id teacherId,
+		b.real_name realName,
+		(case when b.gender=1 then
+		'男' else '女' END)sex,
+		b.id_number idNumber,
+		IFNULL(a.past_province_name,'')pastProvinceName,
+		IFNULL(a.past_city_name,'')pastCityName,
+		IFNULL(a.past_district_name,'')pastDistrictName,
+		IFNULL(a.past_school_name,'')pastSchoolName,
+		IFNULL(a.new_province_name,'')newProvinceName,
+		IFNULL(a.new_city_name,'')newCityName,
+		IFNULL(a.new_district_name,'')newDistrictName,
+		IFNULL(a.new_school_name,'')newSchoolName,
+		a.new_province_id newProvinceId,
+		a.new_city_id newCityId,
+		a.new_district_id newDistrictId,
+		a.new_school_id newSchoolId,
+		a.audit_create_by
+		auditCreateBy,
+		a.audit_create_date auditCreateDate,
+		a.audit_status auditStatus
+		from edu_audit a
+		join
+		edu_user b on a.teacher_id=b.id and a.change_type=2
+		where  
+		a.change_type= 2
+		and a.audit_status in (15,13)
+		and a.teacher_id = #teacherId#
+  </select>
+   
+</sqlMap>

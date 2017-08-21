@@ -1,0 +1,12 @@
+﻿不要替换更新以下2个文件：
+\WEB-INF\classes\config\edu\edu.properties 
+\WEB-INF\classes\config\spring\ibatisConfig.xml
+
+---2014.11.15更新上线---
+ insert into edu_sys_function (func_name,func_type,func_code) values('培训成绩公布',3,'project_049');
+ insert into edu_sys_function (func_name,func_type,func_code) values('培训成绩审核',3,'project_050');
+ 
+ 
+ ---2014.11.20内网教师评价菜单看不到.生产上已有,不用在生产上执行此语句---
+ --insert into edu_sys_function (func_name,func_type,func_code) values(903,'教师评价',3,'project_903');
+ 

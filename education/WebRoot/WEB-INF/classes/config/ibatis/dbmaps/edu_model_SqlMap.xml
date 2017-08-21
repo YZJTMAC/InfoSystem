@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_model" >
+  <resultMap id="abatorgenerated_EduModelResult" class="project.edupm.projectmanage.pojo.EduModel" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="model_name" property="modelName" jdbcType="VARCHAR" />
+    <result column="model_code" property="modelCode" jdbcType="VARCHAR" />
+    <result column="train_type" property="trainType" jdbcType="VARCHAR" />
+    <result column="train_hour" property="trainHour" jdbcType="VARCHAR" />
+    <result column="train_score" property="trainScore" jdbcType="VARCHAR" />
+    <result column="start_date" property="startDate" jdbcType="TIMESTAMP" />
+    <result column="end_date" property="endDate" jdbcType="TIMESTAMP" />
+     <result column="memo" property="memo" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="DATE" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_date" property="updateDate" jdbcType="DATE" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="excellent_rule" property="excellentRule" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <select id="select_model_count" parameterClass="java.util.HashMap" resultClass="int">
+  	select 
+  	count(1)
+  	FROM
+	edu_model m
+ 	INNER JOIN edu_user u ON m.create_by = u.login_account
+	WHERE u.status = 1
+	<isNotNull prepend="and" property="provinceId">
+			u.user_province_id = #provinceId#
+		</isNotNull>
+		<isNotNull prepend="and" property="cityId">
+			u.user_city_id = #cityId#
+		</isNotNull>
+		<isNull prepend="and" property="cityId">
+			u.user_city_id is null
+		</isNull>
+		<isNotNull prepend="and" property="districtId">
+			u.user_district_id = #districtId#
+		</isNotNull>
+		<isNull prepend="and" property="districtId">
+			u.user_district_id is null
+		</isNull>
+		<isNotNull prepend="and" property="schoolId">
+			u.school_id = #schoolId#
+		</isNotNull>
+		<isNull prepend="and" property="schoolId">
+			u.school_id is null
+		</isNull>
+</select>
+  <select id="select_model_list" parameterClass="java.util.HashMap" resultMap="abatorgenerated_EduModelResult">
+ 	select * from edu_model m
+ 	INNER JOIN edu_user u ON m.create_by = u.login_account
+	WHERE u.status = 1
+		<isNotNull prepend="and" property="provinceId">
+			u.user_province_id = #provinceId#
+		</isNotNull>
+		<isNotNull prepend="and" property="cityId">
+			u.user_city_id = #cityId#
+		</isNotNull>
+		<isNull prepend="and" property="cityId">
+			u.user_city_id is null
+		</isNull>
+		<isNotNull prepend="and" property="districtId">
+			u.user_district_id = #districtId#
+		</isNotNull>
+		<isNull prepend="and" property="districtId">
+			u.user_district_id is null
+		</isNull>
+		<isNotNull prepend="and" property="schoolId">
+			u.school_id = #schoolId#
+		</isNotNull>
+		<isNull prepend="and" property="schoolId">
+			u.school_id is null
+		</isNull>
+	ORDER BY  m.id desc
+   limit #startIndex#,#endIndex# 
+  </select>
+  <select id="select_model_all_list" parameterClass="java.util.HashMap" resultMap="abatorgenerated_EduModelResult">
+ 	select * from edu_model m INNER JOIN edu_user u ON m.create_by = u.login_account
+  </select>
+  
+  <insert id="model_insert" parameterClass="java.util.HashMap" >
+   INSERT INTO edu_model (
+	model_name,
+	model_code,
+	train_type,
+	train_hour,
+	train_score,
+	start_date,
+	end_date,
+	create_by,
+	create_date,
+	update_by,
+	update_date,
+	memo,
+	status
+)
+VALUES
+	(
+		 #modelName#, #modelCode#, #trainType#,
+		#trainHour#, #trainScore#, #startDate#, #endDate#,
+		#loginAccount#, now(), #loginAccount#, now(),
+		#memo#,#status#)
+  </insert>
+  
+  <select id="select_model_info_id" parameterClass="int" resultMap="abatorgenerated_EduModelResult">
+  	select 
+  	*
+  	FROM
+	edu_model
+	where 
+	id=#id#
+  </select>
+  
+  <select id="select_model_max_id" parameterClass="java.util.HashMap" resultClass="java.lang.String">
+  	
+  	select model_code from edu_model where id = (select 
+  	max(id)
+  	FROM
+	edu_model where 1=1)	
+	
+  </select>
+  
+   <delete id="deleteModelInfoById" parameterClass="java.lang.Integer">
+      delete from edu_model where id  = #id#
+  </delete>
+  
+  
+  <update id="update_model_info" parameterClass="java.util.HashMap" >
+    update edu_model
+    set model_name = #modelName#,
+      model_code = #modelCode#,
+      train_type = #trainType#,
+      train_hour = #trainHour#,
+      train_score = #trainScore#,
+      start_date = #startDate#,
+      end_date = #endDate#,
+      update_by = #loginAccount#,
+      update_date = now(),
+      memo = #memo#,
+      status = #status#
+    where id = #id#
+  </update>
+  
+  <select id="select_model_no_page" resultClass="project.edupm.projectmanage.pojo.EduModelPOJO" parameterClass="java.util.HashMap">
+  	
+  		select 
+  			m.id as id,
+  	model_name as name,
+  	exchange_role as unit
+  		from edu_model m
+ 	INNER JOIN edu_user u ON m.create_by = u.login_account  AND u.status!=0
+	WHERE 1= 1 and m.status = 1
+		<isNotNull prepend="and" property="provinceId">
+			u.user_province_id = #provinceId#
+		</isNotNull>
+		<isNotNull prepend="and" property="cityId">
+			u.user_city_id = #cityId#
+		</isNotNull>
+		<isNull prepend="and" property="cityId">
+			u.user_city_id is null
+		</isNull>
+		<isNotNull prepend="and" property="districtId">
+			u.user_district_id = #districtId#
+		</isNotNull>
+		<isNull prepend="and" property="districtId">
+			u.user_district_id is null
+		</isNull>
+		<isNotNull prepend="and" property="schoolId">
+			u.school_id = #schoolId#
+		</isNotNull>
+		<isNull prepend="and" property="schoolId">
+			u.school_id is null
+		</isNull>
+	</select>
+  
+  
+  <select id="checkModelName" parameterClass="java.lang.String" resultClass="java.lang.String" >
+  	SELECT m.model_name FROM edu_model m WHERE m.model_name = #modelName# limit 1
+  </select>
+  
+   <select id="checkModelNameInEdit" parameterClass="java.util.HashMap" resultClass="java.lang.String" >
+  	SELECT m.model_name FROM edu_model m WHERE m.model_name = #modelName# and id != #modelId#  limit 1
+  </select>
+  
+  
+  <select id="checkModelCode" parameterClass="java.lang.String" resultClass="java.lang.String" >
+  	SELECT m.model_code FROM edu_model m WHERE m.model_code = #modelCode#  LIMIT 1
+  </select>
+  
+  <select id="checkModelCodeInEdit" parameterClass="java.util.HashMap" resultClass="java.lang.String" >
+  	SELECT m.model_code FROM edu_model m WHERE m.model_code = #modelCode# and id != #modelId# LIMIT 1
+  </select>
+  
+</sqlMap>

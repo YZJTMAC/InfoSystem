@@ -1,0 +1,90 @@
+package project.master.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
+import project.master.dao.IEduMasterReadDAO;
+import project.master.dao.IEduMasterWriteDAO;
+import project.master.pojo.EduComparisonComment;
+import project.master.service.IEduMasterService;
+import framelib.service.AbsService;
+import framelib.utils.page.PageObject;
+
+public class EduMasterServiceImpl extends AbsService implements IEduMasterService {
+
+	@Autowired
+	@Qualifier("eduMasterReadDAO")
+	private IEduMasterReadDAO eduMasterReadDAO;
+	
+	@Autowired
+	@Qualifier("eduMasterWriteDAO")
+	private IEduMasterWriteDAO eduMasterWriteDAO;
+	
+
+	@Override
+	public boolean addComparison(Map<String, Object> condition) {
+		return eduMasterWriteDAO.addComparison(condition);
+	}
+
+	@Override
+	public PageObject queryComparison(Map<String, Object> condition) {
+		return eduMasterReadDAO.queryComparison(condition);
+	}
+
+	@Override
+	public boolean updateComparison(Map<String, Object> condition) {
+		return eduMasterWriteDAO.updateComparison(condition);
+	}
+
+	@Override
+	public boolean deleteComparison(Map<String, Object> condition) {
+		return eduMasterWriteDAO.deleteComparison(condition);
+	}
+
+	@Override
+	public PageObject queryComparisonTeacher(Map<String, Object> condition) {
+		return eduMasterReadDAO.queryComparisonTeacher(condition);
+	}
+
+	@Override
+	public boolean signUpComparisonTeacher(Map<String, Object> condition) {
+		return eduMasterWriteDAO.signUpComparisonTeacher(condition);
+	}
+
+	@Override
+	public boolean canelSignUpComparisonTeacher(Map<String, Object> condition) {
+		return eduMasterWriteDAO.canelSignUpComparisonTeacher(condition);
+	}
+
+	@Override
+	public boolean resignUpComparisonTeacher(Map<String, Object> condition) {
+		return eduMasterWriteDAO.resignUpComparisonTeacher(condition);
+	}
+
+	@Override
+	public List<EduComparisonComment> querySignUpComparisonTeacher(
+			Map<String, Object> condition) {
+		return eduMasterReadDAO.querySignUpComparisonTeacher(condition);
+	}
+
+	@Override
+	public boolean signUpComparisonTeacherBatch(Map<String, Object> condition) {
+		return eduMasterWriteDAO.signUpComparisonTeacherBatch(condition);
+	}
+
+	@Override
+	public boolean canelSignUpComparisonTeacherBatch(
+			Map<String, Object> condition) {
+		return eduMasterWriteDAO.canelSignUpComparisonTeacherBatch(condition);
+	}
+
+	@Override
+	public int querySignUpComparisonTeacherCount(Map<String, Object> condition) {
+		// TODO Auto-generated method stub
+		return eduMasterReadDAO.querySignUpComparisonTeacherCount(condition);
+	}
+	
+}

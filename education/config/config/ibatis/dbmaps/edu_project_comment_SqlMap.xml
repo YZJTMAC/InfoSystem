@@ -1,0 +1,970 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_project_comment" >
+  <resultMap id="abatorgenerated_EduProjectCommentResult" class="project.furtheredu.edumanage.pojo.EduProjectComment" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="project_score" property="projectScore" jdbcType="REAL" />
+    <result column="teacher_id" property="teacherId" jdbcType="INTEGER" />
+    <result column="organization_id" property="organizationId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="teacher_score" property="teacherScore" jdbcType="REAL" />
+    <result column="teacher_train_status_id" property="teacherTrainStatusId" jdbcType="INTEGER" />
+    <result column="teacher_train_status_name" property="teacherTrainStatusName" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="DATE" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_date" property="updateDate" jdbcType="DATE" />
+    <result column="teacher_score_audit_status_id" property="teacherScoreAuditStatusId" jdbcType="INTEGER" />
+    <result column="teacher_score_audit_status_name" property="teacherScoreAuditStatusName" jdbcType="VARCHAR" />
+    <result column="examine" property="examine"  jdbcType="INTEGER" />
+    <result column="opinion" property="opinion" jdbcType="VARCHAR" />
+    
+     <result column="district_examine" property="districtExamine"  jdbcType="INTEGER" />
+     <result column="city_examine" property="cityExamine"  jdbcType="INTEGER" />
+     <result column="province_examine" property="provinceExamine"  jdbcType="INTEGER" />
+     <result column="school_id" property="schoolId"  jdbcType="INTEGER" />
+     <result column="city_id" property="cityId"  jdbcType="INTEGER" />
+     <result column="district_id" property="districtId"  jdbcType="INTEGER" />
+     <result column="province_id" property="provinceId"  jdbcType="INTEGER" />
+       <result column="districtMemo" property="districtMemo" jdbcType="VARCHAR" />
+      <result column="cityMemo" property="cityMemo" jdbcType="VARCHAR" />
+      <result column="provinceMemo" property="provinceMemo" jdbcType="VARCHAR" />
+  </resultMap>
+  
+ <select id="select_unpass_reason" resultClass="java.lang.String" parameterClass="int">
+	select audit_memo from edu_project_comment where id = #id#
+	</select>
+	
+  	<!-- 项目证书打印某一项目下参训教师总数(培训类) -->
+  	<select id="selectTeacherByProIdCount_Train" resultClass="int" parameterClass="java.util.Map">
+  		SELECT
+			COUNT(1)
+		FROM
+			edu_project_comment pc
+		LEFT JOIN edu_project p ON pc.project_id = p.id
+		LEFT JOIN edu_user u ON pc.teacher_id = u.id
+		LEFT JOIN edu_school s ON u.school_id = s.school_id
+		WHERE
+			pc.project_id = #proId#
+		<isNotEmpty prepend="AND" property="teacherName">
+			u.real_name LIKE '%$teacherName$%'
+		</isNotEmpty>
+  	</select>
+  	
+  	<!-- 项目证书打印某一项目下参训教师(培训类) -->
+  	<select id="selectTeacherByProId_Train" resultClass="project.furtheredu.edumanage.pojo.TeacherInfoActivity" parameterClass="java.util.Map">
+  		SELECT
+  			p.id AS proId,
+  			p.project_name as proName,
+  			p.year,
+			u.real_name AS teacherName,
+			u.gender,
+			u.id_number As idNumber,
+			s.school_name AS schoolName,
+			p.class_period AS classPeriod,
+			pc.teacher_class_period AS teacherClassPeriod,
+			pc.teacher_train_status_name AS trainStatus,
+			pc.teacher_score_audit_status_name AS auditStatus,			
+			pc.teacher_class_score AS teacherClassScore,
+			pc.teacher_score AS teacherScore,
+			pc.teacher_id as teacherId,
+			pc.period_certificate_code as periodCertificateCode,
+			pc.project_certificate_code as projectCertificateCode,
+			p.print_xueshi_certificate as printXueshiCertificate,
+			p.print_project_certificate as printProjectCertificate
+		FROM
+			edu_project_comment pc
+		LEFT JOIN edu_project p ON pc.project_id = p.id
+		LEFT JOIN edu_user u ON pc.teacher_id = u.id
+		LEFT JOIN edu_school s ON u.school_id = s.school_id
+		WHERE
+			pc.project_id = #proId#
+		<isNotEmpty prepend="AND" property="teacherName">
+			u.real_name LIKE '%$teacherName$%'
+		</isNotEmpty>
+		ORDER BY
+			pc.create_date DESC
+		LIMIT 
+			#startIndex#, #endIndex# 	
+  	</select>
+  	
+  	<!-- 证书查询下参训教师总数(培训类) -->
+  	<select id="selectTeacherCount_Train" resultClass="int" parameterClass="java.util.Map">
+  		SELECT
+			COUNT(1)
+		FROM
+			edu_project_comment pc
+		LEFT JOIN edu_project p ON pc.project_id = p.id
+		LEFT JOIN edu_user u ON pc.teacher_id = u.id
+		LEFT JOIN edu_school s ON u.school_id = s.school_id
+		WHERE  p.is_score_published=1
+		
+		<isNotEmpty prepend="AND" property="eduModelType">
+			p.edu_model_type = #eduModelType# 
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="projectScope">
+			p.project_scope_id = #projectScope# 
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="projectName">
+			p.project_Name LIKE '%$projectName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="queryYearStart">
+			p.`year` >= #queryYearStart#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="queryYearEnd">
+			#queryYearEnd# >=  p.`year`
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="queryStatus">
+			pc.teacher_score_audit_status_id = #queryStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="teacherName">
+			u.real_name LIKE '%$teacherName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="idCard">
+			u.id_number = '$idCard$'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="provinceId">
+			u.user_province_id = #provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="cityId">
+			u.user_city_id = #cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="districtId">
+			u.user_district_id = #districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="schoolId">
+			u.school_id = #schoolId#
+		</isNotEmpty>
+  	</select>
+  
+  	<!-- 证书查询下参训教师列表(培训类) -->
+  	<select id="selectTeacher_Train" resultClass="project.furtheredu.edumanage.pojo.TeacherInfoActivity" parameterClass="java.util.Map">
+  		SELECT
+  			p.id AS proId,
+  			p.project_name AS proName,
+  			p.year,
+			u.real_name AS teacherName,
+			u.gender,
+			u.id_number As idNumber,
+			s.school_name AS schoolName,
+			p.class_period AS classPeriod,
+			pc.teacher_class_period AS teacherClassPeriod,
+			pc.teacher_train_status_name AS trainStatus,
+			pc.teacher_score_audit_status_name AS auditStatus,			
+			pc.teacher_class_score AS teacherClassScore,
+			pc.teacher_score AS teacherScore,
+			pc.teacher_id as teacherId,
+			pc.period_certificate_code AS periodCertificateCode,
+			pc.project_certificate_code AS projectCertificateCode
+		FROM
+			edu_project_comment pc
+		LEFT JOIN edu_project p ON pc.project_id = p.id
+		LEFT JOIN edu_user u ON pc.teacher_id = u.id
+		LEFT JOIN edu_school s ON u.school_id = s.school_id
+		WHERE
+			 p.is_score_published=1 
+			 
+		<isNotEmpty prepend="AND" property="eduModelType">
+			p.edu_model_type = #eduModelType# 
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="projectScope">
+			p.project_scope_id = #projectScope# 
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="projectName">
+			p.project_Name LIKE '%$projectName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="queryYearStart">
+			p.`year` >= #queryYearStart#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="queryYearEnd">
+			#queryYearEnd# >=  p.`year`
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="queryStatus">
+			pc.teacher_score_audit_status_id = #queryStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="teacherName">
+			u.real_name LIKE '%$teacherName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="idCard">
+			u.id_number = '$idCard$'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="provinceId">
+			u.user_province_id = #provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="cityId">
+			u.user_city_id = #cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="districtId">
+			u.user_district_id = #districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="schoolId">
+			u.school_id = #schoolId#
+		</isNotEmpty>
+		ORDER BY
+			pc.create_date DESC
+		LIMIT 
+			#startIndex#, #endIndex# 	
+  	</select>
+  	
+  	<!-- 教师证书导出 -->
+  	<select id="selectTeacherCertificateActivetyListNoPage" resultClass="project.furtheredu.edumanage.pojo.TeacherCertificateExportActivity" parameterClass="java.util.Map">
+  		SELECT 
+  			m.model_name AS modelName,
+			p.project_name AS projectName,
+  			o.organization_name AS organizationName,
+  			s.school_name AS school,
+			u.user_province_name AS userProvinceName,
+			u.user_city_name AS userCityName,
+			u.user_district_name AS userDistrictName,
+			u.real_name AS realName,
+			u.id_number AS idNumber,
+			IF(u.gender=1, '男', '女') AS gender,
+			pc.teacher_train_status_name AS trainStatus,
+			pc.teacher_score_audit_status_name AS auditStatus,
+			pc.period_certificate_code AS periodCertificateCode,
+			pc.project_certificate_code AS projectCertificateCode,
+			pc.teacher_class_period AS teacherClassPeriod,
+			pc.teacher_class_score AS teacherClassScore,
+			j.job_former_teaching_section AS jobFormerTeachingSection,
+			j.job_former_teaching_subject AS jobFormerTeachingSubject,
+			j.job_recruitment_position AS jobRecruitmentPosition,
+			j.job_school_administration_office AS jobSchoolAdministrationOffice,
+			b.teacher_phone_num AS mobile,
+			b.teacher_email AS email 
+			FROM edu_project_comment pc      
+			LEFT JOIN edu_project p on pc.project_id = p.id
+			LEFT JOIN edu_model m on p.edu_model_type = m.id  
+			LEFT JOIN edu_organization o on p.organization_id = o.organization_id     
+			LEFT JOIN edu_user u on pc.teacher_id = u.id   
+			LEFT JOIN edu_teacher_basic_info b on b.teacher_id = u.id and b.status = 1     
+			LEFT JOIN edu_teacher_job j on j.teacher_id = u.id and j.status = 1    
+			LEFT JOIN edu_school s on s.school_id = u.school_id 
+		WHERE
+			p.is_score_published=1 
+			
+		<isNotEmpty prepend="AND" property="eduModelType">
+			p.edu_model_type = #eduModelType# 
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="projectScope">
+			p.project_scope_id = #projectScope# 
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="queryProjectName">
+			p.project_Name LIKE '%$queryProjectName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="queryYearStart">
+			p.`year` >= #queryYearStart#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="queryYearEnd">
+			#queryYearEnd# >=  p.`year`
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="queryStatus">
+			pc.teacher_score_audit_status_id = #queryStatus#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="queryRealName">
+			u.real_name LIKE '%$queryRealName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="queryIdNumber">
+			u.id_number = '$queryIdNumber$'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="provinceId">
+			u.user_province_id = #provinceId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="cityId">
+			u.user_city_id = #cityId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="districtId">
+			u.user_district_id = #districtId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="schoolId">
+			u.school_id = #schoolId#
+		</isNotEmpty>
+		
+		<isNotNull property="checkList">
+			<iterate prepend="and" conjunction="or" open="(" close=")" property="checkList">
+				pc.teacher_id = #checkList[].teacherId# and pc.project_id = #checkList[].projectId#
+			</iterate>
+		</isNotNull>
+		ORDER BY
+			pc.create_date DESC
+  	</select>
+  	
+  
+   	<!-- 项目证书设置下项目列表/项目证书打印下项目列表(培训类) -->
+   	<select id="selectSSProByStatusTrain" resultClass="project.furtheredu.edumanage.pojo.TeacherProActivity" parameterClass="java.util.Map">
+   		SELECT
+			p.id AS proId,
+			p.project_name AS proName,
+			p.start_date AS startDate,
+			p.end_date AS endDate,
+			p.train_type_name AS trainTypeName,
+			p.project_property_name AS projectPropertyName,
+			p.train_scope_name AS trainScopeName,
+			p.create_by_area as createByArea,
+			p.print_xueshi_certificate as printXueshiCertificate,
+			p.print_project_certificate as printProjectCertificate
+		FROM
+			edu_project p
+		LEFT JOIN edu_project_audit t on t.id = (SELECT MAX(id)id from edu_project_audit where project_id=p.id)
+		WHERE  p.is_score_published = 1
+		<isNotEmpty prepend="AND" property="print">
+			p.status IN(50, 60)
+		</isNotEmpty>
+		<isNotNull prepend="and" property="createById">
+			p.create_by_id = #createById#
+		</isNotNull>	
+		<isNotNull prepend="and" property="applyerId">
+	  		t.applicant_id = #applyerId#
+	  	</isNotNull> 
+		<!-- <isNotEmpty prepend="and" property="createByArea">
+			p.create_by_area = #createByArea#
+		</isNotEmpty>
+		<isNotNull prepend="and" property="organizationId">
+	  		p.organization_id = #organizationId#
+	  	</isNotNull> -->
+		<isNotEmpty prepend="AND" property="projectName">
+			p.project_name LIKE '%$projectName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="year">
+			p.year = #year#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="trainTypeId">
+			p.train_type_id = #trainTypeId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="proProperty">
+			p.project_property_id = #proProperty#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="proScope">
+			p.project_scope_id = #proScope#
+		</isNotEmpty>
+		ORDER BY p.create_date DESC
+		<isNotEmpty prepend="" property="startIndex">
+		   LIMIT #startIndex#, #endIndex# 	
+		</isNotEmpty>
+   	</select>
+   	
+   	<!-- 项目证书设置下项目/项目证书打印下项目 列表count(培训类) -->
+	<select id="selectSSProByStatusTrainCount" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+   		SELECT
+			count(p.id)
+		FROM
+			edu_project p
+		LEFT JOIN edu_project_audit t on t.id = (SELECT MAX(id)id from edu_project_audit where project_id=p.id)
+		WHERE p.is_score_published = 1
+		<isNotEmpty prepend="AND" property="print">
+			p.status IN(50, 60)
+		</isNotEmpty>
+		<isNotNull prepend="and" property="createById">
+			p.create_by_id = #createById#
+		</isNotNull>	
+		<isNotNull prepend="and" property="applyerId">
+	  		t.applicant_id = #applyerId#
+	  	</isNotNull> 
+		<!-- <isNotEmpty prepend="and" property="createByArea">
+			p.create_by_area = #createByArea#
+		</isNotEmpty>
+		<isNotNull prepend="and" property="organizationId">
+	  		p.organization_id = #organizationId#
+	  	</isNotNull> --> 
+		<isNotEmpty prepend="AND" property="projectName">
+			p.project_name LIKE '%$projectName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="year">
+			p.year = #year#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="trainTypeId">
+			p.train_type_id = #trainTypeId#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="proProperty">
+			p.project_property_id = #proProperty#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="proScope">
+			p.project_scope_id = #proScope#
+		</isNotEmpty>
+   	</select>
+   
+   	<!-- 教师项目证书打印__查询已结束或已关闭的项目__(培训类) -->
+	<select id="selectTeacherProByStatusTrain" resultClass="project.furtheredu.edumanage.pojo.TeacherProActivity" parameterClass="java.util.Map">
+   		SELECT
+			p.id AS proId,
+			p.year,
+			p.project_name AS proName,
+			p.start_date AS startDate,
+			p.end_date AS endDate,
+			p.train_type_name AS trainTypeName,
+			p.project_property_name AS projectPropertyName,
+			pc.teacher_train_status_name AS trainStatus,
+			pc.teacher_score_audit_status_name AS auditStatus,
+			u.real_name AS teacherName,
+			pc.teacher_class_period AS teacherClassPeriod,
+			pc.teacher_class_score AS teacherClassScore,
+			pc.teacher_score AS teacherScore,
+			u.id_number AS idNumber,
+			pc.teacher_id as teacherId,
+			pc.period_certificate_code AS periodCertificateCode,
+			pc.project_certificate_code AS projectCertificateCode,
+			p.print_xueshi_certificate as printXueshiCertificate,
+			p.print_project_certificate as printProjectCertificate
+		FROM
+			edu_project_comment pc
+			LEFT JOIN edu_project p ON p.id = pc.project_id
+			LEFT JOIN edu_user u ON pc.teacher_id = u.id
+		WHERE
+			pc.teacher_id = #teacherId#
+		AND
+			p.status IN(50, 60)
+		<isNotEmpty prepend="AND" property="projectName">
+			p.project_name LIKE '%$projectName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="year">
+			p.year = #year#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="trainTypeId">
+			p.train_type_id = #trainTypeId#
+		</isNotEmpty>
+			ORDER BY p.create_date DESC
+		
+   	</select>
+   
+   
+   
+   
+   	<!-- 教师项目证书打印__查询已结束或已关闭的项目__(培训类) -->
+	<!--select id="selectTeacherProByStatusTrain" resultClass="project.furtheredu.edumanage.pojo.TeacherProActivity" parameterClass="java.util.Map">
+   		SELECT
+			p.id AS proId,
+			p.year,
+			p.project_name AS proName,
+			p.start_date AS startDate,
+			p.end_date AS endDate,
+			p.train_type_name AS trainTypeName,
+			p.project_property_name AS projectPropertyName,
+			pc.teacher_score_audit_status_name AS trainStatus,
+			u.real_name AS teacherName,
+			pc.teacher_class_period AS teacherClassPeriod,
+			pc.teacher_class_score AS teacherClassScore,
+			pc.teacher_score AS teacherScore
+		FROM
+			edu_project p
+			LEFT JOIN edu_project_comment pc ON p.id = pc.project_id
+			LEFT JOIN edu_user u ON pc.teacher_id = u.id
+		WHERE
+			pc.teacher_id = #teacherId#
+		AND
+			p.status IN(50, 60)
+		<isNotEmpty prepend="AND" property="projectName">
+			p.project_name LIKE '%$projectName$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="year">
+			p.year = #year#
+		</isNotEmpty>
+		<isNotEmpty prepend="AND" property="trainTypeId">
+			p.train_type_id = #trainTypeId#
+		</isNotEmpty>
+			ORDER BY p.create_date DESC
+   	</select-->
+   
+   	<!-- 机构: 上传培训成绩   	add by zhangxiaoqi -->
+   	<!-- update id="updateTeacherScore" parameterClass="project.organization.pojo.ProjectCommonActivity" >
+		UPDATE
+			edu_project_comment
+		SET
+			teacher_score = #teacherScore#,
+			update_by = #updateBy#,
+			update_date = #updateDate#,
+			upload_date = #uploadDate#
+		WHERE
+			project_id = #projectId#
+		AND
+			teacher_id = #teacherId#
+		<isNotEmpty prepend="AND" property="organizationId">
+			organization_id = #organizationId#
+		</isNotEmpty>
+	</update-->
+	
+	<!-- 上传培训成绩 -->
+	<update id="updateTeacherScore" parameterClass="project.organization.pojo.ProjectCommonActivity" >
+		UPDATE
+			edu_project_comment
+		SET
+			update_by = #updateBy#,
+			update_date = #updateDate#,
+			upload_date = #uploadDate#
+			<isNotEmpty prepend="," property="teacherScore">
+				teacher_score = #teacherScore#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="teacherTrainStatusId">
+				teacher_train_status_id = #teacherTrainStatusId#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="teacherTrainStatusName">
+				teacher_train_status_name = #teacherTrainStatusName#
+			</isNotEmpty>
+			<isNotEmpty prepend="," property="teacherClassPeriod">
+				teacher_class_period = #teacherClassPeriod#
+			</isNotEmpty>
+			<!-- teacher_class_score = #teacherClassScore#, -->
+		WHERE
+			project_id = #projectId#
+		AND
+			teacher_id = #teacherId#
+		<isNotEmpty prepend="AND" property="organizationId">
+			organization_id = #organizationId#
+		</isNotEmpty>
+	</update>
+   
+   
+  <select id="selectCommentListNoPage" resultMap="abatorgenerated_EduProjectCommentResult" parameterClass="java.util.HashMap" >
+    select id, project_id, project_score, teacher_id, organization_id, status, teacher_score,
+      teacher_train_status_id, teacher_train_status_name, create_by, create_date, update_by,
+      update_date, teacher_score_audit_status_id, teacher_score_audit_status_name, audit_memo
+    from edu_project_comment
+    order by create_date desc 
+  </select>
+  
+  <select id="select_project_comments" parameterClass="java.util.HashMap" resultClass="int">
+ 	SELECT
+		count(1)
+	FROM
+		edu_project_comment c 
+	LEFT JOIN edu_project p ON p.id = c.project_id
+	WHERE
+		p.edu_model_type = #eduModelType# AND p.is_score_published = 1
+ </select>
+  
+  <delete id="comment_delete" parameterClass="java.lang.Integer" >
+    delete from edu_project_comment
+    where id = #id:INTEGER#
+  </delete>
+  
+  <update id="comment_audit" parameterClass="java.util.HashMap"  >
+    update edu_project_comment
+    set 
+      teacher_score_audit_status_id = #status#,
+      update_by = #updateBy#,
+      update_date = now(),
+      audit_memo = #memo#
+    where id = #id:INTEGER#
+  </update>
+   
+  	<!-- add BY yinxiaolong -->
+  	<insert id="teacherAddProjectBaoming2" parameterClass="java.util.HashMap" > 
+	    insert into edu_project_comment (project_id, teacher_id,status,create_by,create_date,update_by,update_date,version,type)
+	    values (#projectId#,#teacherId#,#status#,#loginAccount#,now(),#loginAccount#,now(),#version#,#type#)
+ 	</insert>
+ 
+  <!-- add BY yinxiaolong 
+  教师报名不需要审核
+  -->
+  <insert id="teacherAddProjectBaoming" parameterClass="java.util.HashMap" >
+	    insert into edu_project_comment (organization_id,project_id, teacher_id,status,create_by,create_date,update_by,update_date,version,type,school_id,district_id)
+	    values (#organizationId#,#projectId#,#teacherId#,#status#,#loginAccount#,now(),#loginAccount#,now(),#version#,#type#,#schoolId#,#districtId#)
+ </insert>
+ 
+ <!-- add BY yinxiaolong 
+ 	教师评价
+ -->
+  <insert id="addTeacherCommentPro" parameterClass="java.util.HashMap" >
+  update edu_project_comment
+  	set project_score = #projectScore#
+  	where project_id = #projectId# and teacher_id = #teacherId#
+ </insert>
+ <!-- add BY yinxiaolong 
+ 	教师去学习选择机构插入ID
+ -->
+  <update id="addTeacherOrganizationId" parameterClass="java.util.HashMap" >
+ UPDATE edu_project_comment
+SET organization_id = #organizationId#,
+create_by = #loginAccount#,
+create_date = now()
+WHERE
+	project_id = #projectId#
+AND teacher_id = #teacherId#
+ </update>
+ 
+ <!-- 组织报名 -->
+  <insert id="batch_sign_up" parameterClass="java.util.HashMap" >
+	    insert into edu_project_comment (organization_id,project_id, teacher_id,status,create_date,update_date,create_by,update_by,type,version)
+	    values (#organizationId#,#projectId#,#teacherId#,#status#,now(),now(),#account#,#account#,#type#,#version#)
+ </insert>
+ 
+ <!-- 根据项目ID查询所有报名的老师ID -->
+ <select id="select_tId_by_project_id" parameterClass="int" resultClass="int">
+ 	select teacher_id from edu_project_comment where project_id = #projectId#
+ 
+ </select>
+ 
+ <!-- 成绩发布前,修改单个成绩 -->
+ <update id="updateTeacherScore_by_modify_score" parameterClass="java.util.HashMap" >
+ 	UPDATE edu_project_comment
+ 	<dynamic prepend="set"> 
+		<isNotEmpty prepend="," property="score">
+			teacher_score = #score#
+		</isNotEmpty>
+		<isNotEmpty prepend="," property="period">
+			teacher_class_period = #period#
+		</isNotEmpty>
+		<isNotEmpty prepend=",">
+			update_date = now()
+		</isNotEmpty>
+	</dynamic>
+	WHERE
+		project_id = #projectId#
+	AND id = #teacherId#
+ </update>
+ 
+ <!-- 审核成绩 -->
+ <update id="updateTeacherScore_by_modify_scores" parameterClass="java.util.HashMap" >
+	 UPDATE edu_project_comment
+	  <dynamic prepend="set">  
+          <isNotNull prepend="," property="score">            
+               examine=#score#  
+           </isNotNull> 
+         <isNotNull prepend="," property="opinion">            
+               opinion=#opinion#  
+           </isNotNull> 
+      </dynamic>  	
+	WHERE
+		project_id = #projectId# AND id = #commentId#
+		
+
+<!-- teacher_id in  ($teacherId$) -->
+
+ </update>
+ 
+ <!-- 批量审核培训结果 -->
+ <update id="update_teacher_train_status" parameterClass="java.util.HashMap" >
+	 UPDATE edu_project_comment	
+	 	SET teacher_train_status_id=#trainStatusId#, teacher_train_status_name=#trainStatusName#
+	WHERE 1=1 
+	<isNotEmpty prepend="AND" property="projectId">
+		project_id = #projectId#
+	</isNotEmpty>
+	<isNotEmpty prepend="AND" property="ids">
+		id IN 
+		<iterate property="ids" open="(" close=")" conjunction=",">  
+            $ids[]$ 
+        </iterate>
+	</isNotEmpty>
+ </update>
+ 
+  <!-- 批量审核成绩 -->
+ <update id="update_teacher_Score_info" parameterClass="java.util.HashMap" >
+	 UPDATE edu_project_comment	           
+           set    examine=#status#
+            <isNotNull prepend="," property="auditMemo">   
+           opinion=#auditMemo# 
+           </isNotNull>
+	WHERE id = #commentId#
+ </update>
+ 
+   <!-- 全部审核/全部取消审核成绩 -->
+ <update id="audit_all_teacher_scores" parameterClass="java.util.HashMap" >
+	 UPDATE edu_project_comment	           
+           set  examine=#examine#
+            <isNotNull prepend="," property="auditMemo">   
+           opinion=#auditMemo# 
+           </isNotNull>
+	WHERE status = 13 and project_id = #projectId#
+ </update>
+ 
+ <!-- 成绩发布前,批量修改成绩, 加分 -->
+ <update id="ScoreBatchUpdateByAdd" parameterClass="java.util.HashMap" >
+ 	UPDATE edu_project_comment
+		SET teacher_score = teacher_score+ #score#, 
+		update_date = now()
+	WHERE
+		project_id = #projectId# 
+		and teacher_score between #start# and #end#
+ </update>
+ 
+  <!-- 成绩发布前,批量修改成绩, 减分 -->
+ <update id="ScoreBatchUpdateBySub" parameterClass="java.util.HashMap" >
+ 	UPDATE edu_project_comment
+		SET teacher_score = teacher_score - #score#, 
+		update_date = now()
+	WHERE
+		project_id = #projectId# 
+		and teacher_score between #start# and #end#
+ </update>
+ 
+   <!-- 成绩发布前,批量修改成绩, 成绩统一设为分数值 -->
+ <update id="ScoreBatchUpdateByGive" parameterClass="java.util.HashMap" >
+ 	UPDATE edu_project_comment
+		SET teacher_score =  #score#, 
+		update_date = now()
+	WHERE
+		project_id = #projectId# 
+		and teacher_score between #start# and #end#
+ </update>
+ <!-- 批量修改学时 -->
+ <update id="ScoreBatchUpdateByModifyPeriod" parameterClass="java.util.HashMap" >
+ 	UPDATE edu_project_comment
+		SET teacher_class_period =  #period#, 
+		update_date = now()
+	WHERE
+		project_id = #projectId# 
+ </update>
+ 
+ <!-- 教师是否已经报名 -->
+ <select id="select_has_sign" parameterClass="java.util.HashMap" resultClass="int">
+ 	select count(1) from edu_project_comment where teacher_id = #teacherId# and project_id = #projectId#
+ </select>
+ 
+  
+  
+<!-- 成绩直接发布原始导入的数据,合格者如果没有导入学时,更新其学时为项目学时 -->
+ <update id="update_score_rule_zero" parameterClass="java.util.HashMap" >
+ 	UPDATE edu_project_comment
+		SET teacher_class_period = case when teacher_class_period is NULL then #classPeriod# else teacher_class_period end, 
+			teacher_train_status_id=1,
+		update_date = now()
+	WHERE
+		project_id = #projectId# 
+		and teacher_train_status_name='合格'
+ </update>
+ 
+ <update id="update_score_rule_zero_nopass" parameterClass="java.util.HashMap" >
+ 	UPDATE edu_project_comment
+		SET teacher_class_period = 0,
+		update_date = now()
+	WHERE
+		project_id = #projectId# 
+		and teacher_train_status_id = 0
+		and teacher_class_period is NULL
+ </update>
+
+  <!-- 成绩发布,合格 -->
+ <update id="update_score_rule_one_tow_A" parameterClass="java.util.HashMap" >
+ 	UPDATE edu_project_comment
+		SET teacher_class_period =  #classPeriod#, 
+			teacher_train_status_id=1,
+			teacher_train_status_name='合格',
+		update_date = now()
+	WHERE
+		project_id = #projectId# 
+		and teacher_score >=#publishRuleScore#
+ </update>
+ 
+  <!-- 成绩发布,不合格 -->
+ <update id="update_score_rule_one_tow_B" parameterClass="java.util.HashMap" >
+ 	UPDATE edu_project_comment
+		SET teacher_class_period =  0, 
+			teacher_train_status_id=0,
+			teacher_train_status_name='不合格',
+		update_date = now()
+	WHERE
+		project_id = #projectId# 
+		and #publishRuleScore# > teacher_score  
+ </update>
+ 
+
+  <!-- 成绩发布,优秀 -->
+ <update id="update_score_rule_three_A" parameterClass="java.util.HashMap" >
+ 	UPDATE edu_project_comment
+		SET teacher_class_period =  #classPeriod#, 
+			teacher_train_status_id=2,
+			teacher_train_status_name='优秀',
+		update_date = now()
+	WHERE
+		project_id = #projectId# 
+		and teacher_score  >= #levelA#   
+ </update>
+ 
+   <!-- 成绩发布,良好 -->
+ <update id="update_score_rule_three_B" parameterClass="java.util.HashMap" >
+ 		UPDATE edu_project_comment
+		SET teacher_class_period =  #classPeriod#, 
+			teacher_train_status_id=3,
+			teacher_train_status_name='良好',
+		update_date = now()
+	WHERE
+		project_id = #projectId# 
+		and teacher_score  >= #levelB#   
+ </update>
+ 
+   <!-- 成绩发布,中 合格 -->
+ <update id="update_score_rule_three_C" parameterClass="java.util.HashMap" >
+ 	UPDATE edu_project_comment
+		SET teacher_class_period =  #classPeriod#, 
+			teacher_train_status_id=1,
+			teacher_train_status_name='合格',
+		update_date = now()
+	WHERE
+		project_id = #projectId# 
+		and teacher_score  >= #levelC#   
+ </update>
+ 
+   <!-- 成绩发布,差 不合格 -->
+ <update id="update_score_rule_three_D" parameterClass="java.util.HashMap" >
+ 	UPDATE edu_project_comment
+		SET teacher_class_period = 0, 
+			teacher_train_status_id=0,
+			teacher_train_status_name='不合格',
+		update_date = now()
+	WHERE
+		project_id = #projectId# 
+		and  #levelC#    >teacher_score 
+ </update>
+ 
+  <!-- 修改教师学分 -->
+  <update id="auditCreditTrain" parameterClass="java.util.Map" >
+    update edu_project_comment
+    	set teacher_score_audit_status_id=#status#,
+    		teacher_score_audit_status_name=#statusName#
+    		<isNotEmpty prepend="," property="score" >
+		  		teacher_class_score=#score#
+		  	</isNotEmpty>
+    where project_id=#projectId#
+	<isNotEmpty prepend="AND" property="ids">
+		teacher_id IN 
+		<iterate property="ids" open="(" close=")" conjunction=",">  
+            $ids[]$ 
+        </iterate>
+	 </isNotEmpty>    
+  </update>
+   
+ <!-- 更新教师报名信息 -->
+ <update id="updateTeacherSign" parameterClass="java.util.HashMap" >
+  update edu_project_comment
+  	set status = #status#,
+  	version=#version#,
+  	update_date = now()
+  	where project_id = #projectId# and teacher_id = #teacherId# and status != 13
+ </update>
+ 
+ <!-- 查询教师是否已报名 -->
+ <select id="CountTeacherSignInfo" parameterClass="java.util.HashMap" resultClass="int">
+ 	select count(1) from edu_project_comment where project_id = #projectId# and teacher_id = #teacherId#
+ </select>
+ 
+  <update id="updateTeacherProjectComment" parameterClass="java.util.HashMap" >
+  update edu_project_comment
+  	<dynamic prepend="set" >
+  	<isNotNull prepend="," property="projectCertificateUrl" >
+  		project_certificate_url = #projectCertificateUrl#
+  	</isNotNull>
+  	<isNotNull prepend="," property="periodCertificateUrl" >
+  		period_certificate_url = #periodCertificateUrl#
+  	</isNotNull>
+  	<isNotNull prepend="," property="qrcodeUrl" >
+  		qrcode_url = #qrcodeUrl#
+  	</isNotNull>
+  	<isNotNull prepend=",">
+  	update_date = now()
+  	</isNotNull>
+  	</dynamic>
+  	where project_id=#projectId#
+  	<isNotNull prepend="and" property="teacherId" >
+  		teacher_id = #teacherId#
+  	</isNotNull>
+ </update>
+ 
+ <!-- 按证书类别批量修改证书编号 -->
+ <update id="updateProjectCertificateAll" parameterClass="java.util.HashMap" >
+  update edu_project_comment
+  	<dynamic prepend="set" >
+  	<isNotNull prepend="," property="certificatePeriodCode" >
+  	period_certificate_code = CONCAT(#certificatePeriodCode#,RIGHT(period_certificate_code,6))
+    </isNotNull>
+    <isNotNull prepend="," property="certificateProjectCode" >
+  	project_certificate_code = CONCAT(#certificateProjectCode#,RIGHT(project_certificate_code,6))
+  	</isNotNull>
+  	<isNotNull prepend=",">
+  	update_date = now()
+  	</isNotNull>
+  	</dynamic>
+  	where project_id=#projectId#
+  	<isNotNull prepend="and" property="type" >
+  		type = #type#
+  	</isNotNull>
+ </update>
+ 
+  	 <!-- 批量修改教师学分(规则兑换/成绩发布) -->
+	 <update id="update_teacher_score_by_proId" parameterClass="java.util.HashMap" >
+		 UPDATE edu_project_comment SET 
+		 <isNotNull property="periodToCredit">
+		 teacher_class_score=round(teacher_class_period*$period_rule$,2)
+		 </isNotNull>
+		 <isNotNull property="CreditToPeriod">
+		 teacher_class_score=round(teacher_class_period/$period_rule$,2)
+		 </isNotNull>
+		  WHERE 1=1
+		  <isNotNull prepend="AND" property="proIds">
+			project_id IN 
+			<iterate property="proIds" open="(" close=")" conjunction=",">  
+	            $proIds[]$ 
+	        </iterate>
+		  </isNotNull>
+		  <isNotNull prepend="AND" property="ids">
+			id IN 
+			<iterate property="ids" open="(" close=")" conjunction=",">  
+	            $ids[]$ 
+	        </iterate>
+		  </isNotNull>
+		  <isNotNull prepend="and" property="excellentRule" >
+	  		 teacher_train_status_id=2
+	  	  </isNotNull>
+	  	  <isNotNull prepend="and" property="commonRule" >
+	  		 teacher_train_status_id != 2
+	  	  </isNotNull>
+	  	  and teacher_score_audit_status_id=11
+	 </update>
+	 
+	 <!-- 批量修改教师学分(培训结果审核) -->
+	 <update id="update_teacher_class_score" parameterClass="java.util.HashMap" >
+		 UPDATE edu_project_comment SET teacher_class_score=round(teacher_class_period/$period_rule$,0)
+		  WHERE 1=1
+		  <isNotEmpty prepend="AND" property="projectId">
+			project_id = #projectId#
+		 </isNotEmpty>
+		 <isNotEmpty prepend="AND" property="ids">
+			id IN 
+			<iterate property="ids" open="(" close=")" conjunction=",">  
+	            $ids[]$ 
+	        </iterate>
+		 </isNotEmpty>
+		  <isNotNull prepend="and" property="excellentRule" >
+	  		 teacher_train_status_id=2
+	  	  </isNotNull>
+	  	  and teacher_score_audit_status_id=11
+	 </update>
+	 <insert id="insert_project_comment_special" parameterClass="java.util.HashMap"> 
+	   INSERT INTO edu_project_comment (
+			project_id,
+			teacher_id,
+			STATUS,
+			create_by,
+			create_date,
+			teacher_train_status_id,
+			teacher_train_status_name,
+			teacher_class_score,
+			teacher_score_audit_status_id,
+			teacher_score_audit_status_name,
+			examine
+		)
+		VALUES
+			(
+				#projectId#,
+				#teacherId#,
+				#status#,
+				#createBy#,
+				#createDate#,
+				#teacherTrainStatusId#,
+				#teacherTrainStatusName#,
+				#teacherClassScore#,
+				#teacherScoreAuditStatusId#,
+				#teacherScoreAuditStatusName#,
+				#examine#
+			<selectKey resultClass="int" keyProperty="id">
+				SELECT
+				LAST_INSERT_ID()
+			</selectKey>
+			)
+		</insert>
+		
+		<delete id="cancel_registration_all" parameterClass="java.util.HashMap">
+		delete from edu_project_comment where
+		project_id = #projectId#
+		
+		</delete>
+</sqlMap>

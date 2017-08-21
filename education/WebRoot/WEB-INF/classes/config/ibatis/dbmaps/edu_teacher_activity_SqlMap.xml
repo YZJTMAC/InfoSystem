@@ -1,0 +1,554 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_teacher_activety" >
+  <resultMap id="abatorgenerated_EduUserResult" class="project.person.pojo.EduUser" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="login_account" property="loginAccount" jdbcType="VARCHAR" />
+    <result column="real_name" property="realName" jdbcType="VARCHAR" />
+    <result column="role_id" property="roleId" jdbcType="INTEGER" />
+    <result column="id_number" property="idNumber" jdbcType="VARCHAR" />
+    <result column="mail" property="mail" jdbcType="VARCHAR" />
+    <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+    <result column="paswd_question_type" property="paswdQuestionType" jdbcType="INTEGER" />
+    <result column="paswd_answer" property="paswdAnswer" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="version" property="version" jdbcType="INTEGER" />
+    <result column="teacher_no" property="teacherNo" jdbcType="VARCHAR" />
+    <result column="school_id" property="schoolId" jdbcType="INTEGER" />
+    <result column="gender" property="gender" jdbcType="INTEGER" />
+  </resultMap>
+  
+   <resultMap id="teacherQueryActivity" extends="abatorgenerated_EduUserResult" class="project.teacher.teachermanage.pojo.TeacherActivity">
+    <result column="teacher_no" property="teacherNo" jdbcType="VARCHAR" />
+     <result column="school_province_id" property="schoolProvinceId" jdbcType="INTEGER" />
+    <result column="school_province_name" property="schoolProvinceName" jdbcType="VARCHAR" />
+     <result column="school_city_id" property="schoolCityId" jdbcType="INTEGER" />
+    <result column="school_city_name" property="schoolCityName" jdbcType="VARCHAR" />
+     <result column="school_district_id" property="schoolDistrictId" jdbcType="INTEGER" />
+    <result column="school_district_name" property="schoolDistrictName" jdbcType="VARCHAR" />
+    <result column="school_name" property="schoolName" jdbcType="VARCHAR" />
+    <result column="status_name" property="statusName" jdbcType="VARCHAR" />
+    <result column="user_image_url" property="userImageUrl" jdbcType="VARCHAR" />
+    
+    <result column="job_former_teaching_section" property="teachingSection" jdbcType="VARCHAR" />
+    <result column="job_former_teaching_section_type" property="teachingSectionType" jdbcType="INTEGER" />
+    <result column="job_former_teaching_subject" property="teachingSubject" jdbcType="VARCHAR" />
+    <result column="job_former_teaching_subject_type" property="teachingSubjectType" jdbcType="VARCHAR" />
+  </resultMap>
+  
+    <resultMap id="teacherQueryExport" extends="abatorgenerated_EduUserResult" class="project.teacher.teachermanage.pojo.TeacherActivity">
+    <result column="teacher_no" property="teacherNo" jdbcType="VARCHAR" />
+     <result column="school_province_id" property="schoolProvinceId" jdbcType="INTEGER" />
+    <result column="school_province_name" property="schoolProvinceName" jdbcType="VARCHAR" />
+     <result column="school_city_id" property="schoolCityId" jdbcType="INTEGER" />
+    <result column="school_city_name" property="schoolCityName" jdbcType="VARCHAR" />
+    <result column="school_name" property="schoolName" jdbcType="VARCHAR" />
+    <result column="status_name" property="statusName" jdbcType="VARCHAR" />
+    
+    <result column="job_former_teaching_section" property="teachingSection" jdbcType="VARCHAR" />
+    <result column="job_former_teaching_section_type" property="teachingSectionType" jdbcType="INTEGER" />
+    <result column="job_former_teaching_subject" property="teachingSubject" jdbcType="VARCHAR" />
+    <result column="job_former_teaching_subject_type" property="teachingSubjectType" jdbcType="VARCHAR" />
+  </resultMap>
+    
+  <select id="selectTeacherActivetyListNoPage" resultClass="project.teacher.teachermanage.pojo.TeacherExportActivity" parameterClass="java.util.HashMap" >
+  	select 
+   		u.id as id,
+		u.login_account as loginAccount,
+		u.real_name as realName,
+		u.role_id as roleId,
+		u.id_number as idNumber,
+		u.mail as mail,
+		u.mobile as mobile,
+		u.paswd_answer as paswdAnswer,
+		u.PASSWORD as password,
+		u.create_by as createBy,
+		u.update_by as updateBy,
+		u.create_date as createDate,
+		u.update_date as updateDate,
+		u. STATUS as status,
+		u.version as version,
+		u.teacher_no as teacherNo,
+		u.school_id as schoolId,
+		(case when u.gender=1 then '男' else '女' end) as sex,
+		s.school_code as schoolCode,
+		u.school_name as schoolName,
+		u.user_province_name as userProvinceName,
+	  	u.user_district_name as userDistrictName,
+		u.user_city_name as userCityName,
+	
+		IFNULL(
+			j.job_former_teaching_section,
+			""
+		) AS jobFormerTeachingSection,
+	 
+		IFNULL(
+			j.job_former_teaching_subject,
+			""
+		) AS jobFormerTeachingSubject,
+	 
+		j.job_comment_position as jobCommentPosition,
+		j.job_recruitment_position as jobRecruitmentPosition,
+		j.job_school_administration_office as jobSchoolAdministrationOffice,
+		j.job_core_teacher as jobCoreTeacher,
+		(case when j.job_whether_teacher=1 then '是' else '否' end) as jobWhetherTeacher,
+		(case when j.job_county_rural_teacher=1 then '是' else '否' end) as jobCountyRuralTeacher,
+		j.job_certificate_num as jobCertificateNum,
+		t.teacher_native_place as teacherNativePlace,
+		(select dictionary_name from edu_sys_dictionary sd where sd.dictionary_type = 'political_status' and sd.dictionary_id = t.teacher_political_status) as teacherPoliticalStatus,
+		t.party_time as partyTime,
+		t.teacher_nation as teacherNation,
+		(select dictionary_name from edu_sys_dictionary sd where sd.dictionary_type = 'jszgz_type' and sd.dictionary_id = j.jszgz) as jszgz,
+		low.education_experience as educationExperience,
+		low.education_degree as educationDegree,
+		low.education_graduation_time as educationGraduationTime,
+		low.education_graduation_school as educationGraduationSchool,
+		low.education_graduation_profession as educationGraduationProfession,
+		
+		top.education_experience as topEducationExperience,
+		top.education_degree as topEducationDegree,
+		top.education_graduation_time as topEducationGraduationTime,
+		top.education_graduation_school as topEducationGraduationSchool,
+		top.education_graduation_profession as topEducationGraduationProfession,
+		
+		(case when j.qrzsfzy=1 then '是' else '否' end) as qrzsfzy,
+		(select dictionary_name from edu_sys_dictionary sd where sd.dictionary_type = 'mfsfs_type' and sd.dictionary_id = j.mfsfs) as mfsfs,
+		j.eliteTraining as eliteTraining,
+		j.teachingMaster as teachingMaster,
+		j.job_subject_leader_name as jobSubjectLeaderName,
+		(select dictionary_name from edu_sys_dictionary sd where sd.dictionary_type = 'contract_type' and sd.dictionary_id = j.contract) as contract,
+		j.adjust_name as adjustName,
+		j.rych as rych,
+		j.jxjybh as jxjybh,
+		j.jsnpxqk as jsnpxqk,
+		j.cjqsny as cjqsny,
+		(select dictionary_name from edu_sys_dictionary sd where sd.dictionary_type = 'pthdj_type' and sd.dictionary_id = j.pthdj) as pthdj,
+		j.job_comment_date as jobCommentDate,
+		j.job_recruitment_date as jobRecruitmentDate,
+		(case when j.sfzb=1 then '是' else '否' end) as sfzb,
+		(select dictionary_name from edu_sys_dictionary sd where sd.dictionary_type = 'gwlb_type' and sd.dictionary_id = j.gwlb) as gwlb,
+		(select dictionary_name from edu_sys_dictionary sd where sd.dictionary_type = 'gwdj_type' and sd.dictionary_id = j.gwdj) as gwdj,
+		j.postGrade as postGrade,
+		j.job_work_time as jobWorkTime,
+		j.job_work_date as jobWorkDate,
+		j.postBack as postBack,
+		j.jdfldw as jdfldw,
+		j.jdflTime as jdflTime,
+		j.remark as remark,
+		j.salary as salary
+	
+	FROM 
+		edu_user u
+     	LEFT JOIN edu_teacher_basic_info t ON u.id = t.teacher_id AND t.STATUS = 1
+		LEFT JOIN edu_teacher_job j ON u.id = j.teacher_id AND j.STATUS = 1
+		LEFT JOIN edu_school s ON u.school_id = s.school_id
+		LEFT JOIN edu_teacher_education low ON low.teacher_id = u.id AND low.sort = 1 AND low.`status` = 1
+		LEFT JOIN edu_teacher_education top ON top.teacher_id = u.id AND top.`status` = 1 AND top.sort=(SELECT MAX(sort) FROM edu_teacher_education WHERE teacher_id=u.id AND status=1)
+		WHERE u.status != 0 and u.role_id in (4,5)
+		
+		<isNotNull prepend="and" property="teachers">
+			u.id in ($teachers$)
+		</isNotNull>
+		<isNotNull prepend="and" property="provinceId">
+			u.user_province_id = #provinceId#
+		</isNotNull>
+		<isNotNull prepend="and" property="cityId">
+			u.user_city_id = #cityId#
+		</isNotNull>
+		<isNotNull prepend="and" property="districtId">
+			u.user_district_id = #districtId#
+		</isNotNull>
+		<isNotNull prepend="and" property="schoolId">
+			u.school_id = #schoolId#
+		</isNotNull>
+		<isNotNull prepend="and" property="queryRealName">
+			u.real_name LIKE '%$queryRealName$%'
+		</isNotNull>
+		<isNotNull prepend="and" property="queryTeacherNo">
+			u.teacher_no LIKE '%$queryTeacherNo$%'
+		</isNotNull>
+		<isNotNull prepend="and" property="queryIdNumber">
+			u.id_number LIKE '%$queryIdNumber$%'
+		</isNotNull>
+		<isNotNull prepend="and" property="gender">
+			u.gender = #gender#
+		</isNotNull>
+		<isNotNull prepend="and" property="userStatus">
+			u.status = #userStatus#
+		</isNotNull>
+		<isNotNull prepend="and" property="stdutySubject">
+			j.job_former_teaching_subject_type LIKE '%$stdutySubject$%'
+		</isNotNull>
+		<isNotNull prepend="and" property="stdutySection">
+			j.job_former_teaching_section_type = #stdutySection#
+		</isNotNull>
+		<isNotNull prepend="and" property="subjectLeader">
+			j.job_subject_leader = #subjectLeader#
+		</isNotNull>
+		<isNotNull prepend="and" property="coreTeacher">
+			j.job_core_teacher_type = #coreTeacher#
+		</isNotNull>
+		<isNotNull prepend="and" property="gradeTeacher">
+			j.job_whether_grade_teacher = #gradeTeacher#
+		</isNotNull>
+		<isNotNull prepend="and" property="specialTeacher">
+			j.job_special_teacher = #specialTeacher#
+		</isNotNull>
+		<isNotNull prepend="and" property="countyRuralTeacher">
+			j.job_county_rural_teacher = #countyRuralTeacher#
+		</isNotNull>
+		<isNotNull prepend="and" property="gwlb">
+			j.gwlb = #gwlb#
+		</isNotNull>
+		<isNotNull prepend="and" property="jobCommentPosition">
+			j.job_comment_position_type = #jobCommentPosition#
+		</isNotNull>
+		<isNotNull prepend="and" property="jobRecruitmentPosition">
+			j.job_recruitment_position_type = #jobRecruitmentPosition#
+		</isNotNull>
+		<isNotNull prepend="and" property="gwdj">
+			j.gwdj = #gwdj#
+		</isNotNull>
+		<isNotEmpty prepend="and" property="jdfldw">
+			j.jdfldw like '%$jdfldw$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="jobCommentDate">
+			j.job_comment_date = #jobCommentDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="jobRecruitmentDate">
+			j.job_recruitment_date = #jobRecruitmentDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="postGrade">
+			j.postGrade = #postGrade#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="jobWorkDate">
+			j.job_work_date = #jobWorkDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="jdflTime">
+			j.jdflTime = #jdflTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="postBack">
+			j.postBack = #postBack#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="jobWhetherTeacher">
+			j.job_whether_teacher = #jobWhetherTeacher#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="marry">
+			 t.teacher_marital_status = #marry#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="ageA">
+			 (year(now())-year(t.teacher_born_date)-1) + 
+					( DATE_FORMAT(NOW(), '%m%d') >=DATE_FORMAT(t.teacher_born_date, '%m%d') ) $ageA$
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="workAge">
+			 (year(now())-year(j.job_work_time)-1) + 
+					( DATE_FORMAT(NOW(), '%m%d') >=DATE_FORMAT(j.job_work_time, '%m%d') ) $workAge$
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="lowEducation">
+			 low.education_experience_type = #lowEducation#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="topEducation">
+			 top.education_experience_type = #topEducation#
+		</isNotEmpty>
+		order by u.create_date desc
+		<!-- GROUP BY u.id -->
+  </select>
+  
+  <!-- 教师信息列表 -->
+  <select id="selectTeacherActivetyList" resultMap="teacherQueryActivity" parameterClass="java.util.HashMap" >
+  	select 
+   		u.id,
+		login_account,	real_name,	role_id,	IFNULL(id_number,"") as id_number,	mail,	mobile,
+		paswd_question_type,	paswd_answer,	password, user_image_url,
+		u.create_by,	u.update_by,	u.create_date,
+		u.update_date,	u.status, d.dictionary_name as status_name, u.version, u.teacher_no,
+		u.school_id, u.gender,
+		teacher_no,	
+		s.school_province_id,	IFNULL(s.school_province_name,"") as school_province_name,
+		s.school_city_id,  IFNULL(s.school_city_name,"") as school_city_name,	
+		s.school_district_id,  IFNULL(s.school_district_name,"") as school_district_name,	
+		s.school_id,	
+		IFNULL(s.school_name,"") as school_name,
+		IFNULL(j.job_former_teaching_section,"") as  job_former_teaching_section,  
+		j.job_former_teaching_section_type,
+		IFNULL(j.job_former_teaching_subject,"") as job_former_teaching_subject,  j.job_former_teaching_subject_type
+	FROM
+		edu_user u
+		LEFT JOIN edu_teacher_basic_info t ON  u.id = t.teacher_id and t.status = 1
+		LEFT JOIN edu_teacher_job j ON u.id = j.teacher_id and j.status = 1
+		<isNotEmpty property="lowEducation">
+			 LEFT JOIN edu_teacher_education low ON u.id = low.teacher_id and low.status = 1 and low.sort=1
+		</isNotEmpty>
+		<isNotEmpty property="topEducation">
+			LEFT JOIN edu_teacher_education top ON u.id = top.teacher_id and top.status = 1 and top.sort=(SELECT MAX(sort) from edu_teacher_education where teacher_id=u.id and status=1)
+		</isNotEmpty>
+		LEFT JOIN edu_school s ON u.school_id = s.school_id	
+		LEFT JOIN edu_sys_dictionary d ON d.dictionary_type = 'teacher_status' and u.status = d.dictionary_id
+		where 1=1
+		and u.status != 0
+		and u.role_id in (4,5)
+		<isNotNull prepend="and" property="provinceId">
+			u.user_province_id = #provinceId#
+		</isNotNull>
+		<isNotNull prepend="and" property="cityId">
+			u.user_city_id = #cityId#
+		</isNotNull>
+		<isNotNull prepend="and" property="districtId">
+			u.user_district_id = #districtId#
+		</isNotNull>
+		<isNotNull prepend="and" property="schoolId">
+			u.school_id = #schoolId#
+		</isNotNull>
+		
+		<isNotNull prepend="and" property="queryRealName">
+			real_name LIKE '%$queryRealName$%'
+		</isNotNull>
+		<isNotNull prepend="and" property="queryTeacherNo">
+			teacher_no LIKE '%$queryTeacherNo$%'
+		</isNotNull>
+		<isNotNull prepend="and" property="queryIdNumber">
+			id_number LIKE '%$queryIdNumber$%'
+		</isNotNull>
+		
+		<isNotNull prepend="and" property="stdutySubject">
+			j.job_former_teaching_subject_type LIKE '%$stdutySubject$%'
+		</isNotNull>
+		
+		<isNotNull prepend="and" property="stdutySection">
+			j.job_former_teaching_section_type = #stdutySection#
+		</isNotNull>
+		<isNotEmpty prepend="and" property="marry">
+			 t.teacher_marital_status = #marry#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="ageA">
+			 (year(now())-year(t.teacher_born_date)-1) + 
+					( DATE_FORMAT(NOW(), '%m%d') >=DATE_FORMAT(t.teacher_born_date, '%m%d') ) $ageA$
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="workAge">
+			 (year(now())-year(j.job_work_time)-1) + 
+					( DATE_FORMAT(NOW(), '%m%d') >=DATE_FORMAT(j.job_work_time, '%m%d') ) $workAge$
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="lowEducation">
+			 low.education_experience_type = #lowEducation#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="topEducation">
+			 top.education_experience_type = #topEducation#
+		</isNotEmpty>
+		<isNotNull prepend="and" property="gender">
+			u.gender = #gender#
+		</isNotNull>
+		<isNotNull prepend="and" property="subjectLeader">
+			j.job_subject_leader = #subjectLeader#
+		</isNotNull>
+		<isNotNull prepend="and" property="coreTeacher">
+			j.job_core_teacher_type = #coreTeacher#
+		</isNotNull>
+		<isNotNull prepend="and" property="gradeTeacher">
+			j.job_whether_grade_teacher = #gradeTeacher#
+		</isNotNull>
+		<isNotNull prepend="and" property="specialTeacher">
+			j.job_special_teacher = #specialTeacher#
+		</isNotNull>
+		<isNotNull prepend="and" property="countyRuralTeacher">
+			j.job_county_rural_teacher = #countyRuralTeacher#
+		</isNotNull>
+		<isNotNull prepend="and" property="gwlb">
+			j.gwlb = #gwlb#
+		</isNotNull>
+		<isNotNull prepend="and" property="jobCommentPosition">
+			j.job_comment_position_type = #jobCommentPosition#
+		</isNotNull>
+		<isNotNull prepend="and" property="jobRecruitmentPosition">
+			j.job_recruitment_position_type = #jobRecruitmentPosition#
+		</isNotNull>
+		<isNotNull prepend="and" property="gwdj">
+			j.gwdj = #gwdj#
+		</isNotNull>
+		<isNotEmpty prepend="and" property="jdfldw">
+			j.jdfldw like '%$jdfldw$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="jobCommentDate">
+			j.job_comment_date = #jobCommentDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="jobRecruitmentDate">
+			j.job_recruitment_date = #jobRecruitmentDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="postGrade">
+			j.postGrade = #postGrade#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="jobWorkDate">
+			j.job_work_date = #jobWorkDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="jdflTime">
+			j.jdflTime = #jdflTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="postBack">
+			j.postBack = #postBack#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="jobWhetherTeacher">
+			j.job_whether_teacher = #jobWhetherTeacher#
+		</isNotEmpty>
+		<isNotNull prepend="and" property="userStatus">
+			u.status = #userStatus#
+		</isNotNull>
+      order by u.create_date desc LIMIT #startIndex#,#endIndex# 
+  </select>
+  
+   <!-- 教师信息列表count -->
+   <select id="selectTeacherActivetyListCount" resultClass="java.lang.Integer" parameterClass="java.util.HashMap" >
+    select count(u.id) 
+	FROM 
+			edu_user u
+		LEFT JOIN edu_teacher_basic_info t ON  u.id = t.teacher_id and t.status = 1
+		LEFT JOIN edu_teacher_job j ON u.id = j.teacher_id and j.status = 1
+		<isNotEmpty property="lowEducation">
+			LEFT JOIN edu_teacher_education low ON u.id = low.teacher_id and low.status = 1 and low.sort=1
+		</isNotEmpty>
+		<isNotEmpty property="topEducation">
+			LEFT JOIN edu_teacher_education top ON u.id = top.teacher_id and top.status = 1 and top.sort=(SELECT MAX(sort) from edu_teacher_education where teacher_id=u.id and status=1)
+		</isNotEmpty>
+		LEFT JOIN edu_school s ON u.school_id = s.school_id	
+		<!-- INNER JOIN edu_sys_dictionary d ON d.dictionary_type = 'teacher_status' and u.status = d.dictionary_id
+		 -->
+		where 1=1
+		and u.status != 0
+		and u.role_id in (4,5)
+		<isNotNull prepend="and" property="provinceId">
+			u.user_province_id = #provinceId#
+		</isNotNull>
+		<isNotNull prepend="and" property="cityId">
+			u.user_city_id = #cityId#
+		</isNotNull>
+		<isNotNull prepend="and" property="districtId">
+			u.user_district_id = #districtId#
+		</isNotNull>
+		<isNotNull prepend="and" property="schoolId">
+			u.school_id = #schoolId#
+		</isNotNull>
+		
+		<isNotNull prepend="and" property="queryRealName">
+			real_name LIKE '%$queryRealName$%'
+		</isNotNull>
+		<isNotNull prepend="and" property="queryTeacherNo">
+			teacher_no LIKE '%$queryTeacherNo$%'
+		</isNotNull>
+		<isNotNull prepend="and" property="queryIdNumber">
+			id_number LIKE '%$queryIdNumber$%'
+		</isNotNull>
+		
+		<isNotNull prepend="and" property="stdutySubject">
+			j.job_former_teaching_subject_type LIKE '%$stdutySubject$%'
+		</isNotNull>
+		
+		<isNotNull prepend="and" property="stdutySection">
+			j.job_former_teaching_section_type = #stdutySection#
+		</isNotNull>
+		
+		<isNotEmpty prepend="and" property="marry">
+			 t.teacher_marital_status = #marry#
+		</isNotEmpty>
+		
+		<isNotEmpty prepend="and" property="ageA">
+			 (year(now())-year(t.teacher_born_date)-1) + 
+					( DATE_FORMAT(NOW(), '%m%d') >=DATE_FORMAT(t.teacher_born_date, '%m%d') ) $ageA$
+		</isNotEmpty>
+		
+		<isNotEmpty prepend="and" property="workAge">
+			 (year(now())-year(j.job_work_time)-1) + 
+					( DATE_FORMAT(NOW(), '%m%d') >=DATE_FORMAT(j.job_work_time, '%m%d') ) $workAge$
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="lowEducation">
+			 low.education_experience_type = #lowEducation#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="topEducation">
+			 top.education_experience_type = #topEducation#
+		</isNotEmpty>
+		<isNotNull prepend="and" property="gender">
+			u.gender = #gender#
+		</isNotNull>
+		<isNotNull prepend="and" property="subjectLeader">
+			j.job_subject_leader = #subjectLeader#
+		</isNotNull>
+		<isNotNull prepend="and" property="coreTeacher">
+			j.job_core_teacher_type = #coreTeacher#
+		</isNotNull>
+		<isNotNull prepend="and" property="gradeTeacher">
+			j.job_whether_grade_teacher = #gradeTeacher#
+		</isNotNull>
+		<isNotNull prepend="and" property="specialTeacher">
+			j.job_special_teacher = #specialTeacher#
+		</isNotNull>
+		<isNotNull prepend="and" property="countyRuralTeacher">
+			j.job_county_rural_teacher = #countyRuralTeacher#
+		</isNotNull>
+		<isNotNull prepend="and" property="gwlb">
+			j.gwlb = #gwlb#
+		</isNotNull>
+		<isNotNull prepend="and" property="jobCommentPosition">
+			j.job_comment_position_type = #jobCommentPosition#
+		</isNotNull>
+		<isNotNull prepend="and" property="jobRecruitmentPosition">
+			j.job_recruitment_position_type = #jobRecruitmentPosition#
+		</isNotNull>
+		<isNotNull prepend="and" property="gwdj">
+			j.gwdj = #gwdj#
+		</isNotNull>
+		<isNotEmpty prepend="and" property="jdfldw">
+			j.jdfldw like '%$jdfldw$%'
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="jobCommentDate">
+			j.job_comment_date = #jobCommentDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="jobRecruitmentDate">
+			j.job_recruitment_date = #jobRecruitmentDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="postGrade">
+			j.postGrade = #postGrade#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="jobWorkDate">
+			j.job_work_date = #jobWorkDate#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="jdflTime">
+			j.jdflTime = #jdflTime#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="postBack">
+			j.postBack = #postBack#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="jobWhetherTeacher">
+			j.job_whether_teacher = #jobWhetherTeacher#
+		</isNotEmpty>
+		<isNotNull prepend="and" property="userStatus">
+			u.status = #userStatus#
+		</isNotNull>
+  </select>
+  
+  <resultMap id="teacher_all_version_map" class="project.teacher.teachermanage.pojo.EduTeacherVersionPOJO">
+  	<result column="userVersion" property="userVersion" jdbcType="INTEGER" />
+   	<result column="baseVersion" property="baseVersion" jdbcType="INTEGER" />
+    <result column="jobVersion" property="jobVersion" jdbcType="INTEGER" />
+    <result column="eduVersion" property="eduVersion" jdbcType="INTEGER" />
+  </resultMap>
+  
+     <select id="teacher_all_version" resultMap="teacher_all_version_map" parameterClass="java.lang.Integer" >
+     SELECT 
+     	u.version as userVersion,
+     	IFNULL(MAX(b.version),1) as baseVersion, 
+     	IFNULL(MAX(j.version),1) as jobVersion, 
+     	IFNULL(MAX(e.version),1) as eduVersion
+     from 
+		edu_user u 
+		LEFT JOIN edu_teacher_basic_info b ON u.id = b.teacher_id
+		LEFT JOIN edu_teacher_job j ON u.id = j.teacher_id
+		LEFT JOIN edu_teacher_education e ON u.id = e.teacher_id
+   	 WHERE
+		u.id = #teacherId#
+		group by u.version
+  </select>
+
+  
+</sqlMap>

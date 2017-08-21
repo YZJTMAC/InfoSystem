@@ -1,0 +1,126 @@
+package project.master.pojo;
+
+public class EduComparisonComment {
+	private int id;					//主键
+	private String comparisonId;	//评比活动id
+	private String teacherId;		//教师id
+	private String teacherName;		//教师姓名
+	private String idNumber;		//身份证号
+	private String teacherSubject;	//教师学科
+	private String provinceName;	//省
+	private String cityName;		//市
+	private String districtName;	//县
+	private String schoolName;		//校
+	private String expertScore;		//得分
+	private String averageScore;	//平均分
+	private String createBy;			//创建者		
+	private String createDate;			//创建时间
+	private String updateBy;			//修改者
+	private String updateDate;			//修改时间
+	private String status;				//状态
+	
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getComparisonId() {
+		return comparisonId;
+	}
+	public void setComparisonId(String comparisonId) {
+		this.comparisonId = comparisonId;
+	}
+	public String getTeacherName() {
+		return teacherName;
+	}
+	public void setTeacherName(String teacherName) {
+		this.teacherName = teacherName;
+	}
+	public String getIdNumber() {
+		return idNumber;
+	}
+	public void setIdNumber(String idNumber) {
+		this.idNumber = idNumber;
+	}
+	public String getTeacherSubject() {
+		return teacherSubject;
+	}
+	public void setTeacherSubject(String teacherSubject) {
+		this.teacherSubject = teacherSubject;
+	}
+	public String getProvinceName() {
+		return provinceName;
+	}
+	public void setProvinceName(String provinceName) {
+		this.provinceName = provinceName;
+	}
+	public String getCityName() {
+		return cityName;
+	}
+	public void setCityName(String cityName) {
+		this.cityName = cityName;
+	}
+	public String getDistrictName() {
+		return districtName;
+	}
+	public void setDistrictName(String districtName) {
+		this.districtName = districtName;
+	}
+	public String getSchoolName() {
+		return schoolName;
+	}
+	public void setSchoolName(String schoolName) {
+		this.schoolName = schoolName;
+	}
+	public String getExpertScore() {
+		return expertScore;
+	}
+	public void setExpertScore(String expertScore) {
+		this.expertScore = expertScore;
+	}
+	public String getAverageScore() {
+		return averageScore;
+	}
+	public void setAverageScore(String averageScore) {
+		this.averageScore = averageScore;
+	}
+	public String getCreateBy() {
+		return createBy;
+	}
+	public void setCreateBy(String createBy) {
+		this.createBy = createBy;
+	}
+	public String getCreateDate() {
+		return createDate;
+	}
+	public void setCreateDate(String createDate) {
+		this.createDate = createDate;
+	}
+	public String getUpdateBy() {
+		return updateBy;
+	}
+	public void setUpdateBy(String updateBy) {
+		this.updateBy = updateBy;
+	}
+	public String getUpdateDate() {
+		return updateDate;
+	}
+	public void setUpdateDate(String updateDate) {
+		this.updateDate = updateDate;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public String getTeacherId() {
+		return teacherId;
+	}
+	public void setTeacherId(String teacherId) {
+		this.teacherId = teacherId;
+	}
+	
+	
+}

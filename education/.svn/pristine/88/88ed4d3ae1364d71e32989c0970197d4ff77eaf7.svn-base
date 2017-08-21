@@ -1,0 +1,477 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_project_comment" >
+  <resultMap id="abatorgenerated_EduProjectCommentResult" class="project.furtheredu.edumanage.pojo.EduProjectComment" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="project_score" property="projectScore" jdbcType="REAL" />
+    <result column="teacher_id" property="teacherId" jdbcType="INTEGER" />
+    <result column="organization_id" property="organizationId" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="teacher_score" property="teacherScore" jdbcType="REAL" />
+    <result column="teacher_train_status_id" property="teacherTrainStatusId" jdbcType="INTEGER" />
+    <result column="teacher_train_status_name" property="teacherTrainStatusName" jdbcType="VARCHAR" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="DATE" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_date" property="updateDate" jdbcType="DATE" />
+    <result column="teacher_score_audit_status_id" property="teacherScoreAuditStatusId" jdbcType="INTEGER" />
+    <result column="teacher_score_audit_status_name" property="teacherScoreAuditStatusName" jdbcType="VARCHAR" />
+  </resultMap>
+   
+  <resultMap id="eduManageQueryActivity" extends="abatorgenerated_EduProjectCommentResult" class="project.furtheredu.edumanage.pojo.CommentActivity">
+    <result column="year" property="year" jdbcType="VARCHAR" />
+    <result column="project_name" property="projectName" jdbcType="VARCHAR" />
+    <result column="real_name" property="realName" jdbcType="VARCHAR" />
+    <result column="id_number" property="idNumber" jdbcType="VARCHAR" />
+    <result column="school_id" property="schoolId" jdbcType="INTEGER" />
+    <result column="school_name" property="schoolName" jdbcType="VARCHAR" />
+    <result column="teacher_class_period" property="teacherClassPeriod" jdbcType="decimal" />
+    <result column="teacher_class_score" property="teacherClassScore" jdbcType="decimal" />
+    <result column="create_by_area" property="createByArea" jdbcType="INTEGER" />
+    <result column="organization_id" property="organizationId" jdbcType="INTEGER" />
+  </resultMap>
+   
+   <resultMap id="teacherCommentActivity" extends="abatorgenerated_EduProjectCommentResult" class="project.furtheredu.edumanage.pojo.CommentActivity">
+    <result column="project_no" property="projectNo" jdbcType="VARCHAR" />
+    <result column="project_name" property="projectName" jdbcType="VARCHAR" />
+    <result column="start_date" property="startDate" jdbcType="DATE" />
+    <result column="end_date" property="endDate" jdbcType="DATE" />
+    <result column="teacher_class_score" property="teacherClassScore" jdbcType="INTEGER" />
+    <result column="teacher_class_period" property="teacherClassPeriod" jdbcType="INTEGER" />
+  </resultMap>
+   
+   <select id="teacherCommentActivityList" resultMap="teacherCommentActivity" parameterClass="java.util.HashMap" >
+    select c.id, project_id, project_score, teacher_id, p.organization_id, c.status, teacher_score,
+      teacher_train_status_id, teacher_train_status_name, c.create_by, c.create_date, c.update_by,
+      c.update_date, teacher_score_audit_status_id, teacher_score_audit_status_name, audit_memo,
+      c.teacher_class_score, c.teacher_class_period,
+	  p.project_name, 
+	  p.project_no,
+	  p.start_date,
+	  p.end_date
+		
+    from edu_project_comment c
+		LEFT JOIN edu_project p ON  p.id = c.project_id
+	where 1=1
+	  and teacher_id = #teacherId#
+    order by c.create_date desc 
+  </select>
+  
+  	<!-- 项目评价报表 -->
+    <select id="selectProcjectEvaluationInfo" resultClass="project.furtheredu.edumanage.pojo.EduProjectEvaluation" parameterClass="java.util.HashMap" >
+     select
+		 c.project_id as projectId,
+		 c.organization_id as orgId,
+		 c.project_score as scoreLevel,
+		 IFNULL(count(c.project_score),0) as scoreCount
+	FROM
+		edu_project_comment c
+		where 1=1
+		<isNotNull prepend="and" property="projectId" >
+       		c.project_id = #projectId#
+     	</isNotNull>
+     	<isNotNull prepend="and" property="orgId" >
+        	c.organization_id = #orgId#  
+     	</isNotNull>
+	GROUP BY c.project_id,	c.organization_id, 	c.project_score
+  	</select>
+  	
+  	<!-- 培训项目总结下项目列表/查看培训成绩/教师评价  -->
+  	<select id="selectOverProCountByParamMap" parameterClass="java.util.HashMap" resultClass="int">
+  	<!-- select 
+  	count(t1.id)
+  	FROM
+	edu_project t1
+LEFT JOIN edu_project_comment t2 ON t1.id = t2.project_id
+WHERE
+	t2.teacher_id = #teacherId#
+AND t1.status = 50
+  	<isNotNull prepend="and" property="start">
+  		year >= #start#
+  	</isNotNull>
+  	<isNotNull prepend="and" property="end">
+  		#end#>=year
+  	</isNotNull>
+  	<isNotNull prepend="and" property="projectName">
+  		project_name like '$projectName$'
+  	</isNotNull> -->
+  	
+  	select count(*) from (
+  	SELECT 
+    p.id as id,
+	p.project_name as projectName,
+	p.start_date as startDate,
+	p.end_date as endDate,
+	p.train_type_name as trainTypeName,
+	p.project_property_name as projectPropertyName,
+	c.teacher_score as teacherScore,
+	c.teacher_train_status_name as teacherTrainStatusName
+	
+	from edu_project_comment c
+	
+	inner join edu_project p on c.project_id=p.id 
+	
+	where p.is_score_published=1  and c.teacher_id=#teacherId#
+	
+	<isNotNull prepend="and" property="start">
+  		p.year >= #start#
+  	</isNotNull>
+  	<isNotNull prepend="and" property="end">
+  		#end#>=p.year
+  	</isNotNull>
+  	<isNotNull prepend="and" property="projectName">
+  		p.project_name like '%$projectName$%'
+  	</isNotNull>
+  	 ORDER BY p.id desc limit #startIndex#,#endIndex#
+	  	) a
+  </select>
+  
+  <!-- 培训项目总结下项目列表/查看培训成绩/教师评价 -->
+   <select id="selectTeacherOverProcjectList" resultClass="project.teacher.teacherProject.pojo.EduProjectActivityPojo" parameterClass="java.util.HashMap" >
+   <!--  SELECT
+    DISTINCT
+	t1.id,
+	t1.project_name AS projectName,
+	t1.start_date AS startDate,
+	t1.end_date AS endDate,
+	t1.train_type_name AS trainTypeName,
+	t1.project_property_name AS projectPropertyName,
+	t2.teacher_score AS teacherScore,
+	teacher_train_status_name AS teacherTrainStatusName,
+	t2.project_score AS projectScore
+	FROM
+	edu_project t1
+JOIN edu_project_comment t2 ON t1.id = t2.project_id 
+WHERE
+	t2.teacher_id = #teacherId#
+	AND t1.status = 50 
+	<isNotNull prepend="and" property="start">
+  		year >= #start#
+  	</isNotNull>
+  	<isNotNull prepend="and" property="end">
+  		#end#>=year
+  	</isNotNull>
+  	<isNotNull prepend="and" property="projectName">
+  		project_name like '%$projectName$%'
+  	</isNotNull>
+  	 limit #startIndex#,#endIndex# -->
+  	 
+  	 SELECT 
+    p.id as id,
+	p.project_name as projectName,
+	p.start_date as startDate,
+	p.end_date as endDate,
+	p.train_type_name as trainTypeName,
+	p.project_property_name as projectPropertyName,
+	c.project_score AS projectScore,
+	c.teacher_score as teacherScore,
+	c.teacher_class_score as classScore,
+	c.teacher_train_status_name as teacherTrainStatusName
+	
+	from edu_project_comment c
+	
+	inner join edu_project p on c.project_id=p.id 
+	
+	where p.is_score_published=1  and c.teacher_id=#teacherId#
+	
+	<isNotNull prepend="and" property="start">
+  		p.year >= #start#
+  	</isNotNull>
+  	<isNotNull prepend="and" property="end">
+  		#end#>=p.year
+  	</isNotNull>
+  	<isNotNull prepend="and" property="projectName">
+  		p.project_name like '%$projectName$%'
+  	</isNotNull>
+  	  ORDER BY p.id desc limit #startIndex#,#endIndex#
+    </select>
+    
+    <!-- 项目评价  -->
+    <select id="selectProcjectEvaluationList" resultClass="project.furtheredu.edumanage.pojo.EduProjectEvaluation" parameterClass="java.util.HashMap" >
+    SELECT
+		c.project_id as projectId,
+		p.organization_id as orgId,
+		p.project_name as projectName,
+		o.organization_name as orgName,
+		p.create_by_area as createByArea,
+		SUM(c.project_score) / count(c.project_score) as allScore
+	FROM
+		edu_project p 
+	INNER  JOIN edu_organization o ON o.organization_id = p.organization_id
+	INNER JOIN  edu_project_comment c ON p.id = c.project_id
+	LEFT JOIN edu_project_audit t on t.id = (SELECT MAX(id)id from edu_project_audit where project_id=p.id )
+	where 1=1
+	   AND p.status = 50
+	 <isNotNull prepend="and" property="fromYear" >
+        p.`year` >= #fromYear#
+     </isNotNull>
+     <isNotNull prepend="and" property="toYear" >
+        #toYear# >= p.`year`
+     </isNotNull>
+     <isNotNull prepend="and" property="projectName" >
+        p.project_name LIKE '%$projectName$%'
+     </isNotNull>
+     <!-- <isNotEmpty prepend="and" property="createByArea">
+		p.create_by_area = #createByArea#
+	 </isNotEmpty>
+	 <isNotNull prepend="and" property="organizationId">
+  		p.organization_id = #organizationId#
+  	 </isNotNull>  -->
+  	 <isNotNull prepend="and" property="createById">
+		p.create_by_id = #createById#
+	 </isNotNull>	
+	 <isNotNull prepend="and" property="applyerId">
+  		t.applicant_id = #applyerId#
+  	 </isNotNull> 
+    GROUP BY c.project_id, p.organization_id
+    order by c.create_date desc LIMIT #startIndex#,#endIndex#
+  </select>
+  
+  <!-- 项目评价count  -->
+  <select id="selectProcjectEvaluationListCount" resultClass="java.lang.Integer"  parameterClass="java.util.HashMap" >
+    select count(1) 
+      FROM
+		(
+		  SELECT
+			c.project_id,
+			p.organization_id,
+			p.project_name,
+			o.organization_name,
+			SUM(c.project_score),
+			count(c.project_score),
+			SUM(c.project_score) / count(c.project_score)
+		FROM
+			edu_project p 
+		INNER  JOIN edu_organization o ON o.organization_id = p.organization_id
+		INNER JOIN edu_project_comment c ON p.id = c.project_id
+		LEFT JOIN edu_project_audit t on t.id = (SELECT MAX(id)id from edu_project_audit where project_id=p.id )
+		where 1=1
+		  AND p.status = 50
+		<isNotNull prepend="and" property="fromYear" >
+        	p.`year` >= #fromYear#
+     	</isNotNull>
+     	<isNotNull prepend="and" property="toYear" >
+        	#toYear# >= p.`year`
+     	</isNotNull>
+     	<isNotNull prepend="and" property="projectName" >
+        	p.project_name LIKE '%$projectName$%'
+     	</isNotNull>
+		<!-- <isNotEmpty prepend="and" property="createByArea">
+			p.create_by_area = #createByArea#
+		</isNotEmpty>
+		<isNotNull prepend="and" property="organizationId">
+	  		p.organization_id = #organizationId#
+	  	</isNotNull> -->
+	  	<isNotNull prepend="and" property="createById">
+			p.create_by_id = #createById#
+		</isNotNull>	
+		<isNotNull prepend="and" property="applyerId">
+	  		t.applicant_id = #applyerId#
+	  	</isNotNull>  	     
+	    GROUP BY c.project_id, p.organization_id
+		) tb
+  </select>
+  
+  <!-- 继教信息列表 -->
+  <select id="selectCommentList" resultMap="eduManageQueryActivity" parameterClass="java.util.HashMap" >
+    select c.id, project_id, teacher_class_period,teacher_class_score,IFNULL(project_score,0) as project_score, teacher_id, p.organization_id, c.status, teacher_score,
+      teacher_train_status_id, teacher_train_status_name, c.create_by,p.create_by_area, c.create_date, c.update_by,
+      c.update_date, teacher_score_audit_status_id, teacher_score_audit_status_name, audit_memo,
+			u.real_name,
+			u.school_id,
+			u.school_name,
+			u.id_number,
+			p.project_name, 
+			p.`year` as year
+		
+    from edu_project_comment c
+    	INNER JOIN edu_user u ON c.teacher_id = u.id
+		LEFT JOIN edu_project p ON  p.id = c.project_id
+	where 1=1 AND is_score_published = 1
+	<isNotNull property="projectName" >
+        and p.project_Name like '%$projectName$%'
+     </isNotNull>
+	 <isNotNull property="queryYearStart" >
+        and p.`year` >= #queryYearStart#
+     </isNotNull>
+      <isNotNull property="queryYearEnd" >
+        and #queryYearEnd# >=  p.`year`
+     </isNotNull>
+      <isNotNull property="queryStatus" >
+        and c.teacher_score_audit_status_id = #queryStatus#
+     </isNotNull>
+      <isNotNull property="queryIdNumber" >
+        and u.id_number = #queryIdNumber#
+     </isNotNull>
+      <isNotNull property="queryRealName" >
+        and u.real_name like '%$queryRealName$%'
+     </isNotNull>
+      <isNotNull property="provinceId" >
+        and u.user_province_id = #provinceId#
+     </isNotNull>    
+      <isNotNull property="cityId" >
+        and u.user_city_id = #cityId#
+     </isNotNull>
+      <isNotNull property="districtId" >
+        and u.user_district_id = #districtId#
+     </isNotNull>
+      <isNotNull property="schoolId" >
+        and u.school_id = #schoolId#
+     </isNotNull>
+     <isNotNull property="organizationId" >
+        and p.organization_id = #organizationId#
+     </isNotNull>
+    order by c.create_date desc LIMIT #startIndex#,#endIndex#
+  </select>
+  
+   <!-- 继教信息列表count -->
+   <select id="selectCommentListCount" resultClass="java.lang.Integer"  parameterClass="java.util.HashMap" >
+    select count(1) 
+       from edu_project_comment c
+    	left JOIN edu_user u ON c.teacher_id = u.id
+		LEFT JOIN edu_project p ON  p.id = c.project_id
+		where 1=1 AND is_score_published = 1
+	 <isNotNull property="projectName" >
+        and p.project_Name like '%$projectName$%'
+     </isNotNull>
+	 <isNotNull property="queryYearStart" >
+        and p.`year` >= #queryYearStart#
+     </isNotNull>
+      <isNotNull property="queryYearEnd" >
+        and #queryYearEnd# >=  p.`year`
+     </isNotNull>
+      <isNotNull property="queryStatus" >
+        and c.teacher_score_audit_status_id = #queryStatus#
+     </isNotNull>
+      <isNotNull property="queryIdNumber" >
+        and u.id_number = #queryIdNumber#
+     </isNotNull>
+      <isNotNull property="queryRealName" >
+        and u.real_name like '%$queryRealName$%'
+     </isNotNull>
+      <isNotNull property="provinceId" >
+        and u.user_province_id = #provinceId#
+     </isNotNull>
+      <isNotNull property="cityId" >
+        and u.user_city_id = #cityId#
+     </isNotNull>
+      <isNotNull property="districtId" >
+        and u.user_district_id = #districtId#
+     </isNotNull>
+      <isNotNull property="schoolId" >
+        and u.school_id = #schoolId#
+     </isNotNull>
+     <isNotNull property="organizationId" >
+        and p.organization_id = #organizationId#
+     </isNotNull>
+  </select>
+  
+   <resultMap id="eduManageGroupQueryActivity"  class="project.furtheredu.edumanage.pojo.CommentActivity">
+    <result column="year" property="year" jdbcType="VARCHAR" />
+    <result column="project_name" property="projectName" jdbcType="VARCHAR" />
+    <result column="teacher_id" property="teacherId" jdbcType="INTEGER" />
+    <result column="real_name" property="realName" jdbcType="VARCHAR" />
+    <result column="id_number" property="idNumber" jdbcType="VARCHAR" />
+    <result column="teacher_score" property="teacherScore" jdbcType="REAL" />
+    <result column="teacher_class_period" property="teacherClassPeriod" jdbcType="REAL" />
+    <result column="teacher_class_score" property="teacherClassScore" jdbcType="REAL" />
+    <result column="school_id" property="schoolId" jdbcType="INTEGER" />
+  </resultMap>
+  
+   <!-- 教师年度考核列表 -->
+   <select id="selectCommentListGroupByYear" resultMap="eduManageGroupQueryActivity" parameterClass="java.util.HashMap" >
+		select 
+			teacher_score,
+			c.teacher_id,
+			u.real_name,
+			u.school_id,
+			u.id_number,
+			'' as project_name, 
+			c.`year` as year,
+			0 as teacher_class_period,
+			0 as teacher_class_score
+    from edu_statistic_year c
+    	INNER JOIN edu_user u ON c.teacher_id = u.id
+	where 1=1
+      <isNotNull property="queryYear" >
+        and  c.`year` =  #queryYear# 
+     </isNotNull>
+      <isNotNull property="provinceId" >
+        and u.user_province_id = #provinceId#
+     </isNotNull>
+      <isNotNull property="cityId" >
+        and u.user_city_id = #cityId#
+     </isNotNull>
+      <isNotNull property="districtId" >
+        and u.user_district_id = #districtId#
+     </isNotNull>
+      <isNotNull property="schoolId" >
+        and u.school_id >= #schoolId#
+     </isNotNull>
+      <isNotNull property="realName" >
+        and u.real_name = #realName#
+     </isNotNull>
+     <isNotEmpty property="teacherId">
+     	and u.id = #teacherId#
+     </isNotEmpty>
+     GROUP BY c.`year`, u.id_number
+    order by c.`year`, u.create_date desc
+    LIMIT #startIndex#,#endIndex#
+  </select>
+  
+  <!--  自由报名项目下查询项目信息 -->
+  <select id="selectTeacherSatusByTeacherId" parameterClass="java.util.HashMap" resultClass="project.edupm.projectmanage.pojo.EduProjectComment" >
+SELECT
+	update_by as updateBy,
+	update_date updateDate,
+	STATUS as status,
+	audit_memo as auditMemo
+FROM
+	edu_project_comment
+WHERE
+	project_id=#projectId# 
+	and teacher_id = #teacherId# 
+</select>
+
+  <!-- 教师年度考核列表count -->
+  <select id="selectCommentListCountGroupByYear" resultClass="java.lang.Integer"  parameterClass="java.util.HashMap" >
+    SELECT
+		count(1)
+	FROM
+	(
+		select 
+			SUM(c.teacher_score) as teacher_score,
+			c.teacher_id,
+			u.real_name,
+			u.school_id,
+			u.id_number,
+			'' as project_name, 
+			c.`year` as year,
+			0 as teacher_class_period,
+			0 as teacher_class_score
+    from edu_statistic_year c
+    	INNER JOIN edu_user u ON c.teacher_id = u.id
+	where 1=1
+      <isNotNull property="queryYear" >
+        and  c.`year` =  #queryYear# 
+     </isNotNull>
+      <isNotNull property="provinceId" >
+        and u.user_province_id = #provinceId#
+     </isNotNull>
+      <isNotNull property="cityId" >
+        and u.user_city_id = #cityId#
+     </isNotNull>
+      <isNotNull property="districtId" >
+        and u.user_district_id = #districtId#
+     </isNotNull>
+      <isNotNull property="schoolId" >
+        and u.school_id >= #schoolId#
+     </isNotNull>
+     <isNotNull property="realName" >
+        and u.real_name = #realName#
+     </isNotNull>
+     GROUP BY c.`year`, u.id_number
+	) t
+  </select>
+</sqlMap>

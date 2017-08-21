@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<sqlMap>
+  <resultMap class="project.statistic.pojo.EduStatisticModel" id="abatorgenerated_EduStatisticModelResult">
+    <result column="id" jdbcType="INTEGER" property="id" />
+    <result column="model_id" jdbcType="INTEGER" property="modelId" />
+    <result column="model_name" jdbcType="VARCHAR" property="modelName" />
+    <result column="teacher_id" jdbcType="INTEGER" property="teacherId" />
+    <result column="teacher_name" jdbcType="VARCHAR" property="teacherName" />
+    <result column="school_name" jdbcType="VARCHAR" property="schoolName" />
+    <result column="teacher_score" jdbcType="REAL" property="teacherScore" />
+  </resultMap>
+  
+    <sql id="edu_statistic_model_column">
+	  <isNotNull prepend="and" property="modelId">
+        model_id = #modelId:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="and" property="modelName">
+        model_name = #modelName:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="and" property="teacherId">
+        teacher_id = #teacherId:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="and" property="teacherName">
+        teacher_name like '%$teacherName$%'
+      </isNotNull>
+      <isNotNull prepend="and" property="beginScore">
+        teacher_score >= #beginScore:REAL#
+      </isNotNull>
+	  <isNotNull prepend="and" property="endScore">
+      	#endScore:REAL# >= teacher_score 
+      </isNotNull>
+  </sql>
+  
+  <!-- 按继教版块查询教师学分 -->
+  <select id="selectEduStatisticModelByParam" resultMap="abatorgenerated_EduStatisticModelResult" parameterClass="java.util.Map">
+  		select * from edu_statistic_model m,edu_user u 
+  		
+  		where m.teacher_id=u.id
+  		<isNotNull prepend="and" property="provinceId">
+  		  u.user_province_id = #provinceId#
+  		</isNotNull>
+  		<isNotNull prepend="and" property="cityId">
+  		  u.user_city_id = #cityId#
+  		</isNotNull>
+  		<isNotNull prepend="and" property="districtId">
+  		  u.user_district_id = #districtId#
+  		</isNotNull>
+  		<isNotNull prepend="and" property="schoolId">
+  		  u.school_id = #schoolId#
+  		</isNotNull>  
+  
+  		<include refid="edu_statistic_model_column"/>
+  		ORDER BY m.id DESC LIMIT #startIndex#, #endIndex#
+  </select>
+  
+   <!-- 按继教版块查询教师学分count -->
+   <select id="selectEduStatisticModelCountByParam" resultClass="java.lang.Integer" parameterClass="java.util.Map">
+  		select count(*) from edu_statistic_model m, edu_user u 
+  		
+  		where m.teacher_id=u.id
+  		<isNotNull prepend="and" property="provinceId">
+  		  u.user_province_id = #provinceId#
+  		</isNotNull>
+  		<isNotNull prepend="and" property="cityId">
+  		  u.user_city_id = #cityId#
+  		</isNotNull>
+  		<isNotNull prepend="and" property="districtId">
+  		  u.user_district_id = #districtId#
+  		</isNotNull>
+  		<isNotNull prepend="and" property="schoolId">
+  		  u.school_id = #schoolId#
+  		</isNotNull> 
+  		<include refid="edu_statistic_model_column"/>
+  </select>
+  
+  <insert id="insertStatisticModelSql" parameterClass="java.util.Map">
+		$sql$
+	</insert>
+  <delete id="removeStatisticModelSql" parameterClass="java.util.Map">
+		$sql$
+	</delete>
+  
+</sqlMap>

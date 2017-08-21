@@ -1,0 +1,222 @@
+$(function(){
+	initDictionary("comparison_type","comparisonType");
+	if(id != "null"){
+		queryComparison();
+		$("#update").css('display','block');
+		$("#save").css('display','none');
+	}
+	initSelectClass();
+})
+
+function queryComparison(){
+	var url = pathHeader + "/master/queryComparison.do";
+	$.ajax({
+		url:url,
+		data:{
+			id:id
+		},
+		type:"post",
+		async:false,
+		success:function(data){
+			var obj = data.rows[0];
+			$("#comparisonName").val(obj.comparisonName);
+			$("#startDate").val(obj.startDate);
+			$("#endDate").val(obj.endDate);
+			$("#comparisonType").val(obj.comparisonTypeId);
+			$("#comparisonNum").val(obj.comparisonPlanNum);
+			$("#memo").val(obj.memo);
+		},
+		error:function(){
+			
+		}
+	});
+}
+
+function initDictionary(dictionaryType, name){
+	$("#"+name+"").html("");
+	var url = pathHeader + "/org/queryDictionaryByType.do";
+	$.ajax({
+		url:url,
+		data:{
+			dictionaryType:dictionaryType,
+			status:1
+		},
+		type:"post",
+		async:false,
+		success:function(data){
+			if(data.rows.length > 0){
+				$("#"+name+"").append("<option  value='' >请选择</option>");
+				$.each(data.rows, function(key, value) {
+					$("#"+name+"").append(
+							"<option  value=\"" + value.dictionaryId + "\">"
+							+ value.dictionaryName + "</option>");
+				});
+			}
+		},
+		error:function(){
+			
+		}
+	});
+}
+
+/**
+ * 保存
+ * @returns {Boolean}
+ */
+function saveInfo(){
+	if(checkout()){
+		var comparisonName = $('#comparisonName').val();
+		var comparisonType = $('#comparisonType').val();
+		var comparisonTypeName = $("#comparisonType option:selected").text();
+		var comparisonNum = $('#comparisonNum').val();
+		var startDate = $('#startDate').val();
+		var endDate   = $('#endDate').val();
+		var memo      = $('#memo').val();
+		var url = pathHeader +"/master/addComparison.do";
+		//	 按钮置灰
+		$("#save").attr({"disabled":"disabled"});
+		$.ajax({
+			url : url,
+			type:"POST",
+			async:"true",
+			data:{
+				comparisonName:comparisonName,
+				comparisonType:comparisonType,
+				comparisonTypeName:comparisonTypeName,
+				comparisonNum:comparisonNum,
+				startDate:startDate,
+				endDate:endDate,
+				memo:memo
+			},
+			success:function(data){
+				if(data.success) 
+				{
+					urlGo=pathHeader +"/master/toManageComparison.htm";	
+					jQuery.generalAlertAndJump(data.message,urlGo);
+					
+				}else{
+					jQuery.generalAlert(data.message);	
+				}
+			},
+			error:function(){
+				jQuery.generalAlert("增加失败");
+			}
+		});
+	}
+}
+
+/**
+ * 保存
+ * @returns {Boolean}
+ */
+function updateInfo(){
+	if(checkout()){
+		var comparisonName = $('#comparisonName').val();
+		var comparisonType = $('#comparisonType').val();
+		var comparisonTypeName = $("#comparisonType option:selected").text();
+		var comparisonNum = $('#comparisonNum').val();
+		var startDate = $('#startDate').val();
+		var endDate   = $('#endDate').val();
+		var memo      = $('#memo').val();
+		var url = pathHeader +"/master/updateComparison.do";
+		//	 按钮置灰
+		$("#save").attr({"disabled":"disabled"});
+		$.ajax({
+			url : url,
+			type:"POST",
+			async:"true",
+			data:{
+				id:id,
+				comparisonName:comparisonName,
+				comparisonType:comparisonType,
+				comparisonTypeName:comparisonTypeName,
+				comparisonNum:comparisonNum,
+				startDate:startDate,
+				endDate:endDate,
+				memo:memo
+			},
+			success:function(data){
+				if(data.success) 
+				{
+					urlGo=pathHeader +"/master/toManageComparison.htm";	
+					jQuery.generalAlertAndJump(data.message,urlGo);
+					
+				}else{
+					jQuery.generalAlert(data.message);	
+				}
+			},
+			error:function(){
+				jQuery.generalAlert("修改失败");
+			}
+		});
+	}
+}
+function checkout(){
+	//校验活动名称
+	$('#comparisonNameErr').html("");
+	if($("#comparisonName").val()==null||$("#comparisonName").val()==""){
+		$('#comparisonNameErr').html("名称不能为空!");
+		return false;
+	}
+	//活动类型
+	$('#comparisonTypeErr').html("");
+	if($("#comparisonType").val()==null||$("#comparisonType").val()==""){
+		$('#comparisonTypeErr').html("活动类型不能为空");
+		return false;
+	}else if(isNaN($("#comparisonType").val())){
+		$('#comparisonTypeErr').html("活动类型不能是非数字	!");
+		$('#comparisonTypeErr').html("");
+		return false;
+	}
+	//计划人数
+	$('#comparisonNumErr').html("");
+	if($("#comparisonNum").val()==null||$("#comparisonNum").val()==""){
+		$('#comparisonNumErr').html("计算人数不能为空!");
+		return false;
+	}else if(isNaN($("#comparisonNum").val())){
+		$('#comparisonNumErr').html("计划人数不能是非数字!");
+		return false;
+	}
+	//开始日期验证
+	$('#startDateError').html("");
+	if($("#startDate").val()==null||$("#startDate").val()==""){
+		$('#startDateError').html("不能为空!");
+		return false;
+	}else{
+	    var reg = /^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/;  
+	    var r = $("#startDate").val().match(reg);    
+	    if(r==null){
+	    	$('#startDateError').html("输入的日期格式不正确!");
+			return false;
+	    }
+	}
+	//结束日期验证
+	$('#endDateError').html("");
+	if($("#endDate").val()==null||$("#endDate").val()==""){
+			$('#endDateError').html("不能为空!");
+			return false;
+	}else{
+	    var reg = /^(\d{1,4})(-|\/)(\d{1,2})\2(\d{1,2})$/;  
+	    var r = $("#endDate").val().match(reg);    
+	    if(r==null){
+	    	$('#endDateError').html("输入的日期格式不正确!");
+			return false;
+	    }else if($("#startDate").val().replace(/-/g, "") - $("#endDate").val().replace(/-/g, "") > 0){
+	    	$('#endDateError').html("开始日期大于结束日期");
+			return false;
+	    }
+	}
+	return true;
+}
+function initSelectClass(){
+    $(".select1").uedSelect({
+		width : 345			  
+	});
+	$(".select2").uedSelect({
+		width : 167  
+	});
+	$(".select3").uedSelect({
+		width : 100
+	});
+}
+

@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_noteice">
+
+
+	<!-- 这个是基础，减少查询负担 -->
+	<resultMap id="base_eduNoticeResult" class="project.message.pojo.EduNotice">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="status" property="status" jdbcType="INTEGER" />
+		<result column="create_by" property="createBy" jdbcType="VARCHAR" />
+		<result column="create_date" property="createDate" jdbcType="VARCHAR" />
+		<result column="send_user_id" property="sendUserId" jdbcType="INTEGER" />
+		<result column="title" property="title" jdbcType="VARCHAR" />
+		<result column="sendType" property="sendType" jdbcType="INTEGER" />
+		<result column="noticeType" property="noticeType" jdbcType="INTEGER" />
+		<result column="send_user_name" property="sendUserName"
+			jdbcType="VARCHAR" />
+		
+	</resultMap>
+	<!-- 查看详情的时候，多了一个content -->
+	<resultMap id="eduNoticeResultWithContent" class="project.message.pojo.EduNotice" extends="base_eduNoticeResult">
+		<result column="content" property="content" jdbcType="VARCHAR" nullValue="" />
+	</resultMap>
+	<!-- 查看详情的时候，列表的时候 -->
+	<resultMap id="eduNoticeResultWithRead" class="project.message.pojo.EduNotice" extends="base_eduNoticeResult">
+		<result column="isRead" property="isRead" jdbcType="INTEGER" nullValue="0" />
+	</resultMap>
+
+	
+	
+	<resultMap id="EduNoticeAreaResult" class="project.message.pojo.EduNoticeArea">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="noticeId" property="noticeId" jdbcType="INTEGER" />
+		<result column="schoolId" property="schoolId" jdbcType="INTEGER" />
+	</resultMap>
+	<resultMap id="EduNoticeUserResult" class="project.message.pojo.EduNoticeUser">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="noticeId" property="noticeId" jdbcType="INTEGER" />
+		<result column="noticeType" property="noticeType" jdbcType="INTEGER" />
+		<result column="userId" property="userId" jdbcType="INTEGER" />
+		<result column="hasRead" property="hasRead" jdbcType="INTEGER" />
+		<result column="hasDelete" property="hasDelete" jdbcType="INTEGER" />
+	</resultMap>
+	
+	<resultMap  id="EduNoticeFileResult" class="project.message.pojo.EduNoticeFile">
+		<result column="id" property="id" jdbcType="INTEGER" />
+		<result column="noticeId" property="noticeId" jdbcType="INTEGER" />
+		<result column="fileName" property="fileName" jdbcType="VARCHAR" />
+		<result column="fileUrl" property="fileUrl" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<insert id="sendNotice" parameterClass="java.util.Map">
+		INSERT INTO edu_notice (
+		content,
+		status,
+		create_by,
+		create_date,
+		send_user_id,
+		title,
+		send_user_name,
+		noticeType,
+		sendType
+		)
+		VALUES
+		(#content#,#status#,#createBy#,
+		NOW(),#sendUserId#,#title#,
+		#sendUserName#,#noticeType#,#sendType#)
+		<selectKey keyProperty="id" resultClass="int">
+			select
+			LAST_INSERT_ID()
+		</selectKey>
+	</insert>
+
+	<insert id="sendNoticeArea" parameterClass="java.util.Map">
+		INSERT INTO
+		edu_notice_area (
+		noticeId,
+		areaId,
+		schoolId)
+		VALUES
+		(#noticeId#,#areaId#,#schoolId#)
+	</insert>
+	
+	<!-- 插入附件 -->
+	<insert id="addNoticeFile" parameterClass="java.util.Map">
+		INSERT INTO
+		edu_notice_files (
+		noticeId,
+		fileName,
+		fileUrl)
+		VALUES
+		(#noticeId#,#fileName#,#fileUrl#)
+	</insert>
+
+	<!-- 通知列表 ，增加了已读、未读提示。-->
+	<select id="selectNoticeList" parameterClass="java.util.Map"
+		resultMap="eduNoticeResultWithRead">
+			 select n.id, n.create_by, n.create_date, n.send_user_id   ,n.title, n.noticeType, n.sendType, n.send_user_name,n.status ,u.hasRead as isRead
+		from edu_notice  as n   left join   edu_notice_user  as u on n.id = u.noticeId   and u.userId =   #userId#
+		<dynamic prepend=" where ">
+			(n.sendType = #sendType# or n.sendType= 0 )
+			and n.id in ( select
+			distinct(noticeId) from
+			edu_notice_area
+			<isNotNull property="provinceId" prepend="or">
+				where areaId =
+				#provinceId#
+			</isNotNull>
+			<isNotNull property="cityId" prepend="or">
+				areaId = #cityId#
+			</isNotNull>
+			<isNotNull property="districtId" prepend="or">
+				areaId =
+				#districtId#
+			</isNotNull>
+			<isNotNull property="schoolId" prepend="or">
+				schoolId =
+				#schoolId#
+			</isNotNull>
+			)
+		</dynamic>
+		<isNotNull property="noticeType" prepend="and">
+			n.noticeType = #noticeType#
+		</isNotNull>
+		and n.id not in (select noticeId from edu_notice_user where hasDelete = 1 and userId = #userId#)
+		<isNotEmpty prepend="" property="startIndex">
+			order by u.hasRead limit #startIndex#,#endIndex#
+		</isNotEmpty>
+	</select>
+	
+
+	<select id="selectNoticeCount" parameterClass="java.util.Map"
+		resultClass="java.lang.Integer">
+		select count(*) from edu_notice
+		<dynamic prepend=" where ">
+			(sendType = #sendType# or sendType= 0 )
+			and id in ( select
+			distinct(noticeId) from
+			edu_notice_area
+			<isNotNull property="provinceId" prepend="or">
+				where areaId =
+				#provinceId#
+			</isNotNull>
+			<isNotNull property="cityId" prepend="or">
+				areaId = #cityId#
+			</isNotNull>
+			<isNotNull property="districtId" prepend="or">
+				areaId =
+				#districtId#
+			</isNotNull>
+			<isNotNull property="schoolId" prepend="or">
+				schoolId =
+				#schoolId#
+			</isNotNull>
+			)
+			and id not in (select noticeId from edu_notice_user where hasDelete = 1  and userId = #userId#)
+		</dynamic>
+		<isNotNull property="noticeType" prepend="and">
+			noticeType = #noticeType#
+		</isNotNull>
+	</select>
+
+
+
+
+	<select id="selectMyNoticeList" parameterClass="java.util.Map"
+		resultMap="base_eduNoticeResult">
+		select * from edu_notice where create_by = #createBy#
+		<isNotEmpty prepend="" property="startIndex">
+			order by id desc limit #startIndex#,#endIndex#
+		</isNotEmpty>
+	</select>
+
+
+	<select id="selectMyNoticeListCount" parameterClass="java.util.Map"
+		resultClass="java.lang.Integer">
+		select count(*) from edu_notice where create_by =
+		#createBy#
+	</select>
+
+
+
+
+	<select id="selectById" parameterClass="java.lang.Integer"
+		resultMap="eduNoticeResultWithContent">
+		select * from edu_notice where id = #id#
+	</select>
+	
+	<select id="selectNoticeFilesByNoticeId" parameterClass="java.lang.Integer"
+		resultMap="EduNoticeFileResult">
+		select * from edu_notice_files where noticeId = #noticeId#
+	</select>
+
+
+	<insert id="readNotice" parameterClass="java.util.Map">
+		INSERT edu_notice_user
+		(noticeId,noticeType,userId,hasRead,hasDelete)
+		VALUES(#noticeId#,#noticeType#,#userId#,#hasRead#,#hasDelete#)
+	</insert>
+
+	<delete id="deleteNotice" parameterClass="java.util.Map">
+		delete from edu_notice
+		where create_by = #createBy#
+		and id = #noticeId#
+	</delete>
+
+	<delete id="deleteNoticeUser" parameterClass="java.util.Map">
+		delete from
+		edu_notice_user where
+		noticeId = #noticeId#
+	</delete>
+
+	<delete id="deleteNoticeArea" parameterClass="java.util.Map">
+		delete from
+		edu_notice_area where
+		noticeId = #noticeId#
+	</delete>
+	
+	
+	<update id="noticeDeleteFromOther"  parameterClass="java.util.Map" >
+		update edu_notice_user set hasDelete = 1 where noticeId = #noticeId# and userId = #userId#
+	</update>
+	
+	
+
+
+	<select id="readNoticeCount" parameterClass="java.util.Map"
+		resultClass="java.lang.Integer">
+		select count(*) from edu_notice_user where userId =
+		#userId# and
+		hasDelete = 0
+		<isNotNull property="noticeType" prepend="and">
+			noticeType =#noticeType#
+		</isNotNull>
+	</select>
+
+	<select id="getNoticeUser" parameterClass="java.util.Map"
+		resultMap="EduNoticeUserResult">
+		select * from edu_notice_user where noticeId =
+		#noticeId# and
+		userId = #userId#
+	</select>
+	
+	
+	<select id="readNoticeIds"  parameterClass="java.util.Map" resultClass="java.lang.String">
+		select distinct(noticeId) from edu_notice_user where userId = #userId#;
+	</select>
+
+
+</sqlMap>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_sys_signet">
+
+	<insert id="insert_signet" parameterClass="project.furtheredu.edumanage.pojo.EduSignet">
+		insert into edu_sys_signet (signet_name, signet_url, flag, create_by,
+		create_date, update_by, update_date)
+		values (#signetName:VARCHAR#,
+		#signetUrl:VARCHAR#,
+		#flag:INTEGER#,
+		#createBy:VARCHAR#, now(),
+		#updateBy:VARCHAR#,
+		now())
+		<selectKey resultClass="Integer" keyProperty="id">
+			SELECT
+			last_insert_id() as id ;    
+        </selectKey>
+	</insert>
+	
+	<!-- 新插入的时候增加了 用户id和当前用户的权限 -->
+	<insert id="insert_signet_new" parameterClass="project.furtheredu.edumanage.pojo.EduSignet">
+		insert into edu_sys_signet (role_id,user_id ,user_province_id,user_district_id,user_city_id,signet_name, signet_url, flag, create_by,
+		create_date, update_by, update_date)
+		values (#roleId:INTEGER#,
+		#userId:INTEGER#,
+		#userProvinceId:VARCHAR#,
+		#userDistrictId:VARCHAR#,
+		#userCityId:VARCHAR#,
+		#signetName:VARCHAR#,
+		#signetUrl:VARCHAR#,
+		#flag:INTEGER#,
+		#createBy:VARCHAR#, now(),
+		#updateBy:VARCHAR#,
+		now())
+		<selectKey resultClass="Integer" keyProperty="id">
+			SELECT
+			last_insert_id() as id ;    
+        </selectKey>
+	</insert>
+
+	<update id="update_signet" parameterClass="project.furtheredu.edumanage.pojo.EduSignet">
+		update edu_sys_signet
+		set
+		flag = #flag:INTEGER#,
+		update_by = #updateBy:VARCHAR#,
+		update_date =
+		now()
+		where id = #id:INTEGER#
+  </update>
+  
+	<select id="select_signet" parameterClass="java.util.HashMap"
+		resultClass="project.furtheredu.edumanage.pojo.EduSignet">
+		select
+		s.id,
+		flag,
+		signet_name signetName,
+		s.create_by createBy,
+		signet_url signetUrl
+		FROM
+		edu_sys_signet s
+		INNER JOIN edu_user u ON s.create_by = u.login_account
+		where 1=1
+		and u.user_province_id = #provinceId#
+		<isNotNull prepend="AND" property="flag">
+			flag = #flag#
+		</isNotNull>
+	</select>
+	
+	<!-- 查询电子印章列表 -->
+	<select id="select_signet_new" parameterClass="java.util.HashMap"
+		resultClass="project.furtheredu.edumanage.pojo.EduSignet">
+		select
+		distinct(s.id),
+		flag,
+		signet_name signetName,
+		s.create_by createBy,
+		signet_url signetUrl,
+		s.role_id
+		FROM
+		edu_sys_signet s
+		LEFT JOIN edu_user u ON s.role_id = u.role_id 
+		<isNotNull prepend="AND" property="cityId">
+			u.user_city_id = s.user_city_id
+		</isNotNull>
+		<isNotNull prepend="AND" property="districtId">
+			u.user_district_id = s.user_district_id
+		</isNotNull>
+		where 1=1
+		and u.user_province_id = #provinceId#
+		and u.role_id = #roleId# 
+		<isNotNull prepend="AND" property="cityId">
+			u.user_city_id =  #cityId#
+		</isNotNull>
+		<isNotNull prepend="AND" property="districtId">
+			u.user_district_id = #districtId#
+		</isNotNull>
+		<isNotNull prepend="AND" property="flag">
+			flag = #flag#
+		</isNotNull>
+		<isNotNull prepend="AND" property="createBy">
+			s.create_by = #createBy#
+		</isNotNull>
+	</select>
+</sqlMap>

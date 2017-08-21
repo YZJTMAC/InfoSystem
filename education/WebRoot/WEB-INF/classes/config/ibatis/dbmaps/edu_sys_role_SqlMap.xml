@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_user">
+	<select id="selectRoleFunction" parameterClass="int"
+		resultClass="project.system.pojo.SysRoleFuncActivty">
+		select
+		c.id,c.func_code funcCode,c.func_name funcName,c.func_type funcType,c.func_url funcUrl
+		from edu_sys_role a
+		JOIN edu_relas_func_role b on a.id=b.role_id
+		JOIN edu_sys_function c on c.id=b.func_id
+		where a.id=#id# order by c.sort
+  </select>
+
+ <!-- 角色名称列表 -->
+ <select id="selectRoleList" resultClass="project.system.pojo.SysRole">
+		select
+		r.id,role_name roleName,
+		r.role_type roleType,
+		r.status,
+		u.real_name createByName,
+		t.role_type_name roleTypeName,
+		u.user_province_name createUserProvince,
+		u.user_city_name createUserCity,
+		u.user_district_name createUserDistrict,
+		u.school_name createUserSchool
+		from edu_sys_role r
+		left join edu_user u
+		on r.create_by_id=u.id
+		left join edu_sys_role_type t 
+		on r.role_type=t.id 
+		where 1 = 1  
+		<isNotNull prepend="and" property="status">
+			r.status = #status#
+		</isNotNull>
+		<isNotNull prepend="and" property="provinceId">
+			( r.create_province_id = #provinceId# or r.isSysRole = 1)
+		</isNotNull>
+		<isNotNull prepend="and" property="cityId">
+			( r.create_city_id = #cityId# or r.isSysRole = 1)
+		</isNotNull>
+		<isNull prepend="and" property="cityId">
+			r.create_city_id is null
+		</isNull>
+		<isNotNull prepend="and" property="districtId">
+			( r.create_district_id = #districtId# or r.isSysRole = 1)
+		</isNotNull>
+		<isNull prepend="and" property="districtId">
+			r.create_district_id is null
+		</isNull>
+		
+		<isNotNull prepend="" property="schoolId">
+			( r.create_school_id = #schoolId# or r.isSysRole = 1)
+		</isNotNull>
+		<isNotEmpty prepend="and" property="roleTypeIds">
+			 r.role_type IN 
+			 <iterate property="roleTypeIds" open="(" close=")" conjunction=",">  
+                $roleTypeIds[]$   
+            </iterate> 
+		</isNotEmpty>
+		
+  </select>
+  
+   <!-- 角色类型列表 -->
+   <select id="roleTypeList" parameterClass="java.util.HashMap" resultClass="project.system.pojo.RoleType">
+		select
+		id,role_type as roleType, 
+		role_type_name as roleTypeName,status
+		from edu_sys_role_type r where 1=1
+		<isNotEmpty prepend="and" property="status">
+			r.status = #status#
+		</isNotEmpty>
+		<isNotEmpty prepend="and" property="isDisTeacher">
+			 r.id not in(5,6,20)
+		</isNotEmpty>
+     </select>
+  
+   <update id="updateRole" parameterClass="project.system.pojo.SysRole">
+		update edu_sys_role set status=#status#,update_by_id=#updateBy#
+		where id=#id#
+  </update>
+  
+  <update id="updateRoleInfo" parameterClass="project.system.pojo.SysRole">
+		update edu_sys_role set status=#status#,update_by_id=#updateBy#,
+		role_name=#roleName#,remark=#remark#
+		where id=#id#
+  </update>
+  
+  <delete id="delete_role_func" parameterClass="int">
+		delete from edu_relas_func_role
+		where role_id=#id#
+  </delete>
+  
+  <insert id="insert_role_func" parameterClass="project.system.pojo.SysRole">
+		insert into edu_relas_func_role(role_id,func_id)values(#roleId#,#funcId#)
+  </insert>
+    
+   <insert id="insert_sys_role" parameterClass="project.system.pojo.SysRole">
+  			insert into edu_sys_role( role_name,status,create_province_id,
+  					create_city_id, create_district_id, create_school_id,
+  					remark, create_by_id, create_date, update_by_id, update_date,
+  					role_type)
+  			values( #roleName#, #status#, #createProvinceId#,
+  			#createCityId#, #createDistrictId#, #createSchoolId#,
+  			#remark#, #createById#, #createDate#, #updateById#, #updateDate#,
+  			#roleType# )	
+  		<selectKey resultClass="Integer" keyProperty="id">
+			SELECT last_insert_id() as id ;    
+        </selectKey>				
+  </insert>
+</sqlMap>

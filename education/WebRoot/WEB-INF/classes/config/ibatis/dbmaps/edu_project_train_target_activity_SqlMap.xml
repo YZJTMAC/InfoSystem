@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_project" >
+  <resultMap id="abatorgenerated_EduProjectResult" class="project.edupm.projectmanage.pojo.EduProject" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="project_no" property="projectNo" jdbcType="VARCHAR" />
+    <result column="project_name" property="projectName" jdbcType="VARCHAR" />
+    <result column="year" property="year" jdbcType="INTEGER" />
+    <result column="start_date" property="startDate" jdbcType="DATE" />
+    <result column="end_date" property="endDate" jdbcType="DATE" />
+    <result column="project_scope_id" property="projectScopeId" jdbcType="INTEGER" />
+    <result column="project_scope_name" property="projectScopeName" jdbcType="VARCHAR" />
+    <result column="project_property_id" property="projectPropertyId" jdbcType="INTEGER" />
+    <result column="project_property_name" property="projectPropertyName" jdbcType="VARCHAR" />
+    <result column="train_scope_id" property="trainScopeId" jdbcType="INTEGER" />
+    <result column="train_scope_name" property="trainScopeName" jdbcType="VARCHAR" />
+    <result column="train_type_id" property="trainTypeId" jdbcType="INTEGER" />
+    <result column="train_type_name" property="trainTypeName" jdbcType="VARCHAR" />
+    
+    <!--
+    <result column="train_target_id" property="trainTargetId" jdbcType="INTEGER" />
+    -->
+    <result column="class_period" property="classPeriod" jdbcType="INTEGER" />
+    <result column="class_score" property="classScore" jdbcType="REAL" />
+    <result column="project_attchement" property="projectAttchement" jdbcType="VARCHAR" />
+    <result column="sign_up_way" property="signUpWay" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+    <result column="create_by" property="createBy" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="DATE" />
+    <result column="update_by" property="updateBy" jdbcType="VARCHAR" />
+    <result column="update_date" property="updateDate" jdbcType="DATE" />
+     <result column="memo" property="memo" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  
+  <select id="pro_selectByPrimaryKey" resultMap="abatorgenerated_EduProjectResult" parameterClass="project.edupm.projectmanage.pojo.EduProject" >
+    select id, project_no, project_name, year, start_date, end_date, project_scope_id,
+      project_scope_name, project_property_id, project_property_name, train_scope_id,
+      train_scope_name, train_type_id, train_type_name, class_period, class_score,
+      project_attchement, sign_up_way, status, create_by, create_date, update_by, update_date, memo
+    from edu_project
+    where id = #id:INTEGER#
+  </select>
+  
+  <insert id="pro_insert" parameterClass="project.edupm.projectmanage.pojo.EduProject" >
+    insert into edu_project (id, project_no, project_name, year, start_date, end_date,
+      project_scope_id, project_scope_name, project_property_id, project_property_name,
+      train_scope_id, train_scope_name, train_type_id, train_type_name,
+      class_period, class_score, project_attchement, sign_up_way, status, create_by, create_date,
+      update_by, update_date, memo)
+    values (#id:INTEGER#, #projectNo:VARCHAR#, #projectName:VARCHAR#, #year:INTEGER#,
+      #startDate#, #endDate#, #projectScopeId:INTEGER#, #projectScopeName:VARCHAR#,
+      #projectPropertyId:INTEGER#, #projectPropertyName:VARCHAR#, #trainScopeId:INTEGER#,
+      #trainScopeName:VARCHAR#, #trainTypeId:INTEGER#, #trainTypeName:VARCHAR#,
+       #classPeriod:INTEGER#, #classScore:REAL#,
+      #projectAttchement:VARCHAR#, #signUpWay:INTEGER#, #status:INTEGER#, #createBy:VARCHAR#,
+      #createDate:DATE#, #updateBy:VARCHAR#, #updateDate:DATE#, #memo:LONGVARCHAR#)
+      <selectKey resultClass="int" keyProperty="id">
+			SELECT LAST_INSERT_ID()
+		</selectKey>
+  </insert>
+  
+  <update id="pro_updateByPrimaryKey" parameterClass="project.edupm.projectmanage.pojo.EduProject" >
+    update edu_project
+    set project_no = #projectNo:VARCHAR#,
+      project_name = #projectName:VARCHAR#,
+      year = #year:INTEGER#,
+      start_date = #startDate:DATE#,
+      end_date = #endDate:DATE#,
+      project_scope_id = #projectScopeId:INTEGER#,
+      project_scope_name = #projectScopeName:VARCHAR#,
+      project_property_id = #projectPropertyId:INTEGER#,
+      project_property_name = #projectPropertyName:VARCHAR#,
+      train_scope_id = #trainScopeId:INTEGER#,
+      train_scope_name = #trainScopeName:VARCHAR#,
+      train_type_id = #trainTypeId:INTEGER#,
+      train_type_name = #trainTypeName:VARCHAR#,
+      class_period = #classPeriod:INTEGER#,
+      class_score = #classScore:REAL#,
+      project_attchement = #projectAttchement:VARCHAR#,
+      sign_up_way = #signUpWay:INTEGER#,
+      status = #status:INTEGER#,
+      create_by = #createBy:VARCHAR#,
+      create_date = #createDate:DATE#,
+      update_by = #updateBy:VARCHAR#,
+      update_date = #updateDate:DATE#,
+      memo = #memo:LONGVARCHAR#
+    where id = #id:INTEGER#
+  </update>
+  
+  
+  
+  <update id="pro_updateByPrimaryKeySelective" parameterClass="project.edupm.projectmanage.pojo.EduProject" >
+    update edu_project
+    <dynamic prepend="set" >
+      <isNotNull prepend="," property="projectNo" >
+        project_no = #projectNo:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="projectName" >
+        project_name = #projectName:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="year" >
+        year = #year:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="startDate" >
+        start_date = #startDate:DATE#
+      </isNotNull>
+      <isNotNull prepend="," property="endDate" >
+        end_date = #endDate:DATE#
+      </isNotNull>
+      <isNotNull prepend="," property="projectScopeId" >
+        project_scope_id = #projectScopeId:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="projectScopeName" >
+        project_scope_name = #projectScopeName:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="projectPropertyId" >
+        project_property_id = #projectPropertyId:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="projectPropertyName" >
+        project_property_name = #projectPropertyName:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="trainScopeId" >
+        train_scope_id = #trainScopeId:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="trainScopeName" >
+        train_scope_name = #trainScopeName:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="trainTypeId" >
+        train_type_id = #trainTypeId:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="trainTypeName" >
+        train_type_name = #trainTypeName:VARCHAR#
+      </isNotNull>
+      <!--
+      <isNotNull prepend="," property="trainTargetId" >
+        train_target_id = #trainTargetId:INTEGER#
+      </isNotNull>
+      -->
+      <isNotNull prepend="," property="classPeriod" >
+        class_period = #classPeriod:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="classScore" >
+        class_score = #classScore:REAL#
+      </isNotNull>
+      <isNotNull prepend="," property="projectAttchement" >
+        project_attchement = #projectAttchement:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="signUpWay" >
+        sign_up_way = #signUpWay:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="status" >
+        status = #status:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="createBy" >
+        create_by = #createBy:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="createDate" >
+        create_date = #createDate:DATE#
+      </isNotNull>
+      <isNotNull prepend="," property="updateBy" >
+        update_by = #updateBy:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="updateDate" >
+        update_date = #updateDate:DATE#
+      </isNotNull>
+      <isNotNull prepend="," property="memo" >
+        memo = #memo:LONGVARCHAR#
+      </isNotNull>
+    </dynamic>
+    where id = #id:INTEGER#
+  </update>
+  
+  
+</sqlMap>

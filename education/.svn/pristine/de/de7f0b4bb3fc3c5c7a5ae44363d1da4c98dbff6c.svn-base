@@ -1,0 +1,130 @@
+<%@ page pageEncoding="UTF-8"%>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>创建评选活动</title>
+		<%@include file="../common/commonHead.jsp"%>
+		<link />
+		<script language="javascript" type="text/javascript" src="<%=basePathHeader%>/javascript/My97DatePicker/WdatePicker.js"></script>
+		<script type="text/javascript" src="<%=basePathHeader%>/javascript/master/createComparison.js"></script>
+		<script type="text/javascript">
+			var id = '<%=request.getParameter("id")%>';
+		</script>
+	</head>
+
+	<body>
+		<!-- top -->
+		<div class="head">
+			<jsp:include page="../common/top.jsp">
+				<jsp:param value="project" name="flag" />
+			</jsp:include>
+		</div>
+		<!-- left -->
+		<div class="leftNav">
+			<%@include file="../common/projectLeft.jsp"%>
+		</div>
+
+		<div class="content">
+			<div class="place">
+				<span>位置：</span>
+				<ul class="placeul">
+					<li>
+						<a href="#">XXXX</a>
+					</li>
+					<li>
+						<a href="#">XXXX</a>
+					</li>
+					<li>
+						<a href="#">XXXX</a>
+					</li>
+				</ul>
+			</div>
+
+			<div class="formbody">
+				<ul class="seachform">
+					<li>
+						<label>
+							<font style="color: red">*</font>评选活动名称：
+						</label>
+						<input name="" type="text" class="scinput" style="width: 550px;" id="comparisonName" />
+						<a id="comparisonNameErr" style="color: red"></a>
+					</li>
+				</ul>
+				<ul class="seachform">
+					<li>
+						<label>
+							<font style="color: red">*</font>计划开始日期：
+						</label>
+						<input type="text" name="startDate" id="startDate"
+							class="Wdate scinput"
+							style="height: 32px; line-height: 32px; border-color: #a7b5bc #ced9df #ced9df #a7b5bc;"
+							onClick="WdatePicker()">
+							<a id="startDateError" style="color: red"></a>
+					</li>
+					<li>
+						<label>
+							<font style="color: red">*</font>计划结束日期：
+						</label>
+						<input type="text" name="endDate" id="endDate"
+							class="Wdate scinput"
+							style="height: 32px; line-height: 32px; border-color: #a7b5bc #ced9df #ced9df #a7b5bc;"
+							onclick="WdatePicker()" />
+						<a id="endDateError" style="color: red"></a>
+					</li>
+				</ul>
+				<ul class="seachform">
+					<li>
+						<label>
+							<font style="color: red">*</font>评选活动类型：
+						</label>
+						<div class="vocation">
+	            			<select  class="select2"  id = "comparisonType"  name="comparisonType" ></select>
+	          			</div>
+	          			<a id="comparisonTypeErr" style="color: red"></a>
+					</li>
+					<li>
+						<label>
+							<font style="color: red">*</font>计划评选人数：
+						</label>
+						<div class="vocation">
+	            			<input name="" type="text" class="scinput" id="comparisonNum" />
+	          			</div>
+	          			<a id="comparisonNumErr" style="color: red"></a>
+					</li>
+				</ul>
+				<ul class="seachform" style="padding-bottom: 10px; height: 100%">
+					<li>
+						<label>
+							备注：
+						</label>
+						<textarea name="" cols="" rows=""
+							style="width: 550px; border: #eee 1px solid; height: 100px; border-color: #a7b5bc #ced9df #ced9df #a7b5bc; -moz-border-radius: 5px; -webkit-border-radius: 5px; border-radius: 5px; margin-left: 50px;"
+							id="memo"></textarea>
+					</li>
+				</ul>
+				<table border="0" cellspacing="0" cellpadding="0"
+					style="margin: 0 auto;" >
+					<tr>
+						<td>
+							<a href="#" class="dian3" onclick="saveInfo()" id="save">保 存</a>
+						</td>
+						<td>
+							<a href="#" class="dian3" onclick="updateInfo()" id="update" style="display: none">修 改</a>
+						</td>
+						<td style="width: 30px;">
+							&nbsp;
+						</td>
+						<td>
+							<a href="#" class="dian3"
+								onclick="javascript:window.history.back();">取 消</a>
+						</td>
+					</tr>
+				</table>
+
+			</div>
+		</div>
+	</body>
+</html>
+

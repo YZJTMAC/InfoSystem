@@ -1,0 +1,262 @@
+$(function(){
+	queryTeacher();
+	lastForSure();
+})
+
+/**
+ * 评选活动教师报名
+ */
+function queryTeacher(){
+	$("#proList1").html("");
+	var teacherName=$("#teacherName").val();
+	var startIndex = $("#pageIndex").val();
+	var pageSize = $("#sizePerPage").val();
+	var url = pathHeader + "/master/queryComparisonTeacher.do";
+	$.ajax({
+		url:url,
+		data:{
+		comparisonId:comparisonId,
+		teacherName:teacherName,
+		startIndex:startIndex,
+		pageSize:pageSize,
+		areaType:$("#areaType").val(),
+		areaId:$("#areaId").val()
+		},
+		type:"post",
+		async:true,
+		success:function(data){
+			if(data.success){
+				var rows = data.rows;
+				var gridHtml = "";
+				if(rows.length > 0){
+					$.each(rows,function(index,element){
+						gridHtml += getTdHtml(element);
+					});
+					$("#proList1").html(gridHtml);
+					pagination(data, function(){queryTeacher();});
+					$("#proList1").html(gridHtml);
+				}else{
+					$('#proList1').html("<tr><td colspan='14'>无查询记录</td></tr>");
+					pagination(data, function(){queryTeacher();});
+				}
+				
+			}
+			
+		},
+		error:function(){
+			
+		}
+	});
+}
+
+function getTdHtml(obj){
+	var gridHtml = "<tr>";
+	gridHtml += "<td><input name='tid' type='checkbox' value='"+obj.id+"'></td>";
+	gridHtml += "<td>"+obj.teacherName+"</td>";
+	gridHtml += "<td>"+obj.idNumber+"</td>";
+	gridHtml += "<td>"+obj.teacherSubject+"</td>";
+	gridHtml += "<td>"+obj.provinceName+"</td>";
+	gridHtml += "<td>"+obj.cityName+"</td>";
+	gridHtml += "<td>"+obj.districtName+"</td>";
+	gridHtml += "<td>"+obj.schoolName+"</td>";
+	gridHtml += "<td>"+(obj.status==0?'未报名':obj.status ==1?'审核通过':obj.status==2?'审核未通过':'等待审核')+"</td>";
+	gridHtml += "<td>"+optionFormatter(obj)+"</td>";
+	gridHtml +="</tr>";
+	return gridHtml;
+	
+	function optionFormatter(row){
+		var status = row.status;
+		var returnStr = "";
+		if(status==0){//未报名
+			returnStr += "<a  class='tablelink' onclick='signUp("+comparisonId+","+row.id+");'>报  名</a>&nbsp;&nbsp;";
+		}else if(status == 2){//审核未通过
+			returnStr += "<a  class='tablelink' onclick='resignUp("+comparisonId+","+row.id+");'>重新报名</a>&nbsp;&nbsp;";
+			returnStr += "<a  class='tablelink' onclick='deleteTeacher("+comparisonId+","+row.id+");'>取消报名</a>&nbsp;&nbsp;";
+		}else if(status == 3){//已报名未审核
+			returnStr += "<a  class='tablelink' onclick='deleteTeacher("+comparisonId+","+row.id+");'>取消报名</a>&nbsp;&nbsp;";
+		}else {
+			
+		}
+		
+		return returnStr;
+	}
+}
+
+/**
+ * 取消报名
+ */
+function deleteTeacher(comparisonId, teacherId){
+	var url = pathHeader + "/master/canelSignUpComparisonTeacher.do";
+	$.ajax({
+		url:url,
+		data:{
+		comparisonId:comparisonId,
+		teacherId:teacherId
+		},
+		type:"post",
+		async:true,
+		success:function(data){
+			if(data.success){
+				queryTeacher();
+			}
+			jQuery.generalAlert(data.message);
+		},
+		error:function(){
+		}
+	});
+}
+/**
+ * 报名
+ */
+function signUp(comparisonId, teacherId){
+	var url = pathHeader + "/master/signUpComparisonTeacher.do";
+	$.ajax({
+		url:url,
+		data:{
+		comparisonId:comparisonId,
+		teacherId:teacherId
+		},
+		type:"post",
+		async:true,
+		success:function(data){
+			if(data.success){
+				queryTeacher();
+			}
+			jQuery.generalAlert(data.message);
+		},
+		error:function(){
+		}
+	});
+}
+
+/**
+ * 重新报名
+ */
+function resignUp(comparisonId, teacherId){
+	var url = pathHeader + "/master/resignUpComparisonTeacher.do";
+	$.ajax({
+		url:url,
+		data:{
+		comparisonId:comparisonId,
+		teacherId:teacherId
+		},
+		type:"post",
+		async:true,
+		success:function(data){
+			if(data.success){
+				queryTeacher();
+			}
+			jQuery.generalAlert(data.message);
+		},
+		error:function(){
+		}
+	});
+}
+
+/**
+ * 批量报名
+ */
+function bathSignUp(){
+	var teacherId = [];
+	$("input[name='tid']:checked").each(function(){		
+		teacherId.push($(this).val());
+	});
+	if(teacherId.length ==0){
+		jQuery.generalAlert("请选择要报名的教师！");
+		return;
+	}
+	var url = pathHeader + "/master/signupComparisonBatch.do";
+	$.ajax({
+		url:url,
+		data:{
+			teacherIds:teacherId.toString(),
+			comparisonId:comparisonId
+		},
+		type:"post",
+		async:true,
+		success:function(data){
+			//如果有不符合条件的教师，查询出来
+			if(data.success){
+				queryTeacher();
+				$("input[name='tids']").attr("checked",false);
+			}
+			jQuery.generalAlert(data.message);
+		},
+		error:function(){
+			jQuery.generalAlert("报名失败！");
+		}
+		
+	});
+}
+
+/**
+ * 批量取消报名
+ */
+function bathCanelSignUp(){
+	var teacherId = [];
+	$("input[name='tid']:checked").each(function(){		
+		teacherId.push($(this).val());
+	});
+	if(teacherId.length ==0){
+		jQuery.generalAlert("请选择要取消报名的教师！");
+		return;
+	}
+	var url = pathHeader + "/master/canelSignupComparisonBatch.do";
+	$.ajax({
+		url:url,
+		data:{
+			teacherIds:teacherId.toString(),
+			comparisonId:comparisonId
+		},
+		type:"post",
+		async:true,
+		success:function(data){
+			if(data.success){
+				queryTeacher();
+				$("input[name='tids']").attr("checked",false);
+			}
+			jQuery.generalAlert(data.message);
+		},
+		error:function(){
+			jQuery.generalAlert("取消报名失败！");
+		}
+		
+	});
+}
+
+//批量选中
+$(function(){
+	$("input[name='tids']").click(function(){
+		if($(this).attr("checked") == "checked"){
+			$("input[name='tid']").attr("checked",true);
+		}else{
+			$("input[name='tid']").attr("checked",false);
+		}
+		
+	});
+})
+
+
+/**
+ * 查询项目
+ */
+function qryPro(){
+	queryTeacher();
+}
+/**
+* 选择地区，确认
+*/
+function lastForSure(){
+	if(lastSelect != null && lastSelect.length > 0) {
+		var conditionArray = lastSelect.split("_");
+		var belone = conditionArray[0];
+		var areaA = conditionArray[1];
+		var text = conditionArray[2];
+		$('#areaName').val(text);
+		$('#areaType').val(areaA);
+		$('#areaId').val(belone);
+	}
+	//清空
+	clear();
+	$(".tip11").fadeOut(200);
+}

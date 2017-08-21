@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE sqlMap PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN" "http://ibatis.apache.org/dtd/sql-map-2.dtd" >
+<sqlMap namespace="edu_project_process" >
+  <resultMap id="process_EduProjectProcessResult" class="project.edupm.projectmanage.pojo.EduProjectProcess" >
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="project_id" property="projectId" jdbcType="INTEGER" />
+    <result column="project_name" property="projectName" jdbcType="VARCHAR" />
+    <result column="title" property="title" jdbcType="VARCHAR" />
+    <result column="content" property="content" jdbcType="LONGVARCHAR" />
+    <result column="attchement_title" property="attchementTitle" jdbcType="VARCHAR" />
+    <result column="attchement_url" property="attchementUrl" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="creator" property="creator" jdbcType="INTEGER" />
+  </resultMap>
+    <select id="process_selectByPrimaryKey" resultMap="process_EduProjectProcessResult" parameterClass="java.lang.Integer" >
+    select * from edu_project_process where id = #id:INTEGER#
+  </select>
+   <insert id="process_insert" parameterClass="project.edupm.projectmanage.pojo.EduProjectProcess" >
+    insert into edu_project_process (project_id,project_name, title, attchement_title, attchement_url,
+      create_date, creator, content)
+    values (#projectId:INTEGER#, #projectName:VARCHAR#,#title:VARCHAR#,
+      #attchementTitle:VARCHAR#, #attchementUrl:VARCHAR#, #createDate:TIMESTAMP#,
+      #creator#, #content:LONGVARCHAR#)
+  </insert>
+  
+  <update id="process_updateByPrimaryKeySelective" parameterClass="project.edupm.projectmanage.pojo.EduProjectProcess" >
+    update edu_project_process
+    <dynamic prepend="set" >
+      <isNotNull prepend="," property="projectId" >
+        project_id = #projectId:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="projectName" >
+        project_name = #projectName:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="title" >
+        title = #title:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="attchementTitle" >
+        attchement_title = #attchementTitle:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="attchementUrl" >
+        attchement_url = #attchementUrl:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="," property="createDate" >
+        create_date = #createDate:TIMESTAMP#
+      </isNotNull>
+      <isNotNull prepend="," property="creator" >
+        creator = #creator:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="," property="content" >
+        content = #content:LONGVARCHAR#
+      </isNotNull>
+    </dynamic>
+    where id = #id:INTEGER#
+  </update>
+  
+    <select id="process_selectByClause" resultMap="process_EduProjectProcessResult" parameterClass="project.edupm.projectmanage.pojo.EduProjectProcess" >
+    select * from edu_project_process where 1=1 
+      <isNotNull prepend="and" property="projectId" >
+        project_id = #projectId:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="and" property="title" >
+        title = #title:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="and" property="attchementTitle" >
+        attchement_title = #attchementTitle:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="and" property="attchementUrl" >
+        attchement_url = #attchementUrl:VARCHAR#
+      </isNotNull>
+      <isNotNull prepend="and" property="createDate" >
+        create_date = #createDate:TIMESTAMP#
+      </isNotNull>
+      <isNotNull prepend="and" property="creator" >
+        creator = #creator:INTEGER#
+      </isNotNull>
+      <isNotNull prepend="and" property="content" >
+        content = #content:LONGVARCHAR#
+      </isNotNull>
+      <isNotNull prepend="and" property="id" >
+        id = #id:INTEGER#
+      </isNotNull>
+  </select>
+
+</sqlMap>

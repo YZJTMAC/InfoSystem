@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd"
+       default-autowire="byName">
+	<!--根据模块间的关联关系，顺序需作调整，被引用的模块放在前面
+	-->
+       
+   
+   <!-- add by dengguo : 个人中心 开始  -->
+   <bean id="userWriteDao" class="project.person.dao.impl.UserWriteDAOImpl" parent="parentDao"/>
+   
+   <!-- add by chenlei : 用户信息  -->
+   <bean id="userReadDao" class="project.person.dao.impl.UserReadDAOImpl" parent="parentQueryDao"/>
+   <bean id="userService" class="project.person.service.impl.UserServiceImpl" />
+   
+    <!-- 继教信息  -->
+   <bean id="eduTagetReadDao" class="project.furtheredu.eduTarget.dao.impl.EduTagetReadDaoImpl" parent="parentQueryDao"/>
+   <bean id="eduTagetWriteDao" class="project.furtheredu.eduTarget.dao.impl.EduTagetWriteDaoImpl" parent="parentDao"/>
+   <bean id="eduTargetService" class="project.furtheredu.eduTarget.service.impl.EduTargetServiceImpl" />
+   
+   <bean id="eduManageReadDao" class="project.furtheredu.edumanage.dao.impl.EduManageReadDaoImpl" parent="parentQueryDao"/>
+   <bean id="eduManageWriteDao" class="project.furtheredu.edumanage.dao.impl.EduManageWriteDaoImpl" parent="parentDao"/>
+   <bean id="eduManageService" class="project.furtheredu.edumanage.service.impl.EduManageServiceImpl" />
+   
+   
+   <bean id="eduStatisticModelReadDao" class="project.furtheredu.edumanage.dao.impl.EduStatisticModelReadDaoImpl" parent="parentQueryDao"/>
+   <bean id="eduStatisticModelWriteDao" class="project.furtheredu.edumanage.dao.impl.EduStatisticModelWriteDaoImpl" parent="parentDao"/>
+   <bean id="eduStatisticModelService" class="project.furtheredu.edumanage.service.impl.EduStaticModelServieImpl" />
+   
+   
+  	<bean id="eduStatisticYearReadDao" class="project.furtheredu.edumanage.dao.impl.EduStatisticYearReadDaoImpl" parent="parentQueryDao"/>
+   	<bean id="eduStatisticYearWriteDao" class="project.furtheredu.edumanage.dao.impl.EduStatisticYearWriteDaoImpl" parent="parentDao"/>
+   	<bean id="eduStatisticYearService" class="project.furtheredu.edumanage.service.impl.EduStaticYearServieImpl" />
+   
+    <!-- add by yinxiaolong : 字典表  -->
+   <bean id="dictionaryReadDao" class="project.dictionary.dao.impl.DictionaryReadDaoImpl" parent="parentQueryDao"/>
+   <bean id="dictionaryWriteDao" class="project.dictionary.dao.impl.DictionaryWriteDaoImpl" parent="parentDao"/>
+   <bean id="dictionaryService" class="project.dictionary.service.impl.DictionaryServiceImpl"/>
+   
+   <!-- add by dengguo : 教师信息  -->
+   <bean id="teacherWriteDao" class="project.teacher.teachermanage.dao.impl.TeacherWriteDaoImpl" parent="parentDao"/>
+   <bean id="teacherReadDao" class="project.teacher.teachermanage.dao.impl.TeacherReadDaoImpl" parent="parentQueryDao"/>
+   <bean id="teacherManageService" class="project.teacher.teachermanage.service.impl.TeacherManageServiceImpl"/>
+   <!-- add by dengguo 结束 -->
+   
+   <!-- add by yinxiaolong:消息 -->
+   <bean id="messageWriteDao" class="project.message.dao.impl.MessageWriteDaoImpl" parent="parentDao"/>
+   <bean id="messageReadDao" class="project.message.dao.impl.MessageReadDaoImpl" parent="parentQueryDao"/>
+   <bean id="messageService" class="project.message.service.impl.MessageServiceImpl"/>
+   
+    <!-- add by zhangBo -->
+   <!-- 项目模块 -->
+	<bean id="eduProjectReadDAO" class="project.edupm.projectmanage.dao.impl.EduProjectReadDAOImpl" parent="parentQueryDao"/>
+   <bean id="eduProjectWriteDAO" class="project.edupm.projectmanage.dao.impl.EduProjectWriteDAOImpl" parent="parentDao"/>
+   <bean id="eduProjectService" class="project.edupm.projectmanage.service.impl.EduProjectServiceImpl"/>
+   
+   
+   <bean id="eduProjectCommentReadDAO"  class="project.edupm.projectmanage.dao.impl.EduProjectCommentReadDAOImpl" parent="parentQueryDao" />
+   <bean id="eduProjectCommentWriteDAO" class="project.edupm.projectmanage.dao.impl.EduProjectCommentWriteDAOImpl" parent="parentDao"/>
+   <bean id="eduProjectCommentService"  class="project.edupm.projectmanage.service.impl.EduprojectCommentServiceImpl"/>
+   
+   
+   <bean id="projectOrgDao" class="project.edupm.projectmanage.dao.impl.IEduProjectOrgReadDAOImpl" parent="parentQueryDao"/>
+   <bean id="eduProjectOrgService" class="project.edupm.projectmanage.service.impl.IEduProjectOrgServiceImpl"/>
+   
+   
+   <bean id="summaryReadDAO" class="project.edupm.projectmanage.dao.impl.ISummaryReadDAOImpl" parent="parentQueryDao"/>
+   <bean id="summaryWriteDAO" class="project.edupm.projectmanage.dao.impl.ISummaryWriteDAOImpl" parent="parentDao"/>
+   
+   <bean id="summaryService" class="project.edupm.projectmanage.service.impl.ISummaryServiceImpl"/>
+  
+   <!-- 项目课程模块 -->
+   <bean id="eduProjectClassReadDAO" class="project.edupm.projectclass.dao.impl.ProjectClassReadDAOImpl" parent="parentQueryDao"/>
+   <bean id="eduProjectClassWriteDAO" class="project.edupm.projectclass.dao.impl.ProjectClassRWriteDAOImpl" parent="parentDao"/>
+   <bean id="eduProjectClassService" class="project.edupm.projectclass.service.impl.ProjectClassServiceImpl"/>
+   
+  <!-- 系统模块 -->
+    <bean id="sysReadDAO" class="project.system.dao.impl.SysReadDAOImpl" parent="parentQueryDao"/>
+   <bean id="sysWriteDAO" class="project.system.dao.impl.SysWriteDAOImpl" parent="parentDao"/>
+   <bean id="sysService" class="project.system.service.impl.SysServiceImpl"/>
+    <bean id="schoolService" class="project.system.service.impl.SysSchoolServiceImpl"/>
+   
+   <!-- add end -->
+   
+	<!-- yinxiaolong  教师端培训的项目-->
+   <bean id="teacherProjectService" class="project.teacher.teacherProject.service.impl.TeacherProjectServiceImpl"/>
+	<bean id="teacherProjectReadDao" class="project.teacher.teacherProject.dao.impl.TeacherProjectReadDaoImpl" parent="parentQueryDao"/>
+   <bean id="teacherProjectWriteDao" class="project.teacher.teacherProject.dao.impl.TeacherProjectWriteDaoImpl" parent="parentDao"/>
+
+	<!-- 机构 -->
+	<bean id="organizationReadDAO" class="project.organization.dao.impl.OrganizationReadDAOImpl" parent="parentQueryDao" />
+	<bean id="organizationWriteDAO" class="project.organization.dao.impl.OrganizationWriteDAOImpl"	parent="parentDao" />
+	<bean id="organizationService" class="project.organization.service.impl.OrganizationServiceImpl" />
+
+	<!-- 教师管理 -->
+	<bean id="eduTeacherReadDAO" class="project.edupm.teachermanage.dao.impl.EduTeacherReadDAO" parent="parentQueryDao" />
+	<bean id="eduTeacherWriteDAO" class="project.edupm.teachermanage.dao.impl.EduTacherWriteDAO" parent="parentDao" />
+	<bean id="eduTeacherService" class="project.edupm.teachermanage.service.impl.EduTeacherServiceImpl" />
+	
+	<!-- 用户用邮箱找回密码 -->
+	<bean id="userForgotpasswordWriteDao" class="project.person.dao.impl.UserForgotpasswordWriteDAOImpl" parent="parentDao"/>
+   <bean id="userForgotpasswordReadDao" class="project.person.dao.impl.UserForgotpasswordReadDAOImpl" parent="parentQueryDao"/>
+   <bean id="userForgotpasswordService" class="project.person.service.impl.UserForgotpasswordServiceImpl" />
+   
+	<!--    统计 -->
+    <bean id="statsService" class="project.stats.service.impl.StatsServiceImpl" />
+   
+  	<!-- 文件上传liuyiyou -->
+   	<bean id="fileUploadReadDao" class="project.fileupload.dao.FileUploadReadDaoImpl" parent="parentQueryDao"/>
+   	<bean id="fileUploadWriteDao" class="project.fileupload.dao.FileUploadWriteDaoImpl" parent="parentDao"/>
+	<bean id="fileUploadService" class="project.fileupload.service.FileUploadServiceImpl" />
+	
+	<!-- 通知 liuyiyou -->
+	<bean id="noticeReadDao" class="project.message.dao.impl.NoticeReadDaoImpl" parent="parentQueryDao"></bean>
+	<bean id="noticeWriteDao" class="project.message.dao.impl.NoticeWriteDaoImpl" parent="parentDao"></bean>
+	<bean id="noticeService" class="project.message.service.impl.NoticeServiceImpl" ></bean>
+	
+	<!-- 专家、评选模块 -->
+	<bean id="eduMasterReadDAO" class="project.master.dao.impl.EduMasterReadDaoImpl" parent="parentQueryDao"/>
+    <bean id="eduMasterWriteDAO" class="project.master.dao.impl.EduMasterWriteDaoImpl" parent="parentDao"/>
+    <bean id="eduMasterService" class="project.master.service.impl.EduMasterServiceImpl"/>
+
+	<!-- 审核模块 by TMACJ -->
+	<bean id="reviewReadDao" class="project.review.dao.impl.ReviewReadDaoImpl" parent="parentQueryDao"/>
+    <bean id="reviewWriteDao" class="project.review.dao.impl.ReviewWriteDaoImpl" parent="parentDao"/>
+    <bean id="reviewService" class="project.review.service.impl.ReviewServiceImpl"/>
+   
+   <!-- 测试模块 -->
+   <bean id="testDao" class="project.test.dao.TestDaoImpl" parent="parentDao"/>
+    <bean id="testService" class="project.test.service.TestServiceImpl"/>
+   
+	<bean id="multipartResolver" class="project.common.KindEditorMultipartResolver">  
+		<property name="excludeUrls" value="kindEditorUpload.do"/>  
+		<!-- url中带有example的http请求就不会被multipartResolver先解析-->  
+	</bean>  
+	
+	<!-- 注入SpringFactory类 -->
+    <bean id="springfactory"  class="project.common.SpringFactory">
+    </bean>
+</beans>
